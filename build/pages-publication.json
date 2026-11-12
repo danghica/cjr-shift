@@ -20,5 +20,9 @@
     "source/proof build tooling"
   ],
   "verifyLogPreserved": true,
-  "verifyLogSha256": "d4851f333f13b2bdcb867508222411324cc2380d57fec798acb526b90ed2b4c4"
+  "verifyLogSha256": "d4851f333f13b2bdcb867508222411324cc2380d57fec798acb526b90ed2b4c4",
+  "verifiedAt": "2026-11-12T15:25:41.353372+00:00",
+  "workflowRun": "https://github.com/danghica/cjr-shift/actions/runs/43247457027",
+  "deploymentStatus": "success",
+  "livePathsChecked": 12
 }
