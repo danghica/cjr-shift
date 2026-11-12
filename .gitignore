@@ -42,3 +42,6 @@ example/authenticator/build/frontend/
 /work/code/test/working-time-tests
 /work/code/test/benchmark
 /work/code/test/working-time-benchmark
+
+# Local Railway account/project linkage (deployment configuration is railway.json).
+/.railway/

@@ -94,7 +94,7 @@ class ComplianceTests(unittest.TestCase):
         after = proposed['stateEncoding']
         new = copy.deepcopy(old);new['revision'] += 1
         a,b = proposed['state']['shifts'][0]
-        new['spans']=[dict(start=a,end=b,kind='work',timeZone='Europe/London',pieces=[[a,b]])]
+        new['spans']=[dict(start=a,end=b,kind='work',timeZone='Europe/London',pieces=[[a,b]],overtime=True)]
         tx=dict(before=before,after=after,metadataBefore=old,metadataAfter=new)
         journal=self.app.metadata_repository.journal
         journal.write_text(json.dumps(tx))
@@ -156,12 +156,12 @@ class ComplianceTests(unittest.TestCase):
         report=self.app.compliance()['report']
         self.assertEqual(report['range'],dict(start=instant(ordinal('2026-01-05T09:00'),'Europe/London'),end=instant(ordinal('2026-01-05T10:00'),'Europe/London')))
 
-    def test_daily_and_hazardous_violations_and_normal_hours_unknown(self):
+    def test_daily_and_hazardous_violations_with_known_normal_hours(self):
         self.profile(night=True,hazard=True)
         self.app.change('missed-shift','2026-01-05T23:00','2026-01-06T09:00',attendance=False)
         report=self.app.compliance()['report']
         self.assertEqual(report['validatorCode'],106)
-        self.assertTrue(any(f['rule']==105 and f['code']==21 and 'Normal working hours' in f['explanation'] for f in report['findings']))
+        self.assertFalse(any(f['rule']==105 and f['code']==21 for f in report['findings']), report)
         self.assertTrue(all(f['legislation']['url'].startswith('https://www.legislation.gov.uk/') for f in report['findings']))
         self.app.change('reset')
         self.app.change('missed-shift','2026-01-05T00:00','2026-01-06T02:00',attendance=False)
@@ -172,6 +172,61 @@ class ComplianceTests(unittest.TestCase):
         self.app.change('missed-shift','2026-01-05T23:00','2026-01-06T09:00',attendance=False)
         report=self.app.compliance()['report']
         self.assertFalse(any(f['rule'] in (105,106) for f in report['findings']))
+
+    def test_complete_records_treat_gaps_before_first_shift_as_no_work(self):
+        self.profile(night=False,hazard=False)
+        self.app.change('missed-shift','2026-11-12T09:00','2026-11-12T10:00',attendance=False)
+        report=self.app.compliance()['report']
+        self.assertEqual(report['validatorCode'],0,report)
+        self.assertFalse(any('Missing history' in f['explanation'] for f in report['findings']))
+        self.assertTrue(any('Gaps are treated as no work' in note for note in report['notes']))
+        self.app.change('missed-shift','2026-11-11T09:00','2026-11-11T10:00',attendance=True)
+        report=self.app.compliance()['report']
+        self.assertEqual(report['status'],'incomplete',report)
+        self.assertTrue(any('attendance or unclassified' in f['explanation'] for f in report['findings']))
+
+    def test_overtime_defaults_running_changes_restart_and_midnight(self):
+        self.app.change('start','2026-01-05T23:00',attendance=False)
+        result=self.app.state();start=result['state']['pending']
+        self.assertFalse(result['pendingOvertime'])
+        self.app.attendance(start,False,'Europe/London',True)
+        restarted=TrackerAdapter(self.path)
+        self.assertTrue(restarted.state()['pendingOvertime'])
+        self.assertEqual(restarted.state()['state']['pending'],start)
+        # Older stop requests preserve the saved choice.
+        result=restarted.change('stop','2026-01-06T01:00',attendance=False)
+        self.assertEqual(len(result['overtime']),2)
+        self.assertTrue(all(result['overtime'].values()))
+        result=restarted.change('missed-shift','2026-01-04T09:00','2026-01-04T10:00',attendance=False)
+        self.assertEqual(list(result['overtime'].values()).count(False),1)
+        result=restarted.change('start','2026-01-07T09:00',attendance=False,overtime=True)
+        start=result['state']['pending']
+        with patch.object(restarted.metadata_repository,'save',side_effect=OSError('disk failure')):
+            with self.assertRaises(OSError):restarted.attendance(start,False,'Europe/London',False)
+        self.assertTrue(TrackerAdapter(self.path).state()['pendingOvertime'])
+        with self.assertRaises(ValueError):restarted.change('stop','2026-01-07T10:00',overtime='yes')
+
+    def test_regular_overtime_included_in_normal_hours_and_old_metadata_defaults(self):
+        self.profile(night=True,hazard=False)
+        self.app.change('missed-shift','2026-01-05T23:00','2026-01-06T07:00',attendance=False,overtime=True)
+        report=self.app.compliance()['report']
+        self.assertEqual(report['validatorCode'],0,report)
+        meta=self.app.metadata_repository.load()
+        del meta['spans'][0]['overtime']
+        self.app.metadata_repository.save(meta)
+        self.assertFalse(any(TrackerAdapter(self.path).state()['overtime'].values()))
+        self.assertEqual(TrackerAdapter(self.path).compliance()['report']['validatorCode'],0)
+
+    def test_regular_overtime_cannot_hide_night_average_or_weekly_violation(self):
+        start,end=self.long_history()
+        meta=self.app.metadata_repository.load()
+        for row in meta['spans']:row['overtime']=True
+        meta['settings'].update(nightWorker=True,hazardousNightWork=False)
+        self.app.metadata_repository.save(meta)
+        report=self.app.compliance(start,end)['report']
+        self.assertTrue(any(f['code']==101 for f in report['findings']),report)
+        self.assertTrue(any(f['code']==105 for f in report['findings']),report)
+        self.assertTrue(all(self.app.state()['overtime'].values()))
 
     def long_history(self):
         spans=[];encoding='-|';day=datetime(2026,1,5)

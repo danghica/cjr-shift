@@ -44,6 +44,9 @@ function navigate(target) {
   $('report-page').hidden = page !== 'report';
   if (page === 'settings') fillSettings();
   $('menu-button').hidden = page !== 'home';
+  for (const [target, id] of Object.entries({shifts:'back-button', missed:'missed-back', compliance:'compliance-back', settings:'settings-back', report:'report-back'})) {
+    $(id).hidden = page !== target;
+  }
   if (page === 'shifts') renderShifts();
   const title = $({home: 'home-title', shifts: 'shifts-title', missed: 'missed-title', compliance:'compliance-title', settings:'settings-title', report:'report-title'}[page]);
   title.tabIndex = -1;
@@ -56,14 +59,15 @@ async function request(path, data) {
       method: 'POST', headers: {'Content-Type': 'application/json', 'X-Tracker-UI': '1'}, body: JSON.stringify(data)
     });
   } catch {
-    throw new Error('Could not reach the local tracker server. Make sure it is running. Check your saved shifts before submitting again.');
+    throw new Error('Could not reach the tracker server. Make sure it is running. Check your saved shifts before submitting again.');
   }
   let result;
   try { result = await response.json(); } catch { result = {}; }
   if (!result || typeof result !== 'object' || Array.isArray(result)) result = {};
   if (result.settings) metadata = {settings:result.settings, revision:result.metadataRevision,
-    pendingKind:result.pendingKind, classifications:result.classifications};
+    pendingKind:result.pendingKind, classifications:result.classifications, pendingOvertime:result.pendingOvertime, overtime:result.overtime};
   if (result.state) {
+    $('demo-notice').hidden = !result.demo;
     state = result.state;
     available = true;
     render();
@@ -103,7 +107,7 @@ async function change(action, payload) {
   showError('');
   setBusy(true);
   try {
-    const data = payload ?? (action === 'reset' ? {confirmed: true} : {timestamp: localTimestamp(), attendance:$('attendance-time').checked, timeZone:timeZone()});
+    const data = payload ?? (action === 'reset' ? {confirmed: true} : {timestamp: localTimestamp(), attendance:$('attendance-time').checked, overtime:$('overtime').checked, timeZone:timeZone()});
     await request(action, data);
     savedMessage = action === 'reset' ? 'A fresh start. All changes saved.' : 'All changes saved';
     if (action === 'missed-shift') {
@@ -150,8 +154,10 @@ function render() {
   const running = state.pending !== null;
   if (running) $('attendance-time').checked = metadata.pendingKind === 'attendance';
   else if (previousPending !== undefined && previousPending !== null) $('attendance-time').checked = false;
+  if (running) $('overtime').checked = metadata.pendingOvertime === true;
+  else if (previousPending !== undefined && previousPending !== null) $('overtime').checked = false;
   previousPending = state.pending;
-  $('attendance-note').textContent = running && metadata.pendingKind === null ? 'Unclassified so far. Choose a type before stopping.' : 'Unchecked records actual working time.';
+  $('attendance-note').textContent = running && metadata.pendingKind === null ? 'Unclassified so far. Choose a type before stopping.' : 'Unchecked records actual working time. Overtime means regular overtime.';
   if (page === 'report' && lastReport && lastReport.revision !== metadata.revision && !$('report-stale')) {
     const note = element('p', 'report-stale', 'Your records or settings changed. Run the check again for an up-to-date report.');
     note.id = 'report-stale'; $('report-body').prepend(note);
@@ -194,7 +200,7 @@ function renderShifts() {
       const times = element('div', 'shift-row-time');
       times.append(document.createTextNode(timeLabel(start)), element('span', '', '→'), document.createTextNode(timeLabel(end)));
       const kind = metadata.classifications?.[String(start)];
-      detail.append(times, element('div', 'shift-row-date', (dateKey(start) !== dateKey(end) ? 'Completed at midnight' : 'Completed shift') + ' · ' + (kind === 'work' ? 'actual work' : kind === 'attendance' ? 'attendance' : 'unclassified')));
+      detail.append(times, element('div', 'shift-row-date', (dateKey(start) !== dateKey(end) ? 'Completed at midnight' : 'Completed shift') + ' · ' + (kind === 'work' ? 'actual work' : kind === 'attendance' ? 'attendance' : 'unclassified') + (metadata.overtime?.[String(start)] ? ' · overtime' : '')));
       row.append(element('span', 'shift-row-icon', '↗'), detail, element('span', 'shift-duration', duration(end - start)));
       section.append(row);
     }
@@ -314,7 +320,7 @@ $('missed-menu').addEventListener('click', () => { navigate('missed'); });
 $('missed-back').addEventListener('click', () => navigate('home'));
 $('missed-form').addEventListener('submit', event => {
   event.preventDefault();
-  if ($('missed-form').reportValidity()) change('missed-shift', {start: $('missed-start').value, end: $('missed-end').value, attendance:$('missed-attendance').checked, timeZone:timeZone()});
+  if ($('missed-form').reportValidity()) change('missed-shift', {start: $('missed-start').value, end: $('missed-end').value, attendance:$('missed-attendance').checked, overtime:$('missed-overtime').checked, timeZone:timeZone()});
 });
 $('compliance-menu').addEventListener('click', () => navigate('compliance'));
 $('settings-menu').addEventListener('click', () => navigate('settings'));
@@ -331,12 +337,15 @@ $('settings-form').addEventListener('submit', event => {
       $('settings-status').textContent = 'Settings saved. They apply to all stored shifts.';
     });
 });
-$('attendance-time').addEventListener('change', () => {
+function saveRunningClassification() {
   if (state?.pending === null || !state) return;
-  action('attendance', {start:state.pending, attendance:$('attendance-time').checked, timeZone:timeZone()}, () => {}, () => {
+  action('attendance', {start:state.pending, attendance:$('attendance-time').checked, overtime:$('overtime').checked, timeZone:timeZone()}, () => {}, () => {
     $('attendance-time').checked = metadata.pendingKind === 'attendance';
+    $('overtime').checked = metadata.pendingOvertime === true;
   });
-});
+}
+$('attendance-time').addEventListener('change', saveRunningClassification);
+$('overtime').addEventListener('change', saveRunningClassification);
 $('compliance-form').addEventListener('submit', event => {
   event.preventDefault();
   if (!$('compliance-form').reportValidity()) return;

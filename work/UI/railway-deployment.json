@@ -1,0 +1,39 @@
+{
+  "checkedAt": "2026-11-12T12:05:48.973976+00:00",
+  "url": "https://cjr-shift-production.up.railway.app",
+  "project": "cjr-shift",
+  "volumeMount": "/data",
+  "store": "/data/shifts.store",
+  "health": {
+    "status": "ok"
+  },
+  "sharedDemo": true,
+  "settingsSurvivedRedeployment": true,
+  "metadataRevision": "1:9e1c5e5aea9c03d57bce712789e48725c6506343b30e5dc4e79a8739f5496f18",
+  "localRecordsUploaded": false,
+  "browserChecks": [
+    "shared-demo notice and phone layout",
+    "menu navigation",
+    "optional compliance bounds and empty-history result",
+    "saved settings displayed",
+    "reload and no console errors"
+  ],
+  "nativeLinuxChecks": {
+    "assertions": 26980,
+    "workingTimeBoundaryChecks": 13
+  },
+  "proofValidationRun": false,
+  "logs": [
+    "hosting-tests.log",
+    "javascript-tests.log",
+    "tests.log",
+    "railway-build.log",
+    "railway-redeploy.log"
+  ],
+  "sourceHashes": {
+    "Dockerfile": "572e65c5d9c318cbcddfd5e6250c8bf9db22bb14e4ed81c8a942926b431607d4",
+    "railway.json": "25b3ea41e6cc791036ec7a7a5e91cf56fa659c77b1d8e1d041d6decf579f243b",
+    "work/UI/server.py": "22e7b65904b53fe59abf5ca7e7ca456405089f5ae1c42626f95ea9c1b1e93823",
+    "work/UI/static/app.js": "3f345fee2d198a70706e36f230de5bd65afcf0235b57117dc366d53cb533156d"
+  }
+}

@@ -1502,3 +1502,55 @@ yes, initialize a local git repository called cjr-shift and commit this version.
 [2026-11-12T11:42:41+00:00]
 make the repo public
 
+[2026-11-12T11:46:40+00:00]
+serve the ui from my railway account
+
+[2026-11-12T11:47:38+00:00]
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_b895dac17fad49098cc135f51cd3d7cb\",0]","question":"Who should be able to use the hosted tracker? It currently has one shared store, so anyone with access can read and reset its shifts.","answer":"Make it an open shared demo"}]
+</send_user_message_question_reply>
+
+[2026-11-12T11:51:12+00:00]
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_501c679a706641cf9becb637cb823c0c\",0]","question":"Railway needs you to authorize its CLI. Open https://railway.com/activate?user_code=TCVN-DWRV and approve the sign-in for your account, then let me know.","answer":"Railway sign-in authorized"}]
+</send_user_message_question_reply>
+
+[2026-11-12T13:00:26+00:00]
+the timer overwrites the text 'on the clock', adjust
+
+[2026-11-12T13:01:54+00:00]
+in case of error message further text overflow format problems
+
+[2026-11-12T13:03:03+00:00]
+what does this mean? what does 'missing history' mean?
+
+[2026-11-12T13:04:20+00:00]
+how can you tell the difference in the store between no work and unrecorded work? 
+
+[2026-11-12T13:04:46+00:00]
+you can assume the records as complete
+
+[2026-11-12T13:06:14+00:00]
+move the back links (such as '< change dates') at the top near the 'shift' logo, justified to the right
+
+[2026-11-12T13:10:28+00:00]
+what does this error mean? how can the app supply the missing information? 
+
+[2026-11-12T13:12:44+00:00]
+add another tick box on the front page called 'overtime', default unticked, to mark overtime. by default no overtime. also added to 'missed shift' page. the 'shifts' page should also display overtime if the case for each shift. 
+
+[2026-11-12T13:14:06+00:00]
+is the 'overtime' metadata not part of the core yet? 
+
+[2026-11-12T13:15:21+00:00]
+we will only track regular overtime. how will you track overtime in the core without changing it? 
+
+[2026-11-12T13:16:00+00:00]
+continue with the implementation using regular overtime only. do not change the core or run proof validation. deploy to railway when done.
+
+[2026-11-12T13:22:25+00:00]
+put the attendence and overtime buttons on the same line 
+
+[2026-11-12T13:24:36+00:00]
+dont check proofs. push to github. 
+

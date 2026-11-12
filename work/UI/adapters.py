@@ -91,7 +91,9 @@ class TrackerAdapter:
         pending = self.metadata['pending']
         return {'code': 0, 'state': state, 'settings': self.metadata['settings'],
                 'metadataRevision': self._revision(),
-                'classifications': classifications, 'pendingKind': pending['kind'] if pending else None, **extra}
+                'classifications': classifications, 'pendingKind': pending['kind'] if pending else None,
+                'overtime': {str(pair[0]): row.get('overtime', False) for row in self.metadata['spans'] for pair in row['pieces']},
+                'pendingOvertime': pending.get('overtime', False) if pending else False, **extra}
 
     def save_settings(self, settings):
         value = settings_value(settings)
@@ -104,9 +106,11 @@ class TrackerAdapter:
             self.metadata = updated
             return self._response()
 
-    def attendance(self, start, attendance, zone):
+    def attendance(self, start, attendance, zone, overtime=None):
         if type(attendance) is not bool or type(start) is not int:
             raise ValueError('Supply the running start and attendance choice.')
+        if overtime is not None and type(overtime) is not bool:
+            raise ValueError('Overtime must be true or false.')
         zone = time_zone(zone)
         with self.mutex, self.repository.locked():
             self._load()
@@ -114,7 +118,8 @@ class TrackerAdapter:
                 raise ValueError('The running shift changed. Reload before changing its attendance setting.')
             updated = copy.deepcopy(self.metadata)
             previous_zone = (updated['pending'] or {}).get('timeZone', zone)
-            updated['pending'] = {'start': start, 'kind': 'attendance' if attendance else 'work', 'timeZone': previous_zone}
+            updated['pending'] = {'start': start, 'kind': 'attendance' if attendance else 'work', 'timeZone': previous_zone,
+                                  'overtime': (updated['pending'] or {}).get('overtime', False) if overtime is None else overtime}
             updated['revision'] += 1
             self.metadata_repository.save(updated)
             self.metadata = updated
@@ -158,7 +163,9 @@ class TrackerAdapter:
             self._load()
             return self._response()
 
-    def change(self, action, timestamp=None, end=None, attendance=None, zone='Europe/London'):
+    def change(self, action, timestamp=None, end=None, attendance=None, zone='Europe/London', overtime=None):
+        if overtime is not None and type(overtime) is not bool:
+            raise ValueError('Overtime must be true or false.')
         if attendance is not None and type(attendance) is not bool:
             raise ValueError('Attendance time must be true or false.')
         zone = time_zone(zone)
@@ -188,19 +195,21 @@ class TrackerAdapter:
                 kind = None if attendance is None else 'attendance' if attendance else 'work'
                 candidate = self.core.call('queryContained', after, '@0', '@9223372036854774367')['state']
                 if action == 'start':
-                    updated['pending'] = {'start': candidate['pending'], 'kind': kind, 'timeZone': zone}
+                    updated['pending'] = {'start': candidate['pending'], 'kind': kind, 'timeZone': zone, 'overtime': overtime if overtime is not None else False}
                 else:
                     old_pieces = {tuple(p) for p in previous['shifts']}
                     pieces = [p for p in candidate['shifts'] if tuple(p) not in old_pieces]
                     if action == 'stop':
                         pending = updated['pending']
+                        if overtime is None and pending:
+                            overtime = pending.get('overtime', False)
                         if attendance is None and pending:
                             kind = pending['kind']
                         if pending and pending['timeZone'] != zone:
                             zone = None
                         updated['pending'] = None
                     updated['spans'].append({'start': pieces[0][0], 'end': pieces[-1][1],
-                                             'kind': kind, 'timeZone': zone, 'pieces': pieces})
+                                             'kind': kind, 'timeZone': zone, 'pieces': pieces, 'overtime': overtime if overtime is not None else False})
             try:
                 self.metadata_repository.commit(self.repository, before, after, self.raw_metadata, updated)
             except OSError as error:

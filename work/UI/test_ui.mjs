@@ -89,7 +89,7 @@ test('validator violations are successful reports, not failed HTTP actions', asy
   assert.equal((await context.api.request('compliance',{start:'',end:''})).report.validatorCode,101);
 });
 
-test('start and stop explicitly send attendance and timezone without changing timestamps', async () => {
+test('start and stop send attendance, regular overtime and timezone without changing timestamps', async () => {
   const {readFile} = await import('node:fs/promises');
   const vm = await import('node:vm');
   const {responseFailure} = await import('./static/time.mjs');
@@ -107,10 +107,12 @@ test('start and stop explicitly send attendance and timezone without changing ti
   vm.runInContext(source.slice(source.indexOf('const $'),source.indexOf('function tick()'))+'\nglobalThis.api={refresh,change};',context);
   await context.api.refresh();await context.api.change('start');
   node('attendance-time').checked=true;
+  node('overtime').checked=true;
   await context.api.change('stop');
   const starts=JSON.parse(calls.find(([p])=>p==='/api/start')[1].body);
   const stops=JSON.parse(calls.find(([p])=>p==='/api/stop')[1].body);
   assert.equal(starts.attendance,false);assert.equal(stops.attendance,true);
+  assert.equal(starts.overtime,false);assert.equal(stops.overtime,true);
   assert.equal(starts.timestamp,'2026-11-12T10:00');assert.equal(stops.timestamp,starts.timestamp);
   assert.equal(typeof starts.timeZone,'string');
 });
@@ -119,4 +121,16 @@ test('older servers explain missing compliance routes', async () => {
   const {responseFailure}=await import('./static/time.mjs');
   assert.match(responseFailure(404,'compliance',{}).message,/does not support compliance checking/);
   assert.match(responseFailure(404,'settings',{}).message,/working-time metadata/);
+});
+
+test('hosted shared-demo disclosure follows the server response', async () => {
+  const {readFile}=await import('node:fs/promises');const vm=await import('node:vm');
+  const {responseFailure}=await import('./static/time.mjs');
+  const nodes=new Map();const node=id=>{if(!nodes.has(id))nodes.set(id,{hidden:true,setAttribute(){}});return nodes.get(id);};
+  let demo=true;
+  const context=vm.createContext({document:{getElementById:node},responseFailure,Intl,render(){},fetch:async()=>({ok:true,status:200,json:async()=>({code:0,state:{pending:null,shifts:[]},demo})})});
+  const source=await readFile(new URL('./static/app.js',import.meta.url),'utf8');
+  vm.runInContext(source.slice(source.indexOf('const $'),source.indexOf('function tick()'))+'\nglobalThis.api={request};',context);
+  await context.api.request('state');assert.equal(node('demo-notice').hidden,false);
+  demo=false;await context.api.request('state');assert.equal(node('demo-notice').hidden,true);
 });

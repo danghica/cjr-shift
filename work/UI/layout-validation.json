@@ -1,0 +1,54 @@
+{
+  "checkedAt": "2026-11-12T13:02:37.259411+00:00",
+  "changes": [
+    "Timer placed in normal layout flow below status label",
+    "Home content keeps its natural height and scrolls when banners reduce available space"
+  ],
+  "browserChecks": [
+    "Running demo layout: status, timer and button have separate bounds",
+    "Real same-minute-stop error displayed together with demo banner",
+    "Heading, label, timer, button, hint and attendance note have nonoverlapping bounds",
+    "Shifts button remains reachable through scrolling"
+  ],
+  "javascriptTests": {
+    "passed": 11,
+    "failed": 0
+  },
+  "proofValidationRun": false,
+  "preview": "timer-error-spacing-preview.jpg",
+  "deployedUrl": "https://cjr-shift-production.up.railway.app",
+  "liveCssMatchesSource": true,
+  "deploymentVerifiedAt": "2026-11-12T13:03:24.941800+00:00",
+  "headerNavigation": {
+    "checkedAt": "2026-11-12T13:07:31.034277+00:00",
+    "pages": [
+      "shifts",
+      "missed shift",
+      "compliance",
+      "settings",
+      "report"
+    ],
+    "browserChecks": [
+      "Report change dates right-aligned beside Shift logo",
+      "Change dates returns to compliance form",
+      "Header back returns home and restores burger menu"
+    ],
+    "preview": "header-navigation-preview.jpg",
+    "liveAssetsMatchSource": true
+  },
+  "completeRecordsAssumptionVerifiedLive": true,
+  "checkboxRow": {
+    "checkedAt": "2026-11-12T13:23:14.132932+00:00",
+    "pages": [
+      "home",
+      "missed shift"
+    ],
+    "browserChecks": [
+      "Attendance and overtime inputs share the same vertical position on both forms"
+    ],
+    "javascriptTestsPassed": 11,
+    "proofValidationRun": false,
+    "preview": "checkbox-row-preview.jpg",
+    "verifiedLive": true
+  }
+}

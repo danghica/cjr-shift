@@ -1,7 +1,8 @@
 test_ambiguous_calendar_window_does_not_hide_known_daily_violation (__main__.ComplianceTests.test_ambiguous_calendar_window_does_not_hide_known_daily_violation) ... ok
 test_classification_pending_restart_final_change_and_midnight (__main__.ComplianceTests.test_classification_pending_restart_final_change_and_midnight) ... ok
 test_clock_conversion_and_ambiguous_history_are_explicit (__main__.ComplianceTests.test_clock_conversion_and_ambiguous_history_are_explicit) ... ok
-test_daily_and_hazardous_violations_and_normal_hours_unknown (__main__.ComplianceTests.test_daily_and_hazardous_violations_and_normal_hours_unknown) ... ok
+test_complete_records_treat_gaps_before_first_shift_as_no_work (__main__.ComplianceTests.test_complete_records_treat_gaps_before_first_shift_as_no_work) ... ok
+test_daily_and_hazardous_violations_with_known_normal_hours (__main__.ComplianceTests.test_daily_and_hazardous_violations_with_known_normal_hours) ... ok
 test_defaults_settings_validation_reset_and_reload (__main__.ComplianceTests.test_defaults_settings_validation_reset_and_reload) ... ok
 test_empty_pending_bounds_and_invalid_dates (__main__.ComplianceTests.test_empty_pending_bounds_and_invalid_dates) ... ok
 test_external_changes_invalidate_reports_and_journal_keeps_actual_before_metadata (__main__.ComplianceTests.test_external_changes_invalidate_reports_and_journal_keeps_actual_before_metadata) ... ok
@@ -10,11 +11,20 @@ test_fortnight_variants_use_declared_calendar_anchor (__main__.ComplianceTests.t
 test_metadata_save_failure_rolls_back_core_and_classification (__main__.ComplianceTests.test_metadata_save_failure_rolls_back_core_and_classification) ... ok
 test_missed_attendance_and_legacy_are_not_assumed_work (__main__.ComplianceTests.test_missed_attendance_and_legacy_are_not_assumed_work) ... ok
 test_non_night_worker_does_not_receive_night_work_violation (__main__.ComplianceTests.test_non_night_worker_does_not_receive_night_work_violation) ... ok
+test_overtime_defaults_running_changes_restart_and_midnight (__main__.ComplianceTests.test_overtime_defaults_running_changes_restart_and_midnight) ... ok
 test_recover_before_and_after_crash_and_preserve_external_change (__main__.ComplianceTests.test_recover_before_and_after_crash_and_preserve_external_change) ... ok
+test_regular_overtime_cannot_hide_night_average_or_weekly_violation (__main__.ComplianceTests.test_regular_overtime_cannot_hide_night_average_or_weekly_violation) ... ok
+test_regular_overtime_included_in_normal_hours_and_old_metadata_defaults (__main__.ComplianceTests.test_regular_overtime_included_in_normal_hours_and_old_metadata_defaults) ... ok
 test_running_metadata_failure_does_not_claim_saved (__main__.ComplianceTests.test_running_metadata_failure_does_not_claim_saved) ... ok
 test_weekly_optout_specific_period_persists_and_can_be_corrected (__main__.ComplianceTests.test_weekly_optout_specific_period_persists_and_can_be_corrected) ... ok
 
 ----------------------------------------------------------------------
-Ran 15 tests in 37.936s
+Ran 19 tests in 39.726s
+
+OK
+test_recover_before_and_after_crash_and_preserve_external_change (__main__.ComplianceTests.test_recover_before_and_after_crash_and_preserve_external_change) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.284s
 
 OK

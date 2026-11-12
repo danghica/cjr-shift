@@ -1,0 +1,17 @@
+*
+!Dockerfile
+!work/
+!work/code/
+!work/code/*.cj
+!work/code/test/
+!work/code/test/runtime_test.cj
+!work/code/test/working_time_test.cj
+!work/CLI/
+!work/CLI/*.cj
+!work/CLI/*.py
+!work/CLI/bin/
+!work/CLI/bin/tracker
+!work/UI/
+!work/UI/*.py
+!work/UI/static/
+!work/UI/static/**

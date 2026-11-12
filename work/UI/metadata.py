@@ -55,8 +55,10 @@ def validate(data):
         return type(n) is int and 0 <= n <= 6000000000
     for row in data['spans'] + ([data['pending']] if data['pending'] is not None else []):
         expected = {'start','kind','timeZone'} if row is data['pending'] else {'start','end','kind','timeZone','pieces'}
-        if not isinstance(row, dict) or set(row) != expected or not moment(row.get('start')) or row.get('kind') not in ('work', 'attendance', None):
+        if not isinstance(row, dict) or set(row) not in (expected, expected | {'overtime'}) or not moment(row.get('start')) or row.get('kind') not in ('work', 'attendance', None):
             raise ValueError('Invalid shift classification metadata.')
+        if 'overtime' in row and type(row['overtime']) is not bool:
+            raise ValueError('Overtime must be true or false.')
         if row.get('timeZone') is not None:
             time_zone(row['timeZone'])
         if row is not data['pending']:

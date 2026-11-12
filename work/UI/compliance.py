@@ -91,8 +91,9 @@ def assess(core, encoding, state, metadata, start='', end='', zone='Europe/Londo
               'summary': 'There are no completed shifts in this range.', 'findings': [], 'optOuts': [],
               'revision': metadata['revision'], 'timeZone': zone,
               'range': None, 'legislation': {'title':'Working Time Regulations 1998', 'url':'https://www.legislation.gov.uk/uksi/1998/1833/part/II'}, 'notes': [
-                  'Ordinary adult Great Britain profile. Records are assumed to include all employment.',
+                  'Ordinary adult Great Britain profile. Records are assumed complete and include all employment. Gaps are treated as no work.',
                   'No break tracking or assumed break deductions. In-work breaks are outside scope.',
+                  'Only regular overtime is tracked. All classified actual work counts as normal hours, including regular overtime.',
                   'A result applies to the supplied records and declared profile; it is not a complete legal compliance certificate.']}
     if not state['shifts'] and state['pending'] is None:
         return report
@@ -132,8 +133,6 @@ def assess(core, encoding, state, metadata, start='', end='', zone='Europe/Londo
         pending = instant(state['pending'], (metadata['pending'] or {}).get('timeZone') or zone) if state['pending'] is not None else None
         actual = core.call('queryContained', actual_encoding, '@0', '@6000000000')['state']['shifts']
         actual_encoding = encode_state(actual, pending)
-        coverage_start = instant(first, zone)
-        coverage_end = int((datetime.now(timezone.utc) - EPOCH).total_seconds() // 60)
         reasons = {}
         ps = []
         calendar_periods = {}
@@ -141,8 +140,6 @@ def assess(core, encoding, state, metadata, start='', end='', zone='Europe/Londo
             if not (p['start'] < upper and lower < p['end']):
                 return
             missing = list(missing)
-            if p['start'] < coverage_start or p['end'] > coverage_end:
-                missing.append('The full statutory period is not covered by known history. Missing history is not zero work.')
             if pending is not None and pending < p['end']:
                 missing.append('The running shift has no completed end time for this period.')
             if any(a < p['end'] and p['start'] < b and kind != 'work' for a, b, kind in intervals):
@@ -210,10 +207,48 @@ def assess(core, encoding, state, metadata, start='', end='', zone='Europe/Londo
                 calendar_periods[(103, context_start, context_end)] = {'start':a, 'end':b}
                 append(period(103, context_start, context_end, step*DAY, settings['restScheme']))
             day += timedelta(days=step)
-        # Normal hours are deliberately unknown. This does not disable independent rules.
-        append(period(105, max(0, calendar_shift(upper, -119, zone)), upper, REFERENCE,
-                      evidence='not_applicable' if settings['nightWorker'] is False else 'unknown'),
-               ['Night-worker status has not been set.' if settings['nightWorker'] is None else 'Normal working hours, including the correct overtime classification, have not been supplied.'])
+        # This application records ordinary work and regular overtime only. Both
+        # form normal hours. Supply genuine rest intervals for the core's night
+        # denominator; no rest or normal hours are inferred inside uncertain spans.
+        night_begin = max(0, calendar_shift(upper, -119, zone))
+        weekly_rest = []
+        rest_unknown = False
+        cursor = night_begin
+        remaining_days = 119
+        while remaining_days > 0:
+            days = min(remaining_days, 7 if settings['restScheme'] == 1 else 14)
+            block_end = upper if days == remaining_days else calendar_shift(cursor, days, zone)
+            required = days*DAY//7
+            chunks = 1 if settings['restScheme'] in (1,3) else 2
+            if days <= 7:
+                chunks = 1
+            size = required//chunks
+            gaps = []
+            gap_start = cursor
+            for a,b,_ in intervals:
+                if b <= cursor or a >= block_end:
+                    continue
+                if a > gap_start:
+                    gaps.append((gap_start,min(a,block_end)))
+                gap_start = max(gap_start,min(b,block_end))
+            if gap_start < block_end:
+                gaps.append((gap_start,block_end))
+            selected = []
+            for a,b in gaps:
+                while len(selected) < chunks and b-a >= size:
+                    selected.append([a,a+size]);a += size
+            if len(selected) != chunks:
+                rest_unknown = True
+            weekly_rest.extend(selected)
+            cursor = block_end
+            remaining_days -= days
+        night_missing = []
+        if settings['nightWorker'] is None:
+            night_missing.append('Night-worker status has not been set.')
+        if rest_unknown:
+            night_missing.append('The weekly-rest exclusion for the night-work average cannot be established from the recorded gaps. Review the weekly-rest findings.')
+        append(period(105, night_begin, upper, REFERENCE,
+                      evidence='not_applicable' if settings['nightWorker'] is False else 'unknown' if night_missing else 'known'), night_missing)
         # A strict window that intersects night work changes at work/night endpoints and
         # the corresponding endpoints minus 24 hours. Use the standard 23:00–06:00 night.
         night = []
@@ -251,9 +286,13 @@ def assess(core, encoding, state, metadata, start='', end='', zone='Europe/Londo
                 if kind == 'work' and max(a, s) < min(b, e):
                     known_night.append([max(a, s), min(b, e)])
         known_night = sorted({tuple(p) for p in known_night})
+        # The caller declares the records complete, including gaps in the full
+        # assessment context. Keep uncertain classifications and running shifts unknown.
+        coverage_start = min([lower] + [p['start'] for p in ps] + [a for a, _, _ in intervals])
+        coverage_end = max([upper] + [p['end'] for p in ps] + [b for _, b, _ in intervals])
         data = dict(jurisdiction='GB', adult=True, ordinaryRegime=True, coverageStart=coverage_start,
                     coverageEnd=coverage_end, periodCoverageComplete=True, elapsedWorkKnown=True,
-                    otherWork=[], normalWork=[], weeklyRest=[], nightWork=known_night, periods=ps)
+                    otherWork=[], normalWork=actual, weeklyRest=weekly_rest, nightWork=known_night, periods=ps)
         # The existing JSON bridge is reused verbatim; no duplicate native encoding logic.
         with NamedTemporaryFile(mode='w+', suffix='.json') as handle:
             json.dump(data, handle);handle.flush()
@@ -285,8 +324,10 @@ def assess(core, encoding, state, metadata, start='', end='', zone='Europe/Londo
                 finding['explanation'] = f"Qualifying rest periods: {finding['measured']}; required: {finding['limit']}. Daily rest is additional; no overlap exception is assumed."
             elif finding['code'] == 106:
                 finding['explanation'] = f"Actual work: {finding['measured']} minutes; limit: {finding['limit']} minutes in this 24-hour period."
+            elif finding['code'] == 105:
+                finding['explanation'] = f"Recorded normal-hours average: {finding['measured']/finding['limit']*8:.2f} hours per 24 hours; limit: 8 hours. Regular overtime is included."
             else:
-                finding['explanation'] = 'The average night-work check requires established normal working hours.'
+                finding['explanation'] = 'The average night-work check includes normal hours and regular overtime.'
             if finding['code'] in (20,21,22):
                 finding['explanation'] = ' '.join(missing) or 'The validator could not assess this period from the supplied metadata.'
             report['findings'].append(finding)

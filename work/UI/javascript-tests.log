@@ -1,18 +1,19 @@
-✔ civil minute bridge has the correct epoch and round trips current local time (4.78625ms)
-✔ midnight splits group by their start day without timezone drift (0.590458ms)
-✔ newest first grouping preserves every independent piece (0.062917ms)
-✔ duration totals use minutes, including long shifts and empty days (0.064916ms)
-✔ missing missed-shift route explains server restart and preserves form guidance (0.18275ms)
-✔ specific domain errors remain useful and unknown errors do not leak generic not-found text (0.072542ms)
-✔ background refresh preserves an unsupported-action error and does not resubmit the shift (3.545166ms)
-✔ validator violations are successful reports, not failed HTTP actions (0.622ms)
-✔ start and stop explicitly send attendance and timezone without changing timestamps (23.208625ms)
-✔ older servers explain missing compliance routes (0.164458ms)
-ℹ tests 10
+✔ civil minute bridge has the correct epoch and round trips current local time (4.860417ms)
+✔ midnight splits group by their start day without timezone drift (0.680834ms)
+✔ newest first grouping preserves every independent piece (0.061833ms)
+✔ duration totals use minutes, including long shifts and empty days (0.053208ms)
+✔ missing missed-shift route explains server restart and preserves form guidance (0.180875ms)
+✔ specific domain errors remain useful and unknown errors do not leak generic not-found text (0.071875ms)
+✔ background refresh preserves an unsupported-action error and does not resubmit the shift (3.650833ms)
+✔ validator violations are successful reports, not failed HTTP actions (0.756333ms)
+✔ start and stop send attendance, regular overtime and timezone without changing timestamps (26.35675ms)
+✔ older servers explain missing compliance routes (0.183917ms)
+✔ hosted shared-demo disclosure follows the server response (0.825833ms)
+ℹ tests 11
 ℹ suites 0
-ℹ pass 10
+ℹ pass 11
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 99.379166
+ℹ duration_ms 127.57875

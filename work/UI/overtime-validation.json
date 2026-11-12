@@ -1,0 +1,42 @@
+{
+  "checkedAt": "2026-11-12T13:20:49.220386+00:00",
+  "overtimeKind": "regular only",
+  "default": false,
+  "storage": "existing JSON metadata sidecar; associated with logical shifts and all midnight pieces",
+  "validatorIntegration": "All classified actual work, including regular overtime, supplied as working time and normal hours",
+  "coreChanged": false,
+  "proofValidationRun": false,
+  "tests": {
+    "compliance": 19,
+    "adapterAndHttp": 15,
+    "hosting": 6,
+    "javascript": 11
+  },
+  "browserChecks": [
+    "unchecked defaults on both forms",
+    "running start and overtime selection survive reload",
+    "running overtime can change without changing start time",
+    "missed overnight shift labels both midnight pieces",
+    "error banner layout remains usable",
+    "stop resets overtime for next shift",
+    "no browser console errors"
+  ],
+  "previews": [
+    "overtime-shifts-preview.jpg",
+    "overtime-home-preview.jpg"
+  ],
+  "sourceHashes": {
+    "work/UI/adapters.py": "791fd618283b80e90ecaf1b63eb1bbd786232204d627a5cd9f5686df6a2504ed",
+    "work/UI/metadata.py": "f7eb95f409f89176ad7a8e35718cdd6f13fb08b11592983d787b83ee86632418",
+    "work/UI/compliance.py": "4ac9f954f1b43812d9524c9c7c0a944fdb4047aaa7e3d62d44bd42269a2a3ea5",
+    "work/UI/server.py": "9143ee01ab524af9c23fd4ceb3fa2e09a98a6e7d7d4e36aa76b7608a48a74131",
+    "work/UI/static/app.js": "a54707a470bb72bf5468376cd99c345792798112218c73428ac921748e96e431",
+    "work/UI/static/index.html": "357fcbbbfcfd0ffac7ac6b38d9b906a70476a3d4e821ecbc795107f01aa80ba6"
+  },
+  "deployedUrl": "https://cjr-shift-production.up.railway.app",
+  "deploymentVerifiedAt": "2026-11-12T13:21:45.674101+00:00",
+  "liveAssetsMatchSource": true,
+  "liveOvertimeMetadataVerified": true,
+  "liveComplianceIntegrationVerified": true,
+  "interruptedOvertimeRecoveryTestPassed": true
+}

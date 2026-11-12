@@ -1,23 +1,33 @@
 {
   "repository": "cjr-shift",
-  "operation": "initial local snapshot",
-  "prepared_utc": "2026-11-12T11:39:07.950579+00:00",
+  "operation": "Publish Railway hosting, layout fixes and regular overtime",
+  "prepared_utc": "2026-11-12T13:25:01.540546+00:00",
   "git_version": "git version 2.54.0 (Apple Git-157)",
   "validation_for_this_commit": {
     "proof_validation_run": false,
     "tests_rerun": false,
-    "reason": "User requested this version committed without rerunning proof validation. Existing completed test and proof evidence is preserved.",
+    "reason": "User requested GitHub push without checking proofs. Previously completed runtime/UI tests and browser/deployment evidence are included. No proof or test commands were rerun for this commit.",
     "checks_performed": [
-      "Git file inventory",
-      "private/local artifact exclusions",
-      "current UI source fingerprints match existing UI validation record",
-      "current core source fingerprints match existing verification record"
+      "Git diff and file inventory",
+      "core, extracted code and CLI unchanged",
+      "preserved exact prompt log and existing build/verify.log",
+      "deployment and overtime evidence included"
     ]
   },
   "existing_ui_test_evidence": {
     "status": "passed",
-    "checked_utc": "2026-11-12T11:02:32.629411+00:00",
-    "automated_tests": 39
+    "automated_tests": 51,
+    "details": {
+      "compliance": 19,
+      "adapter_and_http": 15,
+      "hosting": 6,
+      "javascript": 11
+    },
+    "records": [
+      "work/UI/overtime-validation.json",
+      "work/UI/layout-validation.json",
+      "work/UI/railway-deployment.json"
+    ]
   },
   "existing_proof_evidence": {
     "status": "passed",
@@ -32,7 +42,10 @@
     "work/specs/extraction.json": "eed8fe9b504b989e9c164dabb812d3eed6ea3b27be25744ff13038a84631002e",
     "work/specs/working-time-extraction.json": "164b20766ed488c1e27639d87a9b6777c659b8ad283bf623822e4a21540661a6",
     "work/code/test/test-results.json": "32376f39c689274f3357a8f15bc6b83f631d78bf4d2a296158171e0baf3e314a",
-    "build/verify.log": "d4851f333f13b2bdcb867508222411324cc2380d57fec798acb526b90ed2b4c4"
+    "build/verify.log": "d4851f333f13b2bdcb867508222411324cc2380d57fec798acb526b90ed2b4c4",
+    "work/UI/overtime-validation.json": "dd3511deef07cf5a77b8a328f942460b0219c3d452c3714078a1c46f8752afbf",
+    "work/UI/layout-validation.json": "bd8fdc321005278ba9e6ec60ab4a706854321a8320bc7a250fcfaa7cd6b03e03",
+    "work/UI/railway-deployment.json": "b257dc736e865dad4d44ff55661524ba80073f00d92c892dcb79f67a5500d554"
   },
   "excluded": [
     "private UI store data",
@@ -41,5 +54,5 @@
     "proof objects and Python caches",
     "disposable native test/benchmark executables"
   ],
-  "push_requested": false
+  "push_requested": true
 }

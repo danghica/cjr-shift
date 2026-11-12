@@ -86,8 +86,8 @@ session. It does not add a cancellation or reset operation to the core.
 All browser, clock, HTTP, representation conversion and filesystem behavior
 is outside the Rocq proof boundary. No core source, proof, extraction output
 or CLI implementation was changed for this UI. Local write failure is handled;
-directory-entry durability across power loss is not promised. The server listens
-only on localhost. This is a local application, not a hosted website.
+directory-entry durability across power loss is not promised. The default local server listens
+only on localhost. Local mode listens only on loopback. The opt-in Railway deployment below serves the shared demo over HTTPS.
 
 ## Tests
 
@@ -129,9 +129,11 @@ Night-worker and hazardous-night-work status independently start **Not set**.
 These saved settings apply to every assessment, including older records. The
 ordinary adult Great Britain profile uses 17-week reference periods and the
 standard 23:00–06:00 night period. The strict hazardous-night check applies only
-when night-worker and hazardous-work status are established. Unknown normal
-hours keep an applicable average-night check incomplete; actual work is not
-silently classified as normal hours or regular overtime.
+when night-worker and hazardous-work status are established. Only regular overtime is tracked. Classified actual work, whether overtime is
+ticked or not, supplies normal hours for the average-night check. Attendance
+and legacy unclassified spans still make affected checks incomplete. The adapter
+selects weekly-rest exclusions from recorded gaps for the night denominator; if
+these cannot be established, that check remains incomplete.
 
 On the main and missed-shift pages, **Attendence time** is unchecked by default,
 meaning actual working time. Checked means attendance; no actual-work duration
@@ -143,7 +145,7 @@ records and shifts written by an older client or the CLI remain unclassified.
 
 The application assumes all employment is recorded. Known work is passed to the
 existing `validateWorkingTime` port; periods affected by attendance, unclassified
-records, unknown applicability or incomplete history receive unknown evidence.
+records and unknown applicability receive unknown evidence.
 The adapter prepares context, translates time zones and presents results; hours,
 rest gaps, thresholds and summary codes are calculated by the unchanged native
 validator. Browser time-zone identifiers are saved with new logical shifts.
@@ -218,3 +220,81 @@ rollback/recovery, external edits, exact scoped opt-out corrections, rest and
 hazardous-night independence, clock changes, and actual validator outputs. No
 proof validation is needed or run for these UI-only changes. See
 [compliance test log](compliance-tests.log) and [preview](compliance-preview.jpg).
+
+
+## Railway shared demo
+
+Live demo: [cjr-shift](https://cjr-shift-production.up.railway.app).
+The [deployment record](railway-deployment.json) records the live health,
+browser and persistence checks. Saved settings survived a redeployment.
+
+`Dockerfile` compiles the unchanged extracted Cangjie sources on Linux amd64 with
+SDK **1.0.5**, using the exact archive and published SHA-256 from the
+[official download page](https://cangjie-lang.cn/download/1.0.5). The image runs
+native tracker and working-time boundary tests, then serves the JavaScript UI
+with Python. The checked-in macOS executable is not used in the Linux image.
+No proof compiler, proof extraction or proof-validation command is run.
+
+The hosted mode is deliberately an **open shared demo**. Its banner asks visitors
+to use sample data: everyone can view, modify and reset the shared shifts and
+settings. The deployment starts with its own empty store; local private records
+are excluded by `.gitignore`, `.railwayignore` and `.dockerignore`.
+
+Railway configuration:
+
+- One service/replica and a persistent volume mounted at `/data`.
+- `PORT=8080`, `TRACKER_DEMO=true`, `TRACKER_STORE_FILE=/data/shifts.store`.
+- `TRACKER_PUBLIC_ORIGIN` is the generated HTTPS URL (or use Railway's
+  `RAILWAY_PUBLIC_DOMAIN`). The existing Host, Origin and UI-header checks remain
+  enforced for the app; `/health` returns only readiness status.
+- The platform-provided `PORT` makes the server bind to `0.0.0.0`; local startup
+  without that variable remains `127.0.0.1:8765`.
+- In a Railway environment, startup fails if no persistent volume is attached or
+  the configured store is outside it. Store, metadata, lock and recovery journal
+  files all live together on that volume.
+
+After linking the Railway project/service, deploy with `railway up --ci`.
+The CLI upload includes only the application/build files listed in
+`.railwayignore`; logs, prompts, proofs, documentation caches and local data are
+not uploaded. Docker build context uses the matching `.dockerignore` allowlist.
+Local Railway account tokens and project linkage are not committed.
+
+For a local Linux container check on an amd64 Docker host:
+
+```sh
+docker build --platform linux/amd64 -t cjr-shift .
+docker run --rm -p 8080:8080 -v cjr-shift-data:/data cjr-shift
+```
+
+The hosting-specific regression command is `python3 work/UI/test_hosting.py`.
+It checks public-origin restrictions, data-free health checks, demo disclosure,
+Railway port/domain selection and refusal to use an ephemeral store. Physical
+mobile-device testing and multi-user isolation are outside this shared demo.
+
+Records are assumed complete across assessment periods, including all employment.
+Gaps, including dates before the earliest shift, count as no work. Unknown
+classifications, unfinished shifts and unresolved elapsed times can still make
+a check incomplete. No separate history-completeness declaration is required.
+
+Secondary pages place their back action in the header, right-aligned beside
+the Shift logo. The report uses “change dates” to return to its date form.
+
+## Regular overtime
+
+Both recording forms have an unchecked **overtime** checkbox. It marks the whole
+logical shift as regular overtime; all midnight pieces retain the same flag.
+The running choice saves immediately and survives reload/restart without changing
+the start time. Stopping preserves a saved choice if an older client omits it.
+New shifts default to no overtime, and existing metadata without the flag also
+means no overtime. CLI records remain unclassified as work/attendance.
+
+Shift rows display **overtime** when marked. The flag lives in the JSON metadata
+sidecar, using the existing lock and recovery journal. No core, extracted code or
+proof changes are required. Actual work, including regular overtime, is supplied
+as both working time and normal hours to the existing validator. The flag never
+removes hours from a weekly, rest or night-work check. Occasional overtime is not
+supported.
+
+Start, stop, missed-shift and running-classification requests accept optional
+boolean `overtime`. State responses include `pendingOvertime` and an `overtime`
+map keyed by each midnight piece's start, matching `classifications`.

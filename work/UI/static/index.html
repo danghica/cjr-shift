@@ -16,11 +16,17 @@
       <div class="status-bar" aria-hidden="true"><span id="device-time">--:--</span><span class="device-icons"><svg viewBox="0 0 48 16"><path d="M2 13V10h3v3zm5 0V7h3v6zm5 0V4h3v9zm5 0V1h3v12z"/><path d="M25 5q7-7 14 0l-2 2q-5-5-10 0zm4 4q3-3 6 0l-3 4z"/></svg><span class="battery"></span></span></div>
       <header class="app-header">
         <a class="brand" href="#home" aria-label="Shift home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>shift<span class="brand-period">.</span></a>
+        <button class="back-button" hidden id="back-button" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>back</button>
+        <button class="back-button" hidden id="missed-back" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>back</button>
+        <button class="back-button" hidden id="compliance-back">‹ back</button>
+        <button class="back-button" hidden id="settings-back">‹ back</button>
+        <button class="back-button" hidden id="report-back">‹ change dates</button>
         <div class="menu-container">
           <button class="icon-button request-control" id="menu-button" aria-label="Open menu" aria-haspopup="menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14M5 16h14"/></svg></button>
           <div class="menu" id="menu" role="menu" hidden><button id="missed-menu" role="menuitem"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v18H7zM10 8h4M10 12h4M10 16h2"/></svg>missed shift</button><button id="compliance-menu" role="menuitem">✓ compliance</button><button id="settings-menu" role="menuitem">⚙ settings</button><button id="reset-menu" role="menuitem"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 10v6M14 10v6"/></svg>reset</button></div>
         </div>
       </header>
+      <p class="demo-notice" id="demo-notice" role="status" hidden>Shared public demo · use sample data. Everyone can view and change these shifts.</p>
       <div id="error" class="error-banner" role="alert" hidden><span id="error-message"></span><button id="retry" type="button">retry</button></div>
       <section id="home" class="page home-page" aria-labelledby="home-title">
         <div class="home-heading"><p class="eyebrow" id="today-date">YOUR TIME, WELL SPENT</p><h1 id="home-title">Ready when<br>you are.</h1><p class="heading-note" id="status-note">A fresh moment to focus.</p></div>
@@ -28,30 +34,30 @@
           <div class="tracking-status" id="tracking-status"><span class="status-dot"></span><span id="tracking-label">LOADING YOUR SHIFTS</span></div>
           <div class="timer" id="timer" aria-label="Current shift elapsed time" hidden>00:00:00</div>
           <div class="start-orbit"><button class="track-button request-control" id="track-button" disabled aria-label="start"><svg id="play-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M12 7.5q-2-1-2 1v15q0 2 2 1l13-7.5q2-1 0-2z"/></svg><svg id="stop-icon" viewBox="0 0 32 32" aria-hidden="true" hidden><rect x="8" y="8" width="16" height="16" rx="3"/></svg><span id="track-label">start</span></button></div>
-          <p class="track-hint" id="track-hint">One tap. A little more intention.</p><label class="attendance-field"><input id="attendance-time" class="request-control" type="checkbox">Attendence time</label><p id="attendance-note" class="classification-note">Unchecked records actual working time.</p>
+          <p class="track-hint" id="track-hint">One tap. A little more intention.</p><div class="shift-options"><label class="attendance-field"><input id="attendance-time" class="request-control" type="checkbox">Attendence time</label><label class="attendance-field"><input id="overtime" class="request-control" type="checkbox">overtime</label></div><p id="attendance-note" class="classification-note">Unchecked records actual working time. Overtime means regular overtime.</p>
         </div>
         <div class="home-bottom"><div class="today-summary"><span>Time today</span><strong id="today-total">0h <span>00m</span></strong></div><button class="shifts-button" id="shifts-button"><span class="shifts-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3h10v18H7zM10 8h4M10 12h4M10 16h2"/></svg></span><span><strong>shifts</strong><small>A look at your time</small></span><svg class="arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button><p class="save-status" id="save-status" role="status"><span></span>Getting things ready</p></div>
       </section>
       <section id="shifts-page" class="page shifts-page" aria-labelledby="shifts-title" hidden>
-        <div class="shifts-heading"><button class="back-button" id="back-button" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>back</button><p class="eyebrow">A LITTLE TIME, WELL SPENT</p><h1 id="shifts-title">Your shifts<span>.</span></h1><p class="heading-note">Small moments. Meaningful days.</p></div>
+        <div class="shifts-heading"><p class="eyebrow">A LITTLE TIME, WELL SPENT</p><h1 id="shifts-title">Your shifts<span>.</span></h1><p class="heading-note">Small moments. Meaningful days.</p></div>
         <div class="history-summary"><div><span>TOTAL TIME</span><strong id="history-total">0h 00m</strong></div><span id="history-count">0 shifts</span></div>
         <div id="shift-list" class="shift-list"></div>
         <div id="empty-state" class="empty-state" hidden><div class="empty-symbol" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="11" y="7" width="26" height="34" rx="5"/><path d="M18 18h12M18 25h12M18 32h6"/></svg></div><h2>Your shifts live here.</h2><p>Start your first shift and give<br>your time a little space.</p><button class="empty-back" id="empty-back">let’s begin <span aria-hidden="true">↗</span></button></div>
       </section>
       <section id="missed-page" class="page missed-page" aria-labelledby="missed-title" hidden>
-        <button class="back-button" id="missed-back" aria-label="Back to home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>back</button>
+
         <p class="eyebrow">THERE’S STILL TIME</p>
         <h1 id="missed-title">Missed shift<span>.</span></h1>
         <p class="heading-note">Make a little space for time you forgot.</p>
         <form id="missed-form" class="missed-form">
           <div class="date-field"><label for="missed-start">start</label><input class="request-control" type="datetime-local" id="missed-start" name="start" step="60" min="0001-01-01T00:00" max="9999-12-31T23:59" required><small>When your shift began</small></div>
           <div class="date-field"><label for="missed-end">end</label><input class="request-control" type="datetime-local" id="missed-end" name="end" step="60" min="0001-01-01T00:00" max="9999-12-31T23:59" required><small>When you finished</small></div>
-          <label class="attendance-field"><input id="missed-attendance" class="request-control" type="checkbox">Attendence time</label><p class="classification-note">Unchecked records actual working time.</p><p class="form-note">Choose your local date and time. Overnight shifts are split into days automatically.</p>
+          <div class="shift-options"><label class="attendance-field"><input id="missed-attendance" class="request-control" type="checkbox">Attendence time</label><label class="attendance-field"><input id="missed-overtime" class="request-control" type="checkbox">overtime</label></div><p class="classification-note">Unchecked records actual working time. Only regular overtime is tracked; overtime is off by default.</p><p class="form-note">Choose your local date and time. Overnight shifts are split into days automatically.</p>
           <button id="add-missed" class="add-button request-control" type="submit">add <span aria-hidden="true">↗</span></button>
         </form>
       </section>
       <section id="compliance-page" class="page missed-page" aria-labelledby="compliance-title" hidden>
-        <button class="back-button" id="compliance-back">‹ back</button><p class="eyebrow">MAKE SPACE FOR REST</p>
+        <p class="eyebrow">MAKE SPACE FOR REST</p>
         <h1 id="compliance-title">Compliance<span>.</span></h1><p class="heading-note">A closer look at your working time.</p>
         <form id="compliance-form" class="missed-form">
           <div class="date-field"><label for="compliance-start">start</label><input class="request-control" type="datetime-local" id="compliance-start" step="60" min="0001-01-01T00:00" max="9999-12-31T23:59"><small>Leave blank for the earliest record</small></div>
@@ -61,7 +67,7 @@
         </form>
       </section>
       <section id="settings-page" class="page missed-page" aria-labelledby="settings-title" hidden>
-        <button class="back-button" id="settings-back">‹ back</button><p class="eyebrow">YOUR WORKING PATTERN</p>
+        <p class="eyebrow">YOUR WORKING PATTERN</p>
         <h1 id="settings-title">Settings<span>.</span></h1><p class="heading-note">These choices apply to all stored shifts.</p>
         <form id="settings-form" class="missed-form">
           <div class="date-field"><label for="rest-scheme">Weekly-rest arrangement</label><select id="rest-scheme" class="request-control"><option value="1">24 uninterrupted hours each week</option><option value="2">Two 24-hour rests per fortnight</option><option value="3">48 uninterrupted hours per fortnight</option></select><small>Daily rest is additional.</small></div>
@@ -73,7 +79,7 @@
         </form>
       </section>
       <section id="report-page" class="page missed-page" aria-labelledby="report-title" hidden>
-        <button class="back-button" id="report-back">‹ change dates</button><p class="eyebrow">YOUR WORKING-TIME REPORT</p>
+        <p class="eyebrow">YOUR WORKING-TIME REPORT</p>
         <h1 id="report-title">Your result<span>.</span></h1><div id="report-body" aria-live="polite"></div>
       </section>
       <div class="home-indicator" aria-hidden="true"></div>

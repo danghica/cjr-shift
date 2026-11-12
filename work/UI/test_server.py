@@ -192,6 +192,24 @@ class HTTPTests(unittest.TestCase):
         self.assertEqual(self.request('/api/opt-out',{'optOut':{'answer':True}})[0],400)
         self.assertEqual(self.request('/api/settings',settings,headers={'Origin':'https://foreign.example'})[0],403)
 
+    def test_overtime_http_round_trip_and_rejection(self):
+        initial=self.request('/api/state')[1]
+        self.assertFalse(initial['pendingOvertime'])
+        started=self.request('/api/start',{'timestamp':'2026-01-05T23:00','attendance':False,'overtime':True})[1]
+        pending=started['state']['pending']
+        self.assertTrue(started['pendingOvertime'])
+        changed=self.request('/api/attendance',{'start':pending,'attendance':False,'overtime':False})[1]
+        self.assertFalse(changed['pendingOvertime'])
+        self.assertEqual(changed['state']['pending'],pending)
+        self.assertEqual(self.request('/api/attendance',{'start':pending,'attendance':False,'overtime':1})[0],400)
+        stopped=self.request('/api/stop',{'timestamp':'2026-01-06T01:00','attendance':False,'overtime':True})[1]
+        self.assertEqual(list(stopped['overtime'].values()),[True,True])
+        self.assertEqual(self.request('/api/state')[1]['overtime'],stopped['overtime'])
+        missed=self.request('/api/missed-shift',{'start':'2026-01-04T23:00','end':'2026-01-05T01:00','attendance':False,'overtime':True})[1]
+        self.assertEqual(len(missed['overtime']),4)
+        self.assertTrue(all(missed['overtime'].values()))
+        self.assertEqual(self.request('/api/missed-shift',{'start':'2026-01-03T09:00','end':'2026-01-03T10:00','overtime':'yes'})[0],400)
+
     def test_save_failure_returns_old_state(self):
         started = self.request('/api/start',{'timestamp':'2026-11-11T09:00'})[1]['state']
         with patch.object(self.server.tracker.repository,'save',side_effect=OSError('disk failure')):
