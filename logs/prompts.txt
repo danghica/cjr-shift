@@ -1499,3 +1499,6 @@ commit this version. do not rerun proof validation.
 [2026-11-12T11:34:42+00:00]
 yes, initialize a local git repository called cjr-shift and commit this version. do not rerun proof validation.
 
+[2026-11-12T11:42:41+00:00]
+make the repo public
+
