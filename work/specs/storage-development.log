@@ -1,0 +1,33 @@
+File "./work/specs/Storage.v", line 42, characters 53-54:
+Error:
+Syntax error: [ltac_use_default] expected after [tactic] (in [tactic_command]).
+
+File "./work/specs/Storage.v", line 95, characters 1-247:
+Error: In environment
+st, next : tracker
+c : Z
+Unable to unify "executes (StructLoad ?M13565 ?M13567) ?M13568" with
+ "executes
+    (Val
+       (RecV (Some "completeStore") (Some "$args")
+          (Let (Some "session") (StructLoad (Var "$args") 0)
+             (Let (Some "succeeded") (StructLoad (Var "$args") 1)
+                (If (StructLoad (Var "session") 2)
+                   (If (Var "succeeded")
+                      (Struct []
+                         [StructLoad (Var "session") 1;
+                          StructLoad (Var "session") 1;
+                          Val (LitV (LitBool false)); 
+                          Val (LitV (LitInt 0))])
+                      (Struct []
+                         [StructLoad (Var "session") 0;
+                          StructLoad (Var "session") 0;
+                          Val (LitV (LitBool false)); 
+                          Val (LitV (LitInt 9))]))
+                   (Struct []
+                      [StructLoad (Var "session") 0;
+                       StructLoad (Var "session") 1;
+                       Val (LitV (LitBool false)); 
+                       Val (LitV (LitInt 10))])))))) 
+    (RecV ?name ?arg ?body)".
+

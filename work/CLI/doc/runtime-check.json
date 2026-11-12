@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "checked_utc": "2026-11-10T14:28:32.191977+00:00",
+  "evidence": "../../code/test/test-results.json",
+  "checks": [
+    "CLI launches with runtime environment overrides removed",
+    "session initialization, preparation, rollback and commit exercised in CLI integration tests"
+  ],
+  "binary_sha256": "f25e58dc3a8032b9c8d94c515dd44da56bc871f5910b6364e7d4d908fd0eb988"
+}

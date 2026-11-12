@@ -1,0 +1,7 @@
+-R /Users/danghica/pandian/theories cjr
+-Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples
+-Q /Users/danghica/pandian/example/generics/rocq cjr.examples
+-Q /Users/danghica/pandian/example/misc/rocq cjr.examples
+-Q /Users/danghica/pandian/audit cjr.audit
+rocq/generic_examples.v
+rocq/generic_tests.v

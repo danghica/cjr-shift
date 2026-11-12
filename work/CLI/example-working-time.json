@@ -1,0 +1,70 @@
+{
+  "jurisdiction": "GB",
+  "adult": true,
+  "ordinaryRegime": true,
+  "coverageStart": 0,
+  "coverageEnd": 171360,
+  "periodCoverageComplete": false,
+  "elapsedWorkKnown": true,
+  "otherWork": [],
+  "normalWork": [],
+  "weeklyRest": [],
+  "nightWork": [],
+  "periods": [
+    {
+      "rule": 101,
+      "start": 0,
+      "end": 171360,
+      "calendarMinutes": 171360,
+      "extraStart": 0,
+      "extraEnd": 0,
+      "evidence": "known",
+      "restScheme": 0,
+      "dailyRestOverlap": false
+    },
+    {
+      "rule": 102,
+      "start": 0,
+      "end": 1440,
+      "calendarMinutes": 1440,
+      "extraStart": 0,
+      "extraEnd": 0,
+      "evidence": "known",
+      "restScheme": 0,
+      "dailyRestOverlap": false
+    },
+    {
+      "rule": 103,
+      "start": 0,
+      "end": 10080,
+      "calendarMinutes": 10080,
+      "extraStart": 0,
+      "extraEnd": 0,
+      "evidence": "known",
+      "restScheme": 1,
+      "dailyRestOverlap": false
+    },
+    {
+      "rule": 105,
+      "start": 0,
+      "end": 171360,
+      "calendarMinutes": 171360,
+      "extraStart": 0,
+      "extraEnd": 0,
+      "evidence": "not_applicable",
+      "restScheme": 0,
+      "dailyRestOverlap": false
+    },
+    {
+      "rule": 106,
+      "start": 0,
+      "end": 1440,
+      "calendarMinutes": 1440,
+      "extraStart": 0,
+      "extraEnd": 0,
+      "evidence": "not_applicable",
+      "restScheme": 0,
+      "dailyRestOverlap": false
+    }
+  ]
+}

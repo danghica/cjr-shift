@@ -1,0 +1,593 @@
+{
+  "entries": {
+    "Tracker.Contracts.answerv:7841c1f022f1488444bf268fb749cbfa2c95b001a0a6357785c71717854901f1": {
+      "description": "answerv represents an answer a as a StructV containing, in order, its integer code, its encoded updated tracker state, and its encoded rows list. The state encoding contains its shifts list and an integer for pending: −1 for None, or p for Some p. Lists are encoded recursively using nilv for an empty list and nodev for each pair and the remaining list. The input does not establish the concrete runtime layout of these values."
+    },
+    "Tracker.Contracts.bin_eq:6d8958ce6606920ccec3e162a2d765564a5091c84520cffb6687571ef27dc1e9": {
+      "description": "The lemma states that evaluating the equality operator on the integer literal values representing a and b succeeds, returning a Boolean literal containing the result of a =? b. There are no additional hypotheses. The notation a =? b appears to mean Boolean equality testing, though its definition and the evaluator’s definition are not supplied."
+    },
+    "Tracker.Contracts.bin_le:06b4f343e9807f3466f9a3cd0dc2878c88567ab74709a5464287ee8d98c2b994": {
+      "description": "The lemma states that, for any a and b, evaluating the less-than-or-equal operator on their integer literal values returns Some containing the Boolean literal for the comparison a <=? b (whether a is at most b). Here intv wraps an integer as a literal value and boolv wraps a Boolean as a literal value; no additional premises are stated."
+    },
+    "Tracker.Contracts.boolv:bfbdd8d305e9d773f8cf93d077b029ad1624c8cc1aef5fff0d122bf46c4367ff": {
+      "description": "The definition introduces boolv as a helper that wraps its argument b first with LitBool and then with LitV, apparently constructing a Boolean literal value. The type of b is inferred rather than explicitly stated, and no additional premises or correctness guarantees are given."
+    },
+    "Tracker.Contracts.call_exec:7161e5a3003ec6e79b0f4665ac4b7d277581a9d233bf4e7566e1a5037a616970": {
+      "description": "The lemma states that if expression a evaluates to the structure value StructV args, and invoking function value f on that structure evaluates to w, then applying f directly to a also evaluates to w. Here invoke uses the already computed structure as its argument. The executes relation describes terminating evaluations, so this is a conditional termination-and-result statement, not merely a partial-correctness WP contract."
+    },
+    "Tracker.Contracts.cons_exec:cfc019b773c85a02e808aaf0ca7175c0a5148a207e81e5b475aef5359342b25e": {
+      "description": "The lemma states that, for any s, e, and rest satisfying closed_val rest, calling consPiece_val with a structure containing the integer values s and e and the value rest terminates under the supplied executes semantics, returning nodev s e rest. This result is a structure containing boolv false, those two integers, and a function that ignores its argument and returns rest. The conclusion asserts a terminating evaluation, stronger than a partial-correctness WP contract alone. The definition of closed_val and the underlying consPiece_fn implementation are not supplied, so their precise meaning and behavior cannot be explained further from this input."
+    },
+    "Tracker.Contracts.empty_exec:b3e3c6bb46242fcbe769b86e517058835e4675586baa38e54bd538dbe40b2fe8": {
+      "description": "The lemma states, with no explicit premises, that calling emptyPieces_val with an empty argument structure terminates and returns nilv under the supplied evaluation rules. Here nilv is a structure containing true, two zeros, and a function that ignores its argument and calls emptyPieces_val again with an empty structure. This asserts terminating evaluation, rather than merely the partial correctness of a WP contract. The underlying function body and lemma proof are not supplied, so its intended application meaning and proof cannot be assessed from this input."
+    },
+    "Tracker.Contracts.ends_exec:41e1570280c4d76b37d21e1f95005c294d6b51109f358b3657530699e32f8530": {
+      "description": "The lemma states that, for every list of shift pairs xs and integer s, calling endsAfter_val with their runtime encodings terminates and returns true exactly when some pair’s second component is strictly greater than s, and false otherwise. It has no additional premises. Because executes describes a finite evaluation yielding a value, this asserts termination as well as the result, rather than merely partial correctness conditional on termination. The supplied input includes the statement but no proof."
+    },
+    "Tracker.Contracts.has_exec:68192a526b99a3595d9d52e09ae265a4bb7f6c0206a33fae2e64473545737094": {
+      "description": "The lemma states that, for any list of shifts xs and integer s, calling hasStart_val with their encoded values terminates under the supplied evaluation rules and returns true exactly when some shift’s first component (its start) equals s, and false otherwise. It has no additional premises. The inductive executes relation asserts a finite evaluation, so this includes termination, unlike a partial-correctness WP contract that only constrains the result if execution terminates. No proof is supplied here."
+    },
+    "Tracker.Contracts.intv:2e4894a08be1b691ae72e79996cb258eace3f49a99046710aba17a66c5e6e58c": {
+      "description": "The definition intv takes n and wraps it as an integer literal value, LitV (LitInt n). The supplied declaration does not explicitly state n’s type; it is inferred from its use with LitInt."
+    },
+    "Tracker.Contracts.invoke:3e3ea35f7d1f8e88bc032f140c34650b4a07e69a9aa71d5c23672e1bb3db2f35": {
+      "description": "invoke f args constructs an application expression that applies the value f to one argument: the structured value StructV args. The input leaves the parameter types and structure’s runtime interpretation unspecified, and this definition alone establishes no correctness or termination guarantee."
+    },
+    "Tracker.Contracts.listv:ff3b53e8490e8d88562f6fe4e5e4b1bde925605d2d551ebffeb8b3f9b5507bc8": {
+      "description": "listv converts a list of shifts, each a pair of integers, into a nested value. An empty list becomes a structure containing true, two zeros, and a function that calls emptyPieces_val. A nonempty list becomes a structure containing false, the first pair’s two integers, and a function returning the recursively converted tail. Recursion proceeds on the shorter tail. The supplied input does not establish the concrete runtime layout or what emptyPieces_val does."
+    },
+    "Tracker.Contracts.listv_closed:1d87a1114864e6f5ec590bea2d5d02921ed1637bd41be5c3868d680116d65bfd": {
+      "description": "The lemma states that for every list xs of shifts, the value listv xs is closed, with no additional hypotheses. This value recursively represents the list using nilv for the empty list and nodev for each pair of entries and the remaining list; a supplied dependency also states that emptyPieces_val is closed. Closedness usually means having no free variables, but closed_val is not defined in the input, so its exact meaning is uncertain."
+    },
+    "Tracker.Contracts.midnight_exec:6edca003109e0152e5a266af713bd3a601bc2b6091693eeb86b435dddf5c28ad": {
+      "description": "The lemma states that for every integer s, calling nextMidnight_val with s packaged as a one-field structure terminates and returns the integer s − Z.rem s 1440 + 1440, with no additional premises. Here executes describes finite evaluation, so the statement asserts termination with the specified result, rather than merely partial correctness. The name suggests calculating a next midnight, but the supplied input does not establish time units or that interpretation for all inputs; no proof is supplied."
+    },
+    "Tracker.Contracts.min_exec:894927eabd94f42c1648eb9aa3b55873e952437b0abdd20419d326c84c2eb378": {
+      "description": "The lemma states that for any integers a and b, calling minMinute_val with their integer-value representations evaluates to the integer value of their minimum, with no additional premises or range restrictions. The supplied inductive executes relation describes a finite evaluation, so this asserts termination with that result, unlike a partial-correctness WP contract that only constrains results if execution terminates. The function body and lemma proof are not supplied, so its implementation and verification cannot be assessed here."
+    },
+    "Tracker.Contracts.nilv:d4c0ad5ec3663cd261063a78df33a50f2ca03586a318650a0ba2b136a202457a": {
+      "description": "nilv defines a four-field structured value containing the Boolean true, two integer zeros, and an anonymous function whose argument, named \"unused\", is ignored and whose body calls emptyPieces_val with an empty structure. emptyPieces_val is obtained by erasing emptyPieces_fn using tracker_layouts; the supplied input does not establish the fields’ intended meanings, the structure’s runtime layout, or what that call returns or whether it terminates."
+    },
+    "Tracker.Contracts.nilv_closed:6e45e7e831b477936692fdf375b064fef0735b2ded8832db8b418b5fa8d65f6b": {
+      "description": "The lemma asserts that nilv is a closed value, conventionally meaning it has no free variables, though closed_val is not defined in the supplied input. Here nilv is a structure containing true, two zeros, and a function that ignores its argument and calls emptyPieces_val on an empty structure. The statement has no explicit premises."
+    },
+    "Tracker.Contracts.nodev:8d20e3edcac91cb47e99a7ae50f9384d4fed414a79039cf193210422e4399ff6": {
+      "description": "nodev s e rest constructs a structure value with four fields: the Boolean false, the integer s, the integer e, and a function that ignores its argument and returns rest. The supplied input does not establish the fields’ intended roles or the structure’s runtime layout."
+    },
+    "Tracker.Contracts.nodev_closed:e1ca60d5b835fcf160e2d3c4fedac6db195afd9542a73671f05684d4862b5ca0": {
+      "description": "The lemma states that if rest satisfies closed_val, then nodev s e rest also satisfies closed_val, with no additional premises on s or e. The constructed node contains false, the integer values s and e, and a function that ignores its argument and returns rest. The definition of closed_val is not supplied, so its precise meaning cannot be established from this input."
+    },
+    "Tracker.Contracts.overlaps_exec:b46ef03dc388176dd276d212b96beb947a65ee130abd334b7df3d9248c255c38": {
+      "description": "The lemma states that, for any list xs of start–finish pairs and integers s and e, invoking overlaps_val with their encoded values terminates and returns whether some pair has start < e and s < finish. It imposes no explicit ordering or validity conditions on the endpoints. The supplied executes relation asserts terminating evaluation, which is stronger than a partial-correctness WP contract that only constrains results if execution terminates. The underlying function body and lemma proof are not supplied."
+    },
+    "Tracker.Contracts.pack_exec:1f4ce142a148549e586c1db3576a3145f1af6ecf2a5f24571163e6dc108c6ebb": {
+      "description": "The lemma states that, for any lists of values acc and vs, constructing a structure with acc already accumulated and the values in vs wrapped as Val expressions evaluates to StructV containing acc followed by vs, preserving their order. There are no additional premises. The supplied executes relation describes finite, terminating evaluation, so this asserts termination with that result, rather than merely partial correctness conditional on termination. No proof is supplied."
+    },
+    "Tracker.Contracts.remove_exec:fe528ec60e6e1138837acae0a64a39c9996284bc21589ca5346017948aadf7c3": {
+      "description": "The lemma states that, for any list of shifts xs and integer s, calling removeStart_val on their runtime encodings evaluates to the encoded list obtained by removing every shift whose start (its first component) equals s, preserving the order of the remaining shifts. There are no explicit additional premises. Because executes is defined inductively by finite evaluation rules, this asserts terminating evaluation with that result, rather than merely partial correctness conditional on termination; no proof is supplied here."
+    },
+    "Tracker.Contracts.select_exec:1307159cc446ec8f1094500f9f13aa8f649285b97ac37d6da569201689c21ed2": {
+      "description": "The lemma states that, for any list xs, integer bounds s and e, and Boolean mode, calling selectPieces_val with their encoded values terminates and returns the encoded list obtained by filtering xs, preserving order. When mode is true, it keeps entries whose start is less than e and whose finish is greater than s; otherwise, it keeps entries whose start is at least s and whose finish is at most e. No additional premises, such as s ≤ e, are stated. Here executes asserts terminating evaluation, rather than merely partial correctness conditional on termination; no proof is supplied."
+    },
+    "Tracker.Contracts.statev:ad87f46a7939a88b2f6a6fd5516479b0755e5a66131e4cb6b42d541123b4cce4": {
+      "description": "statev represents a tracker state as a StructV with two components: its shifts list encoded recursively by listv using nilv and nodev, and its pending value encoded as an integer literal, using -1 for None and p for Some p. No premise excludes Some (-1), so it receives the same pending encoding as None. The supplied input does not specify the runtime layout of these values."
+    },
+    "Tracker.Contracts.statev_closed:89fa3661190f0aaaa875d75cc7c7d375305d7eebd6326a362a2a9a0edd76ccfd": {
+      "description": "The lemma states that for any state st, its encoding statev st satisfies the closed_val predicate, whose precise meaning is not supplied. This encoding is a structure containing the encoded list of shifts and an integer representing the pending value, using −1 when none is pending. The supplied dependency establishes closed_val for encoded lists, and no additional assumptions on st are stated."
+    },
+    "Tracker.Contracts.structv_closed:a991748a6b33475c0dd08a6d147b98f3c0a1b3bf4da42ad1158eb08e861311fe": {
+      "description": "The lemma states that if every value in the list vs satisfies closed_val, then the structure value StructV vs also satisfies closed_val. The input does not define closed_val, so the precise meaning of “closed” is not established."
+    },
+    "Tracker.Model.add_pair:430282e938794e91dd793dd1ef3314db950ef54a64461acda586fea622b37b1d": {
+      "description": "add_pair checks a proposed pair of endpoints s and e in order: it returns code 1 if s is negative, 2 if e ≤ s, 4 if pending contains a value p with p < e, or 3 if the overlap test succeeds against existing shifts. Each failure preserves the original state and returns no rows. Otherwise, it returns code 0, preserves pending, and inserts split_daily s e before the first existing shift whose start is at least s, or at the end if none qualifies; it also returns no rows. The supplied input does not establish the exact splitting behavior, overlap criterion, or endpoint units."
+    },
+    "Tracker.Model.add_query_round_trip:4b2333371334aa8296a8c73b9d59b425b491cb47fd9f0a80375ed37a279cfe9c": {
+      "description": "The theorem states that if every existing shift has a nonnegative start and ends strictly after it starts, and adding the interval from s to e succeeds with code 0, then querying the updated state over that same interval returns exactly the list split_daily s e, in either query mode. Successful addition implies 0 ≤ s < e, no reserved endpoint, and no overlap with existing shifts. The query selects shifts using hit in one mode and full containment in the other; the exact definitions of hit, reservation, and daily splitting are not supplied."
+    },
+    "Tracker.Model.add_success:3a6af3632f9ff6e91331efe606043893f7b86979fdc120a82b51cca807ed5efd": {
+      "description": "The lemma states that if add_pair st s e returns code 0, then s is nonnegative, s < e, the reservation and overlap checks are false, and the updated state contains split_daily s e inserted into the existing shifts using splice, with pending unchanged. The reservation condition means pending is absent or its value is at least e. Splice inserts before the first shift whose start is at least s, or appends if none exists. The precise overlap test and splitting behavior are not established because hit and split_fuel are not supplied."
+    },
+    "Tracker.Model.answer:bd3ea779fca99fb45763440d4cd1206bb509f6ab051b0a5149494cb22e00a7c8": {
+      "description": "The record answer, constructed with Answer, contains an integer code, a tracker named updated, and a list of shifts named rows. Each shift is a pair of integers, and a tracker contains a list of shifts and an optional integer named pending. The declaration imposes no further conditions or relationships between these fields; their intended meanings are not established by the supplied input."
+    },
+    "Tracker.Model.boundary:05716a4353c0fd248d0c0c4e184d565d22a58941179c0d9e528bf62f221fdf86": {
+      "description": "For integers s and e, boundary returns the smaller of e and s minus its remainder on division by 1440 plus 1440. The name next_midnight suggests a time cutoff, but the input does not establish time units or assumptions on s that justify interpreting it as the next midnight."
+    },
+    "Tracker.Model.boundary_bounds:a45b1864d8e01edf00b7f9045412c312609c4a9d0b67c3569cac8391808e1eff": {
+      "description": "The lemma states that if s is nonnegative and e is strictly greater than s, then boundary s e is strictly greater than s and no greater than e. The boundary is defined as the integer minimum of next_midnight s and e; the supplied supporting lemma guarantees that next_midnight s is greater than s under the nonnegativity premise."
+    },
+    "Tracker.Model.contained:6c0d8b8b37b9d50c74dbd5a011317e98ed2f587be1016f8feb89ab3134df9fab": {
+      "description": "The definition contained takes integer bounds s and e and a shift x, which is a pair of integers, and returns true exactly when s is at most x’s first component (its start) and x’s second component (its finish) is at most e. It does not require the start to be at most the finish or s to be at most e."
+    },
+    "Tracker.Model.daily_valid:f7b90e69583a81aef08babf3ef9306d491868aea79f2eefe19820b7c4c9e907f": {
+      "description": "A shift x is daily_valid when its start (the pair’s first component) is nonnegative, its finish (the second component) is strictly later, and it finishes no later than the next multiple of 1440 strictly after its start. The names suggest this boundary represents midnight, but the input does not specify the time units."
+    },
+    "Tracker.Model.delete_shift:af0966f056f3784dca7223d0fdaf2e67639a29f20b885808ed08121ad0fb7f8c": {
+      "description": "delete_shift takes a tracker state and a value s. If s is negative, it returns code 1 with the state unchanged. Otherwise, if any shift has start value s (its first component), it returns code 0 with all such shifts removed and pending unchanged; if none matches, it returns code 6 with the state unchanged. Every result contains an empty rows list. This is a function definition, not a correctness or termination claim."
+    },
+    "Tracker.Model.deletion_preserves_invariant:a259838e630eb906946e3e93e6320ad4530cf9d49670f2e31431ceb094dfdba8": {
+      "description": "The theorem states that, for any state st satisfying state_invariant and any s, the updated state returned by delete_shift st s also satisfies that invariant: its shifts are ordered and daily-valid, and any pending start is nonnegative and at least every shift’s finish. Successful deletion removes all shifts whose start equals s and preserves the pending value. Negative s or no matching shift leads to failure; the failure function’s behavior is not supplied. The exact meanings of ordered and daily_valid are also unspecified, and no proof is included."
+    },
+    "Tracker.Model.duplicate_rejected:574dff948b9e8d576b77c78a52d938f3393a90a6a731d96dbc86d54fd5e0fad9": {
+      "description": "The theorem states that if adding the interval from s to e to state st returns code 0, then adding that same interval to the resulting state returns a nonzero code. The initial success requires 0 ≤ s < e, a false reservation check at e, and no overlap with existing shifts; it inserts the interval’s daily pieces while preserving pending. Thus a successful addition makes an immediate duplicate unsuccessful, although the theorem does not specify the second error code."
+    },
+    "Tracker.Model.empty_invariant:5e4e0e7b5cd0cd0e1cb6f9baf3b5408e7b3c424daa661e26c46c31b6e79ff851": {
+      "description": "The theorem states that a tracker with an empty list of shifts and no pending value satisfies the state invariant. This invariant requires the shifts to be ordered and every shift to satisfy daily_valid; the latter holds vacuously for an empty list, while the pending-value condition is automatically true for None. The input does not define the precise meanings of ordered or daily_valid."
+    },
+    "Tracker.Model.end_preserves_invariant:8a77bf480ef998748fd662edeef07d6a3a92b3de73ea9882e6307f8c746147be": {
+      "description": "The theorem states that if a tracker’s state invariant holds before end_shift is called with an end value e, it also holds for the updated state in the returned answer, with no success-code premise. The invariant requires ordered shifts, every shift satisfying daily_valid, and, when a pending start exists, that start being nonnegative and at least every recorded shift’s finish. The claim covers both success and failure outcomes. The supplied input does not define ordered, daily_valid, or failure, so their precise meanings and behavior cannot be established here."
+    },
+    "Tracker.Model.end_shift:06694526f60a3dccfa0372a95347164fab6620c5bc80eed89e6d50883f96ab00": {
+      "description": "end_shift attempts to finish the pending shift at endpoint e. If no start is pending, it returns error 5 with the original state. Otherwise, it calls add_pair with the pending start and pending cleared: a negative start gives error 1, an end at or before the start gives error 2, a reserved end gives error 4, and an overlap gives error 3. Success returns code 0, shifts computed using split_daily and splice, and no pending start; failure returns the error code with the original state, preserving its pending start. All returned row lists are empty. The helper definitions are not supplied, so their precise behavior is unspecified here."
+    },
+    "Tracker.Model.ends_after:7b36099993a60436ce897a7cd6057805aeb9be3bf6aa43dadc28d3f9d2e2fdf1": {
+      "description": "ends_after xs s returns a Boolean indicating whether any element x in xs has a finish value strictly greater than s; finish x is the second component of x. It returns false for an empty list. The supplied input does not specify the component types or the exact comparison represented by <?."
+    },
+    "Tracker.Model.failure:f6b82a5840fb4725c6dfc0768b5e67ed3d7e68483f7e995be142da113befe9f0": {
+      "description": "`failure c st` constructs an `answer` with integer code `c`, updated tracker `st`, and an empty list of shift rows. It imposes no conditions on `c` or `st`, so the supplied input does not establish which codes represent failure or whether the tracker differs from any earlier state."
+    },
+    "Tracker.Model.filter_all:ed741b22d7c63160d172468eac055bbd460fded173191f0f6ebf80f7e2d81e71": {
+      "description": "For a Boolean predicate f on shifts, where each shift is a pair of integers, this lemma states that if f returns true for every element of the list xs, then filtering xs with f leaves the list unchanged."
+    },
+    "Tracker.Model.filter_none:6ed8f2dc94083b2e469dcc0099d0c5846c5106facab7e51d5c42a6b6f5a8eb95": {
+      "description": "The lemma states that for any Boolean-valued function f on shifts (pairs of integers) and any list xs of shifts, if f returns false for every element of xs, then filtering xs with f yields the empty list."
+    },
+    "Tracker.Model.filter_splice_empty:f12c12197f5f9d64fbe47b633bd0b2bce955be7f91a69f0b2eace6baa116632d": {
+      "description": "The lemma states that if the Boolean test f rejects every shift in xs, then filtering splice s ps xs gives exactly the same list as filtering ps alone. A shift is a pair of integers, and splice inserts ps into xs before the first shift whose first component is at least s, or at the end if none qualifies. The premise ensures that every element originally from xs is removed by filtering; no sorting assumption is required."
+    },
+    "Tracker.Model.finish:c78e80afbd7dae28b942a5cba1e27fae2396dd9a9c4ab3b0a292e4470d1f16a3": {
+      "description": "finish takes a shift, which is defined as a pair of integers, and returns the second integer in that pair."
+    },
+    "Tracker.Model.hit:4b0c8f8bb98fba6fc1ce4c818dc52295164983a0c2a118e7fc22dfa4628836d7": {
+      "description": "hit takes integers s and e and an integer pair x, returning true exactly when x’s first component (start) is less than e and s is less than x’s second component (finish). If both pairs describe intervals of positive length, this tests whether they overlap with positive length, excluding mere endpoint contact; the input does not require valid interval bounds or establish that intended interpretation."
+    },
+    "Tracker.Model.inside:a39be19bda9a4d20e602056d4d6fd7486ac0417de4f722c3a02525c0a2169f0e": {
+      "description": "The definition inside says that a shift x, represented by a pair of integers, has its first component (start) at least s and its second component (finish) at most e, allowing equality at both boundaries. It does not require the start to be at most the finish or s to be at most e."
+    },
+    "Tracker.Model.later_start_rejected:d62982170e4d8c740144ebdea485bc2e3150b23e7faa0eb5324a9e4333d69ee0": {
+      "description": "The theorem states that if x is a shift recorded in st, x starts at a nonnegative time and finishes strictly after it starts, and s is earlier than x’s start, then start_shift st s has a nonzero result code. This rules out the zero-code success branch under those premises, but does not specify the exact nonzero code or the resulting state."
+    },
+    "Tracker.Model.next_midnight:56e2b577d6e582635951b73d53a4a3eb024bba9f3564336532fe2687cd4c5e35": {
+      "description": "next_midnight takes an integer s, subtracts its signed remainder on division by 1440, and adds 1440. For nonnegative s, this gives the smallest multiple of 1440 strictly greater than s. The name suggests a midnight calculation, but the input establishes neither time units nor a nonnegative-input requirement; negative inputs may behave differently because Z.rem uses a signed remainder."
+    },
+    "Tracker.Model.next_midnight_bounds:49acf750155c9dee01188e4babcb2638b2a5f71c4ce64e582b2a5cb17610dfa0": {
+      "description": "For any nonnegative integer s, the lemma states that next_midnight s, defined by subtracting the remainder of s divided by 1440 and then adding 1440, is strictly greater than s and at most s + 1440. This describes the next strictly later multiple of 1440, including when s is already a multiple; the input does not specify time units."
+    },
+    "Tracker.Model.no_hit:1f7f61685840bb3b08ddec4fdd27f3ed7f67a0ecaf83141b8394f0f97b90da93": {
+      "description": "The lemma states that if overlaps xs s e is false, then every shift x in the list xs has hit s e x equal to false. Here s and e are integers, overlaps tests whether any element passes hit, and hit is true exactly when both start x < e and s < finish x hold."
+    },
+    "Tracker.Model.ordered:9aab792207cf3f4a740a9e2fc5fc711a94af50f5c4b997c05e2e50ddf707c8a0": {
+      "description": "The definition ordered describes lists of shifts, each represented by a pair of integers whose first component is its start and second is its finish. StronglySorted requires every earlier shift’s finish to be less than or equal to every later shift’s start, allowing equality. It does not require an individual shift’s start to be at most its finish."
+    },
+    "Tracker.Model.ordered_app:29a929af14012305e101565509fc3a5c336d5ff311f7228d8b21853a8d84d595": {
+      "description": "The lemma states that concatenating two ordered lists of shifts produces an ordered list, provided every shift in the first list finishes no later than every shift in the second list starts. Here, ordered means each earlier shift finishes no later than each later shift starts; a shift’s start and finish are its first and second components, respectively."
+    },
+    "Tracker.Model.ordered_filter:d1d530f3a246afa3a41f55edfce704d5e80c188361e56fbf873102ca2620cdf2": {
+      "description": "The lemma states that filtering an ordered list of shifts with f preserves its ordering. The premise is that every shift in the original list finishes no later than any shift appearing after it starts; the filtered list satisfies the same condition."
+    },
+    "Tracker.Model.overlaps:c28f2054a26608f0e6ef6d716a072c8785bf12c7481c7acaded91cc977ca5b8b": {
+      "description": "overlaps xs s e returns true when at least one shift x in the list xs satisfies both start x < e and s < finish x; otherwise it returns false. These strict integer comparisons suggest an interval-overlap test that excludes merely touching endpoints, but the input does not establish that the shifts or the bounds s and e form valid, ordered intervals."
+    },
+    "Tracker.Model.query:433272d75c89031351325b2aaecf8f2c846af0470211b41354e2a6608f2d7163": {
+      "description": "query filters the shifts in tracker st using integer bounds s and e, returning the tracker unchanged. If s is negative, it returns code 1 and no rows; otherwise, if e is at most s, it returns code 2 and no rows. For valid bounds, it returns code 0 and the matching shifts: when intersect is true, a shift matches if its start is before e and its finish is after s; otherwise, it matches if its start is at least s and its finish is at most e. No assumptions about valid shift endpoints are supplied."
+    },
+    "Tracker.Model.query_preserves_state:c94e0c3d07b606afea9b51e8c418ee903bff8d601abd8ee5b1d26e2057c97b1a": {
+      "description": "The theorem states that querying with any mode, state st, and bounds s and e returns an answer whose updated state is exactly st, with no stated premises. The query reports errors for a negative start or an end no greater than the start; otherwise, it returns filtered shifts and explicitly retains st. The claim also covers error cases, although the supplied input does not define failure, so its state-preserving behavior cannot be established from that definition here."
+    },
+    "Tracker.Model.rejected_add_preserves:4858c48dbd04ef16f3f8f3a6ac80b23fa1de1d004788f47488bcf4e664e78442": {
+      "description": "The theorem states that if add_pair st s e has a nonzero result code, its updated state equals the original state st. The definition has failure branches for s < 0, e ≤ s, reserved st e, and overlaps (shifts st) s e; the remaining branch returns code zero. The definitions of failure, reserved, and overlaps are not supplied, so their precise behavior is not established by this input."
+    },
+    "Tracker.Model.rejected_end_preserves:b7eb8129f3bdf8325b0368f6a6b4abdccbde5d0d7cb3e73e286f399aaaba8b38": {
+      "description": "The theorem states that for any tracker state st and end value e, if end_shift st e returns a nonzero code, its updated state equals st, preserving both recorded shifts and the pending start. The nonzero code is the required premise; the theorem says nothing about successful calls or returned rows. The supplied definition routes rejected calls through failure, whose definition is not provided here."
+    },
+    "Tracker.Model.reservation:41e0636cd9dec562b9d65d6a2f7e2ae92c2fb3e627ea772387583db266e66295": {
+      "description": "The theorem states that for any tracker state st and proposed start value s, if start_shift st s returns an answer with code 0, then every shift already stored in st finishes at or before s. A shift’s finish is its second component, and finishing exactly at s is allowed."
+    },
+    "Tracker.Model.reserved:0860c90daca105406bd14a2ee4621d7d72b5db2e87d92e89a8c217359f97da47": {
+      "description": "The definition reserved takes a tracker state st and an integer e and returns a Boolean: false if st has no pending value, or the result of testing whether its pending integer p is strictly less than e. It does not use the tracker’s shifts field."
+    },
+    "Tracker.Model.shift:0157792989d23d59e38eae3c98e61e9d5b74862f69600910dedb6ca24fa04b80": {
+      "description": "The definition shift names the type of ordered pairs of integers (Z * Z). It imposes no additional conditions on either integer; the input does not specify what the pair represents."
+    },
+    "Tracker.Model.splice:6d0814ea7f43cbf2a6c69dbdfb9036eb655ccf5a8685cd97fec41cff9d459d39": {
+      "description": "splice takes an integer s and two lists of integer pairs, pieces and existing. It inserts all of pieces immediately before the first pair in existing whose first component is at least s, or appends pieces at the end if no such pair exists, preserving each list’s internal order. Recursion proceeds through the remaining tail of existing, so it terminates; no sorting assumptions are given, so the result is not necessarily sorted."
+    },
+    "Tracker.Model.splice_contains:3b9e44ea212ea07e45044cd7f47066d72d1146954929a58c9e23bbf844df908a": {
+      "description": "The lemma states that any shift x occurring in ps also occurs in splice s ps xs. Here splice inserts ps into xs before the first shift whose start (its first component) is at least the integer s, or at the end if no such shift exists; no ordering assumption on either list is required."
+    },
+    "Tracker.Model.splice_elements:7d95d8ea390758f8f0ba7c502d6ceb12b143d9a0e81f2858bfe75b2794e473ca": {
+      "description": "The lemma states that if x belongs to splice s ps xs, then x belongs to ps or xs: splicing introduces no new elements. Here splice inserts ps before the first element of xs whose start (its first component) is at least the integer s, or appends ps if no such element exists. The only premise is membership in the result; no assumption that either list is sorted is required."
+    },
+    "Tracker.Model.splice_forall:d6df54bee540cb091ba6cfb135dc5d806e94200c9925f9d39a7999be64d03104": {
+      "description": "The lemma states that if every shift (a pair of integers) in each of the lists ps and xs satisfies a property P, then every shift in splice s ps xs also satisfies P. The splice function inserts ps before the first element of xs whose first coordinate is at least s, or appends ps if there is no such element. No assumption that either list is sorted is required."
+    },
+    "Tracker.Model.splice_ordered:ebcdfe5d739509b50a0b50a2bf06c2bf9fe5884b385bf89b6354662aa35f7cee": {
+      "description": "The lemma states that inserting the list ps into xs before the first shift starting at or after s (or at the end if none does) preserves ordering: each shift finishes no later than any later shift starts. It assumes both lists are already ordered, every shift has a nonnegative start strictly before its finish, every shift in ps starts at or after s and finishes at or before e, and no shift in xs both starts before e and finishes after s."
+    },
+    "Tracker.Model.split_covers:e967cca0f8c7ae48ab8d1af3922ca3fa1a2de3953387ff6433fa3ec06ecfdbb1": {
+      "description": "The lemma states that if s is nonnegative, s ≤ t < e, and the natural-number fuel converted to an integer is strictly greater than e − s, then some interval x in split_fuel fuel s e contains t: start x ≤ t < finish x. Thus, with sufficient fuel, the returned intervals cover every point in [s, e)."
+    },
+    "Tracker.Model.split_daily:6a7747223779c921112c9556b68f255028f7074d310eb82e3910bc2d16005700": {
+      "description": "split_daily takes integer endpoints s and e and calls split_fuel with fuel equal to one plus e − s converted to a natural number, with negative differences converted to zero. The helper returns an empty list when e ≤ s or fuel runs out; otherwise, it adds (s, boundary s e) and continues from that boundary with less fuel. Decreasing fuel ensures termination, but the input does not define boundary, so it does not establish that the resulting shifts are daily or cover the whole interval."
+    },
+    "Tracker.Model.split_daily_covers:afecb6d081be3c05ebc2aac260cddf861c835876ec0076b6a8636d4e7912415a": {
+      "description": "The theorem states that if s is nonnegative and s ≤ t < e, then some shift returned by split_daily s e contains t, including its start but excluding its finish. A shift’s start and finish are its first and second components. The supplied definitions do not establish what makes the splitting “daily” or whether the covering shift is unique."
+    },
+    "Tracker.Model.split_fuel:3a5c25e5b0744a3cc3df44fafcb8e1bb7c7d61e4a9601cef3a68125fde18048d": {
+      "description": "split_fuel takes a natural-number fuel limit and integer endpoints s and e, returning a list of integer pairs. It returns an empty list when fuel is zero or e ≤ s; otherwise, it adds (s, boundary s e) and continues from that boundary with one less fuel. The boundary is the smaller of next_midnight(s) and e. Decreasing fuel ensures termination and limits the list to at most fuel pairs, but the supplied input does not define next_midnight, so it does not establish forward progress or that the resulting pairs cover the whole interval."
+    },
+    "Tracker.Model.split_head:44a7f0bebe765cb835ecdf08ced5e527a7737b1378705de22d920106abce6e96": {
+      "description": "The lemma states that if s is nonnegative and strictly less than e, then split_daily s e is a nonempty list whose first element is the pair (s, boundary s e), followed by some remaining list. The boundary is the minimum of next_midnight s and e. The statement does not describe the remaining list, and the supplied input does not define next_midnight."
+    },
+    "Tracker.Model.split_inside:b596f260c547855b54dd31b736faea1aff944075b6de88714b11318ce26c26ad": {
+      "description": "The lemma states that if s is nonnegative, every shift produced by split_fuel fuel s e has a nonnegative start, finishes strictly after it starts, lies within the bounds s and e, and finishes no later than next_midnight of its start. The function terminates by decreasing its natural-number fuel, but limited fuel may leave part of the interval uncovered; this lemma does not assert complete coverage."
+    },
+    "Tracker.Model.split_nonempty:90ab85ac6bf7a50961f8f2aac547edd5c1bf7c2e9a49c443e5e00c5207ee3c46": {
+      "description": "The lemma states that whenever s is nonnegative and strictly less than e, split_daily s e is not the empty list. The supplied split_head lemma further states that its first element is the pair (s, boundary s e); the input does not define boundary or explain how the splitting works."
+    },
+    "Tracker.Model.split_ordered:9844410d17eca69d12748bdfa84122436b9c0d62614bf8987a5df3a4f27357ac": {
+      "description": "The lemma states that if s is nonnegative, then for any natural-number fuel and integer endpoint e, split_fuel fuel s e produces an ordered list of shifts: every earlier shift finishes no later than every later shift starts. The function stops when fuel runs out or e is at most the current start, so the lemma does not guarantee that the resulting shifts cover the entire interval up to e."
+    },
+    "Tracker.Model.split_selected:782bfdb8515791f91b62994821bab44264287bae5a089c55c4b41bbfd0e938ef": {
+      "description": "The lemma states that if the integer bounds satisfy 0 ≤ s < e, every shift returned by split_daily s e lies within those bounds (s ≤ start and finish ≤ e) and satisfies the strict overlap checks (start < e and s < finish). The definition of split_fuel is not supplied, so the input does not establish exactly how these shifts are constructed or whether they cover the whole interval."
+    },
+    "Tracker.Model.start:965262a461b40a749d7e7c07fe69695c8fb432bc47abac05ec717e44158d7373": {
+      "description": "The definition start takes a shift, defined as a pair of integers, and returns its first integer component. The supplied input gives no further meaning to that component and states no additional premises."
+    },
+    "Tracker.Model.start_end_equivalent:2dad2e2acc5a5cbae41c7d614f9a55d66a9c5c803c95450f93a4d5c5858b5daa": {
+      "description": "The theorem states that if starting a shift at s in state st and directly adding the pair (s, e) to st both return code 0, then ending the shift at e in the state produced by that start returns exactly the same answer as directly adding the pair. This equality includes the return code, updated tracker state, and returned rows."
+    },
+    "Tracker.Model.start_preserves_invariant:c382b122658ca71decef98e848fb9ce5277e25d72a711d190fcecec24749e1dd": {
+      "description": "The theorem states that if a tracker satisfies its invariant, the updated tracker returned by start_shift also satisfies it. The invariant requires ordered shifts, daily validity for every shift, and any pending start to be nonnegative and no earlier than every recorded finish. A successful start preserves the shift list and sets the pending start to s; negative starts, an existing pending start, or a recorded finish later than s trigger failure. The definitions of ordered, daily_valid, and failure are not supplied, so their precise meanings and failure behavior remain unspecified."
+    },
+    "Tracker.Model.start_shift:633e03882b316559e07b562f07b690a1c68f4828432e26ef55139239ac86fe00": {
+      "description": "start_shift takes a tracker state and an integer s. It returns code 1 if s is negative; otherwise, it returns code 4 if a start is already pending or any stored shift finishes strictly after s. These failures preserve the original state. If none of these conditions holds, it returns code 0 and a state with the same stored shifts and pending set to Some s. A stored shift finishing exactly at s does not prevent success. Every result contains an empty rows list."
+    },
+    "Tracker.Model.state_invariant:04567142f00738ffd03b9a33781d27a9dede9aac2a462d7f896fbc0c6ffcb592": {
+      "description": "state_invariant requires every earlier shift in the stored list to finish no later than any later shift starts, and every shift to satisfy valid_shift and finish no later than next_midnight of its start. If pending is Some s, s must be nonnegative and every stored shift must finish at or before s; None adds no requirement. The meanings of valid_shift and next_midnight are not supplied, and this definition alone does not establish that any state satisfies it."
+    },
+    "Tracker.Model.successful_add_preserves_invariant:29aac4a4cdb2b2fb559160fa4030c1728ae139c76cc7a6a5f61ea0de1d5063c0": {
+      "description": "This theorem states that if the initial tracker satisfies its state invariant and add_pair st s e returns code 0, its updated tracker also satisfies that invariant. The invariant requires ordered shifts, each with a nonnegative start, a strictly later finish, and a finish no later than next_midnight of its start; any pending value must be nonnegative and at least every shift’s finish. Success requires 0 ≤ s < e, a false overlap check, and no pending value less than e. The successful update splices split_daily s e into the existing shifts and preserves the pending value. The precise ordering and splitting behavior are not defined in the supplied input; this is an invariant-preservation statement, not a termination contract."
+    },
+    "Tracker.Model.tracker:a24e5f6759d55032547a48a0e00a75d9972f93208158672541c4e1049db11f19": {
+      "description": "The record type tracker has a constructor named State and two fields: shifts, a list of pairs of integers, and pending, an optional integer that is either absent or present. The declaration imposes no further constraints and does not establish what these values represent."
+    },
+    "Tracker.Model.valid_contained_hits:e7e769f041aaec410507246a19a2965e9506109726e3eadf035b893b060f9fdf": {
+      "description": "The lemma states that a shift x with a nonnegative start and a finish strictly later than its start must satisfy hit s e x = true whenever it is contained between integer bounds s and e. Containment means s ≤ start x and finish x ≤ e; the conclusion means start x < e and s < finish x."
+    },
+    "Tracker.Model.valid_shift:c4834571179e7d2fc5eac1ee3aa0483edc08ec12a41192f82ce794cca23998c9": {
+      "description": "A shift is a pair of integers, with its first component called the start and its second called the finish. The definition valid_shift says that a shift is valid exactly when its start is nonnegative and strictly less than its finish."
+    },
+    "Tracker.Operations.daily_exec:d6c0f4f4a3a856c8c76fa106b771531ec7d1485e1f1bcf1c76934aaa3f0df9dc": {
+      "description": "The lemma states that whenever s is nonnegative, calling splitOnto_val with encoded integers s and e and the encoded list rest terminates and returns the encoded list split_daily s e followed by rest. There is no stated requirement that e be at least s. The supplied executes relation describes finite evaluation, so this asserts termination and the result, rather than merely partial correctness. split_daily uses a fuel-limited helper, but that helper’s definition is absent, so the exact meaning of “daily” splitting is not established by this input."
+    },
+    "Tracker.Operations.delete_exec:7c4e2746ef0f0d102f6b58b27dfa934d915d88f83b68f4f3b4f222642030a0e8": {
+      "description": "The lemma states that, for every tracker state st and integer s, with no additional premises, calling deleteShift_val on their encoded values terminates with the encoded answer specified by delete_shift. A negative s gives code 1 and leaves the state unchanged; otherwise, if any shift starts at s, it removes all such shifts, preserves the pending value, and gives code 0; if none does, it gives code 6 and leaves the state unchanged. Every answer contains an empty rows list. Here executes asserts a terminating evaluation, stronger than partial correctness alone in a WP contract. No proof is supplied."
+    },
+    "Tracker.Operations.empty_state_exec:9cc39d936e82ad814eaa27655f52f4d984228edfc8d263fb4ca86cdcec69af3a": {
+      "description": "The lemma states, with no explicit premises, that calling emptyState_val with an empty argument structure terminates under the supplied execution rules and returns an empty tracker state: no shifts and no pending integer. The returned state is encoded as a structure containing listv [] and intv (-1), where -1 represents None. This completed-execution assertion includes termination, whereas a partial-correctness WP contract would only constrain the result if execution terminates. The proof and underlying function body are not supplied."
+    },
+    "Tracker.Operations.executes_result:918960eec7af926ebbfd4c312d17a5e7af703bf3c5a4750694afb010499bfe0b": {
+      "description": "The lemma states that if expression e evaluates to value v under the supplied executes relation, and v equals w, then e also evaluates to w. It simply allows an evaluation result to be replaced by an equal value; it does not assert that every expression terminates or that evaluation results are unique."
+    },
+    "Tracker.Operations.insert_exec:0a0b55392ac2a0098cc919ca3eeab9d2f49e8d3cdb02b307f511388395e5330b": {
+      "description": "The lemma states that, for any list of shifts xs and integers s and e with s nonnegative, calling insertDaily_val on their runtime representations terminates and returns the encoded list splice s (split_daily s e) xs. This inserts the pieces from split_daily before the first existing shift whose start is at least s, or appends them if none qualifies. No sorting assumption on xs or restriction on e is stated. The exact splitting behavior is unclear because split_fuel is not supplied. Here executes asserts a terminating evaluation with the specified result, which is stronger than a partial-correctness WP contract that only constrains results if execution terminates."
+    },
+    "Tracker.Operations.pending_valid:9f679db9baa6b067fe60358a0d186a9ea243799dcb46c3b8012d11fb2b80146b": {
+      "description": "pending_valid says that a tracker’s optional pending integer is valid when it is either absent (None) or present (Some p) with p ≥ 0. It places no condition on the tracker’s shifts list."
+    },
+    "Tracker.Operations.query_contained_exec:5fd6664ea5e6400565f0d55c215a4a39d9f3bd5d4ffa1c044e21340d6065a1ab": {
+      "description": "The lemma states that, for any tracker state st and integer bounds s and e, calling queryContained_val with their encoded values terminates with the encoded answer from query false st s e, with no additional premises. The answer preserves st and returns code 1 with no rows if s < 0, otherwise code 2 with no rows if e ≤ s, otherwise code 0 with the shifts satisfying contained s e. The precise meaning of contained is not supplied. Since executes describes finite evaluation, the statement asserts termination with this result, not merely partial correctness conditional on termination."
+    },
+    "Tracker.Operations.query_intersecting_exec:6f1597f043d4290432915c5b3772aca02397331b81f4d25389d2e1313ff6c151": {
+      "description": "The lemma states that, for any state st and integer bounds s and e, calling queryIntersecting_val with their encoded values terminates and returns the encoded result of query true st s e. The result preserves st and contains code 1 with no rows if s is negative, code 2 with no rows if s is nonnegative and e ≤ s, or code 0 with the state's shifts filtered by hit s e otherwise. There are no explicit validity premises. The exact intersection boundary rules are unspecified because hit is not defined here. The inductive executes relation asserts terminating evaluation, rather than merely partial correctness conditional on termination."
+    },
+    "Tracker.Operations.split_exec:54f83d90c5dc5fc3125a573ec6e5e406fafb46564e060cd4a599b77c7688503d": {
+      "description": "The lemma states that if s is nonnegative and e − s is strictly less than the natural-number fuel, calling splitOnto_val with encoded s, e, and rest terminates and returns the encoded list split_fuel fuel s e followed by rest. The model builds successive interval pieces ending at the smaller of next_midnight(s) and e, stopping when fuel runs out or the current start reaches or exceeds e. The precise meaning of next_midnight is not supplied. Because executes describes finite evaluation, this asserts termination with the stated result, stronger than a partial-correctness WP contract that only constrains results if execution terminates."
+    },
+    "Tracker.Operations.start_exec:53e108d3b00f101c0c02cd490d28171d251352dfd5712896744e2ec7b3ba4518": {
+      "description": "The lemma states that, if st has no pending start or its pending start is nonnegative, calling startShift_val with the encoded state and integer s terminates with the encoded result of start_shift st s. A negative s gives code 1; otherwise, an existing pending start or a recorded shift ending after s gives code 4. These failures preserve the state. Success gives code 0, preserves recorded shifts, and sets the pending start to s. Every result has an empty rows list. Here executes describes finite evaluation, so the claim includes termination, unlike a partial-correctness WP contract. The supplied statement does not establish that its proof was checked."
+    },
+    "Tracker.Public.addPair_correct:56fb6c0275cadf08a07d15329a9a879e3db689ab97327b26ffc209d43f92a557": {
+      "description": "Assuming the supplied logical framework instances and that any pending value in st is nonnegative, addPair_correct states that calling the public “addPair” function with encoded st, s, and e satisfies a partial-correctness contract: if it terminates, its result equals the encoded answer from add_pair st s e. That model checks, in order, for negative s, e ≤ s, reservation, and overlap, selecting failure codes 1, 2, 4, and 3 respectively; otherwise it returns code 0, modifies the shifts using split_daily and splice, preserves the pending value, and returns empty rows. The supplied input does not fully define those helpers or failure results, and this WP contract does not guarantee termination."
+    },
+    "Tracker.Public.add_exec:5cb024001df772f640868ce7ea69b068d155077afea771d80fd587dcddfaedff": {
+      "description": "The lemma states that, whenever the state's pending value is absent or nonnegative, calling addPair_val with the encoded state and integers s and e terminates with the encoded answer computed by add_pair. It checks, in order, whether s is negative (error 1), e is at most s (error 2), a pending value is less than e (error 4), or an existing shift overlaps (error 3); each error preserves the state. Otherwise, it returns code 0, updates shifts using split_daily and splice, and preserves the pending value. Every answer has empty rows. The precise splitting, insertion, and overlap rules are not supplied. Here, executes asserts a finite evaluation yielding the result, so the claim includes termination, unlike a partial-correctness WP contract. No proof is supplied."
+    },
+    "Tracker.Public.deleteShift_correct:8fbbb7a34bd36a4bda4ce9a670960f1f3d8576dba4b9d9e59095cd306cf62c81": {
+      "description": "For any state st and integer s, assuming the listed logical typeclass contexts, deleteShift_correct states that if the public “deleteShift” call on their encoded values returns, its result equals the encoded answer from delete_shift st s. That model selects failure 1 for negative s, removes all shifts starting at s when a match exists, preserving pending and returning code 0 with no rows, and otherwise selects failure 6. The supplied input does not define the contents of those failure answers. The theorem has no explicit additional precondition; its WP contract expresses partial correctness and does not guarantee termination."
+    },
+    "Tracker.Public.emptyState_correct:543fe1f5832c9cbb4d0d60ce2ccd5c993a3bc7a5aa8fa155444db711c6496ea7": {
+      "description": "Assuming the implicit cjrGS and invGS_gen logical infrastructure, emptyState_correct states that calling the public \"emptyState\" entry point with no arguments satisfies a partial-correctness WP contract: if it returns, its result equals the encoded tracker state with no shifts and no pending value, represented as a struct containing an empty list and the integer -1. No additional precondition is stated, and the WP contract itself does not guarantee termination."
+    },
+    "Tracker.Public.endShift_correct:c9d90bd6b492594c092bdaa4e0fd23f831ca3fb07a7ee23ac1e7269518057a76": {
+      "description": "Assuming the state has either no pending start or a nonnegative pending start, endShift_correct states that calling the public “endShift” function with the encoded state and integer e satisfies a partial-correctness contract: if it returns, its result equals the encoded model answer, containing a code, updated state, and rows. The model calls failure with code 5 and the original state when no start is pending; otherwise it calls add_pair with the pending start, e, and a state whose pending field is cleared, accepting a zero-code result or calling failure with the returned code and original state. The definitions of add_pair and failure are not supplied. The WP contract does not guarantee termination."
+    },
+    "Tracker.Public.end_exec:d02ea3d6f3a6fdd6928de978be5d377a96835286815eb89dcafb692098ab1e91": {
+      "description": "The lemma states that whenever st has no pending start or its pending start is nonnegative, calling endShift_val with the encoded state and end time e terminates with the encoded answer computed by end_shift st e, containing a result code, updated state, and rows. The model returns error code 5 if no start is pending; otherwise, it attempts to add the shift, clearing the pending start on success and preserving the original state on failure. Here the inductive executes relation asserts terminating evaluation, stronger than a partial-correctness WP contract that only constrains results if execution terminates."
+    },
+    "Tracker.Public.port:a0dadcb2296730a7a23c8a6522c643b050bdd7f00295bac59907f40984b09618": {
+      "description": "port takes a name and arguments, wraps each argument with GEVal, and constructs GECall with that name, an empty list, and the wrapped arguments. It passes this call to erase using tracker_layouts and the result of linking tracker_functions with those layouts and another empty list. The layouts describe ShiftList, TrackerState, and TrackerResult structures. The supplied input does not establish the precise behavior of erase or link_functions, or the meaning of the empty lists; this definition provides no correctness or termination guarantee."
+    },
+    "Tracker.Public.port_exec:d307e42b91db1bd0f813fc6431ce694a4aee3177579358ed3d10d29b387a04db": {
+      "description": "The lemma states that if looking up name in tracker_runtime returns f, and calling f with args packed into a structure terminates with result, then port name args—the erased, linked named call—also terminates with that same result. Here executes describes terminating evaluation, so the conclusion transfers termination and the result from the assumed direct execution; it does not guarantee that every call terminates."
+    },
+    "Tracker.Public.queryContained_correct:d1fe8709b0fb60162e43bb77965cf0b15a88dff1f6a11f2bf58dfe275ee4cc7a": {
+      "description": "Under the stated ghost-state and invariant assumptions, this theorem gives a partial-correctness contract for calling the public queryContained function with encoded state st and integers s and e: if it returns, its result equals the encoded model answer query false st s e, including its code, updated state, and rows. The model selects failure 1 when s is negative, failure 2 when e ≤ s, and otherwise constructs Answer 0 using st and its shifts filtered by contained s e. No range preconditions are imposed. The supplied input does not define the containment boundaries or failure contents, and the WP contract does not itself guarantee termination."
+    },
+    "Tracker.Public.queryIntersecting_correct:a33c60a1fb75082409cc9c5ebbaba11ca6be7d6da90480e2db83a03b219bee1a": {
+      "description": "Under the stated logical typeclass assumptions, this theorem gives a partial-correctness contract for calling the public “queryIntersecting” function with encoded state st and integers s and e: if it returns, its value equals the encoded result of query true st s e, containing a code, updated state, and rows. The model selects failure 1 when s is negative, otherwise failure 2 when e ≤ s; on valid bounds, it returns code 0, the unchanged state, and the shifts satisfying hit s e. No additional input premises are stated. The supplied definitions do not establish the precise meaning of hit or the contents of failure results, and the WP contract alone does not guarantee termination."
+    },
+    "Tracker.Public.startShift_correct:16c6cd7a806766f62b9d809a878124dc923ac9179397fc724ec8df45bb73d144": {
+      "description": "The theorem states that, in the given logical context, if the state has no pending shift or its pending value is nonnegative, calling “startShift” with the encoded state and integer s satisfies a partial-correctness contract: if it returns, its result equals the encoded model answer, containing a code, updated state, and rows. The model selects failure 1 when s is negative, or failure 4 when a shift is already pending or ends_after holds; otherwise it returns code 0, preserves the shifts, sets the pending value to s, and returns no rows. The supplied input does not define the details of failure or ends_after. This WP contract does not itself guarantee termination."
+    },
+    "Tracker.Pure.executes:dbac50371e61d2315f1da5c1314af87884dd507e98d67ac8cc280669cf1cde88": {
+      "description": "Tracker.Pure.executes defines an inductive relation describing successful, terminating evaluation of an expression to a value. Values evaluate to themselves, and recursive functions become recursive function values. Application requires evaluating the function and argument, then evaluating the body after substituting the recursive function and argument; let bindings similarly substitute an evaluated value. Conditionals require a Boolean condition and evaluate the selected branch. Binary operations require both operands to evaluate and bin_op_eval to return Some result. Structures accumulate evaluated fields in order, and field access requires evaluation to a structure and a successful lookup. The helper functions’ precise behavior is not supplied. This declaration does not assert that every expression terminates and is not a weakest-precondition contract."
+    },
+    "Tracker.Pure.executes_wp:87207e58ab76d501074a8fbba94c480b3b265a30dce7e241b3eb2068bec2845d": {
+      "description": "Assuming the required cjrGS Σ and invGS_gen HasLc Σ instances, whose definitions are not supplied, executes_wp states that a derivation of executes e w establishes a weakest-precondition contract for e: any returned value must equal w. The inductive executes premise describes a terminating evaluation to w under its evaluation rules; the resulting WP contract expresses partial correctness and does not itself guarantee termination."
+    },
+    "Tracker.Runtime.addPair_closed:f22c0f72e6866388f50c9bd2facab66fb88a36bd8b0ebde3be982e3aae4e6038": {
+      "description": "The lemma addPair_closed asserts, with no explicit premises, that addPair_val satisfies closed_val, conventionally meaning it has no free variables; the exact definition of closed_val is not supplied. The value is constructed from addPair_fn using erase_function, tracker_layouts, and the listed helper values. This states a closure property, without specifying what addPair computes or asserting its functional correctness or termination."
+    },
+    "Tracker.Runtime.addPair_val:e61cf57879bc2565ad1f2106aab112c64ed69a966010ce8029103c24b3499833": {
+      "description": "addPair_val defines a value of type val by applying erase_function to addPair_fn with the tracker layouts and named helper values, then evaluating while leaving the listed helpers unexpanded. The function takes a tracker and start/end minutes, checking in order: a negative start returns code 1; an end at or before the start returns code 2; an end beyond pending, when pending is not −1, returns code 4; and a true result from overlaps returns code 3. These branches preserve the tracker. Otherwise, it returns code 0 with pieces updated by insertDaily and pending preserved. Every branch obtains its rows from emptyPieces. The helper bodies are not supplied, so their precise behavior is not established here. This definition states no correctness contract or termination guarantee."
+    },
+    "Tracker.Runtime.consPiece_closed:2da2867e9aaee3b5a2cfb9d2391e1521565aa3d811c27387a585fc6657e6137b": {
+      "description": "The lemma states that consPiece_val is closed, conventionally meaning it has no free variables, though the supplied input does not define closed_val. This value is constructed by erasing consPiece_fn using tracker_layouts and a binding for emptyPieces, whose value is also stated to be closed in a supplied dependency. The lemma has no explicit premises and makes no claim about runtime behavior or termination."
+    },
+    "Tracker.Runtime.consPiece_val:8cd4be61453fa3448e7dc23a007f30dd59131102e8615d7d0504e6e45416414e": {
+      "description": "consPiece_val defines a value of type val by evaluating erase_function on consPiece_fn using tracker_layouts and a mapping from \"emptyPieces\" to emptyPieces_val, while leaving emptyPieces_val unexpanded. The source function takes integer start and end positions and an existing ShiftList, then constructs a ShiftList whose empty flag is false, whose bounds are those positions, and whose rest field is a function that ignores its unit argument and returns the existing list. The supplied input does not define erase_function, so its precise translation behavior is uncertain; this declaration provides no correctness or termination guarantee."
+    },
+    "Tracker.Runtime.deleteShift_closed:826089ec123b3658444ccee31c99b780c0b9850083f5b1299b6e63ab6f53b563": {
+      "description": "The lemma deleteShift_closed states, without explicit premises, that deleteShift_val satisfies closed_val—usually meaning it has no free variables, although that predicate’s definition is not supplied. This value is built from deleteShift_fn using erase_function with tracker_layouts and named helper values; the dependencies include corresponding closedness lemmas for those helpers. The statement concerns closedness only: it gives no contract for deletion behavior and makes no claim about partial correctness or termination."
+    },
+    "Tracker.Runtime.deleteShift_val:a8946e4bc155eb8ba7c9c42b99fd37949cc0ad8b2cff76525e50e1eb64b906cf": {
+      "description": "deleteShift_val defines a value of type val by evaluating erase_function on deleteShift_fn with the tracker layouts and named helpers, leaving the listed helper definitions unexpanded. The supplied function takes a tracker and start minute: a negative minute returns code 1 with the original tracker; otherwise, if hasStart returns true for its pieces, it returns code 0 with pieces replaced by removeStart’s result and pending unchanged; if false, it returns code 6 with the original tracker. Every branch obtains its rows from emptyPieces. The helpers’ exact behavior and the codes’ intended meanings are not supplied, and this definition states no correctness or termination contract."
+    },
+    "Tracker.Runtime.emptyPieces_closed:053ad7aa7f56ce90ad00c623730b4a00fda28fe96f579847ce098dffac60d138": {
+      "description": "The lemma states, with no explicit premises, that emptyPieces_val satisfies closed_val. This value is obtained by evaluating erase_function on tracker_layouts, an empty list, and emptyPieces_fn. “Closed” usually means having no free variables, but the supplied input does not define closed_val, so its exact meaning is uncertain."
+    },
+    "Tracker.Runtime.emptyPieces_val:e0c32ff7c581756ef38ed937050470d8e9ac894c2dcba4db1148e924e003f542": {
+      "description": "emptyPieces_val is a value obtained by computing erase_function on tracker_layouts, an empty list, and emptyPieces_fn using call-by-value reduction. The supplied source function constructs a ShiftList whose empty field is true, start and finish are zero, and rest is a function that ignores its unit argument and calls emptyPieces again when invoked. The recursive call is inside that function, so construction does not directly perform it. The exact behavior of erase_function is not supplied, and this definition alone establishes no correctness or termination guarantee."
+    },
+    "Tracker.Runtime.emptyState_closed:81101da0759210a6fef9281e06a8b54cabfb0cb13464e2468c1bd0fe93c3bfb0": {
+      "description": "The lemma emptyState_closed states, with no explicit premises, that emptyState_val satisfies closed_val. This conventionally means it has no free variables, though closed_val is not defined in the supplied input. The value is constructed from emptyState_fn using erase_function with tracker_layouts and the listed helper values. The statement concerns closedness; it provides no execution contract or termination guarantee, and no proof is supplied here."
+    },
+    "Tracker.Runtime.emptyState_val:c6813c895760db8e540e0f2ca8a44edf02deb852b2ea93995739acd49d33c684": {
+      "description": "emptyState_val defines a value of type val by evaluating erase_function on emptyState_fn, using tracker_layouts and the supplied named helper values while leaving those helpers unexpanded. The source function takes no arguments and constructs a TrackerState whose pieces field comes from calling emptyPieces and whose pending field is −1. The input does not define erase_function or the body of emptyPieces_fn, so their precise behavior and the significance of −1 are not established. This is a definition with no stated preconditions or correctness or termination contract."
+    },
+    "Tracker.Runtime.endShift_closed:b51ff3f8c69f119d4e1bbbeb16fa0f5f9507bbcc1f314a1cc51d7392fc4de6a2": {
+      "description": "The lemma endShift_closed asserts, with no explicit premises, that endShift_val satisfies closed_val. This normally means the value has no free variables, although the definition of closed_val is not supplied. endShift_val is constructed from endShift_fn using erase_function with named helper values. This is a closedness claim, not a contract about execution: it states neither partial correctness nor termination."
+    },
+    "Tracker.Runtime.endShift_val:ecacb526f67aa43eba5bcabb931b89fff4ffa56c9eefd3a3490e8e07ea4d273b": {
+      "description": "endShift_val defines a value by applying erase_function to endShift_fn with the tracker layouts and named helper values, simplifying without unfolding those helpers. The function takes a tracker and an end minute. If the tracker’s pending field is -1, it returns code 5, the original tracker, and rows from emptyPieces. Otherwise, it calls addPair with the existing pieces, pending cleared to -1, and the original pending and supplied end minutes. It returns that result if its code is 0; otherwise, it returns its code with the original tracker and rows from emptyPieces. The helper bodies and code meanings are not supplied, and this definition states no preconditions, correctness contract, or termination guarantee."
+    },
+    "Tracker.Runtime.endsAfter_closed:7e358afdfcfbcf159019faef2b93f08c035b4e9e5ca2049fc7055b545f0644fd": {
+      "description": "The lemma states, with no explicit premises, that endsAfter_val satisfies closed_val, conventionally meaning it has no free variables, though closed_val is not defined in the input. This value is built by erasing endsAfter_fn with bindings for overlaps, minMinute, nextMidnight, consPiece, and emptyPieces, whose closure lemmas are also supplied. The statement concerns closure and provides no claim about runtime results or termination."
+    },
+    "Tracker.Runtime.endsAfter_val:b70cd9eed1135007d633768063486822deed9f3177b7aea3c7eff02bf58599be": {
+      "description": "endsAfter_val defines a value by evaluating erase_function on endsAfter_fn with the tracker layouts and five named helper values, without unfolding those helper definitions. The supplied source function checks a ShiftList: it returns false if empty, true if the current piece’s finish exceeds startMinute, and otherwise recursively checks the rest, obtained by calling its rest function with unit. This expresses a search for a piece ending strictly after startMinute. The definition of erase_function is not supplied, so its precise translation is uncertain; this declaration provides no correctness contract or termination guarantee."
+    },
+    "Tracker.Runtime.hasStart_closed:9fba947b6a166bba1056a1043ced87bff5cae3dd6d5a1e17a9d72ed20229471d": {
+      "description": "The lemma hasStart_closed states, with no explicit premises, that hasStart_val satisfies closed_val, conventionally meaning it has no free variables; the definition of closed_val is not supplied, so that interpretation is uncertain. hasStart_val is constructed by applying erase_function to hasStart_fn with tracker_layouts and named helper values. This is a closure statement, not a contract about execution, and establishes neither functional correctness nor termination. No proof is included in the input."
+    },
+    "Tracker.Runtime.hasStart_val:451d1389a84d9ef8fd7b38cf64b9571833b12383897c8055e6e347c415a310d5": {
+      "description": "hasStart_val defines a value by applying erase_function to hasStart_fn with the tracker layouts and named helper values, then evaluating while leaving those helper definitions unexpanded. The source function searches a ShiftList for a piece whose start equals startMinute: it returns false for an empty list, true for a matching first piece, and otherwise calls the rest function with unit and searches recursively. The input does not define erase_function’s semantics or establish that following rest always terminates. No correctness contract is supplied; a partial-correctness guarantee would describe results when execution finishes, without itself guaranteeing termination."
+    },
+    "Tracker.Runtime.insertDaily_closed:64f830f76cf994fefe097402be11b0601ed29c843270db8474ad794e78125f78": {
+      "description": "The lemma states, with no explicit premises, that insertDaily_val satisfies closed_val, conventionally meaning it has no free variables, although that predicate’s definition is not supplied. The value is constructed by erasing insertDaily_fn with bindings for seven helper values, whose closedness lemmas are also listed. This is a closedness claim, not a contract establishing execution behavior or termination."
+    },
+    "Tracker.Runtime.insertDaily_val:9caae72cc23f9427e6026671107e492f1b628e18c57cf6250a92fc7e5bc5af8d": {
+      "description": "insertDaily_val defines a value of type val by evaluating erase_function on insertDaily_fn with the tracker layouts and seven named helper values, leaving those helper definitions unexpanded. The underlying function takes a shift list and start and end minutes: if the list is empty or the new start is at most the first piece’s start, it calls splitOnto; otherwise, it preserves the first piece using consPiece and recursively processes the tail. The supplied input does not establish splitOnto’s exact behavior or provide a correctness contract or termination guarantee."
+    },
+    "Tracker.Runtime.minMinute_closed:37d791b2f99a5343b5bfb8d3dd1ed6913fe4c7fb51d1276f9e7e391d0bec4a21": {
+      "description": "The lemma asserts, without explicit premises, that minMinute_val satisfies closed_val, conventionally meaning it has no free variables, though that predicate is not defined in the input. The value is constructed by erasing minMinute_fn with bindings for nextMidnight, consPiece, and emptyPieces; corresponding closedness lemmas are also supplied. This is a closedness assertion, not a contract about runtime behavior or termination, and no proof is shown."
+    },
+    "Tracker.Runtime.minMinute_val:79bd5feb9ce90dfe4f609dd22da1e1c1aec0b0f22a8c161e87890b372e4fd926": {
+      "description": "minMinute_val defines a value of type val by evaluating erase_function with tracker_layouts, bindings for nextMidnight, consPiece, and emptyPieces, and minMinute_fn, while leaving those three bound value definitions unexpanded. The supplied minMinute_fn describes a function taking two integers and returning the left one if it is less than or equal to the right, otherwise the right—thus selecting their minimum. The input does not define erase_function, so its precise translation behavior is uncertain; this declaration supplies no correctness or termination contract."
+    },
+    "Tracker.Runtime.nextMidnight_closed:7020c751c95da3c7b50e0a352721be8c64a7192b44826552d824a377eb54cf43": {
+      "description": "The lemma states, with no explicit premises, that nextMidnight_val satisfies closed_val, ordinarily meaning it has no free variables, although that predicate is not defined in the input. The value is produced by erasing nextMidnight_fn with bindings for consPiece and emptyPieces; related lemmas state that those helper values are also closed. This declaration makes no claim about computing midnight correctly or terminating."
+    },
+    "Tracker.Runtime.nextMidnight_val:ff0cd1acb01ead1274240f25c696034a785aa692e10a284d18e29e39da104eb8": {
+      "description": "nextMidnight_val defines a runtime value by evaluating erase_function on nextMidnight_fn with the tracker layouts and bindings for consPiece and emptyPieces, while leaving those helper values unexpanded. The underlying function takes an integer minute and computes minute − (minute remainder 1440) + 1440, apparently intended to find the next midnight using 1440-minute days. Its interpretation for negative inputs depends on remainder semantics not supplied here. This is a definition, with no stated preconditions or contract establishing correctness or termination."
+    },
+    "Tracker.Runtime.overlaps_closed:2c3a4c91c191e85f0ae3acb60a7cf9f4200414af653750b077a7870a53407e69": {
+      "description": "The lemma asserts, with no explicit premises, that overlaps_val is closed, conventionally meaning it has no free variables, though the definition of closed_val is not supplied. overlaps_val is built by erasing overlaps_fn with four helper values whose closure lemmas are also listed. This statement concerns closure, not the correctness or termination of overlap computations."
+    },
+    "Tracker.Runtime.overlaps_val:215eff0793748c717356d6f587e7893ae6c1a23583d515220a1e6583fa60f04f": {
+      "description": "overlaps_val defines a runtime value by applying erase_function to overlaps_fn with tracker_layouts and bindings for four helper values, using call-by-value evaluation while leaving those helpers unexpanded. The supplied function takes a ShiftList and two integer endpoints: it returns false for an empty list, true when a piece satisfies startMinute < piece.finish and piece.start < endMinute, and otherwise recursively checks the rest by calling its unit-taking function. Thus touching endpoints do not satisfy the overlap test. No endpoint-ordering or list-finiteness assumptions are supplied, and erase_function itself is not defined here, so its precise behavior is uncertain. This declaration supplies no correctness contract or termination guarantee; no WP contract is present."
+    },
+    "Tracker.Runtime.queryContained_closed:b9f329a82c082bd6bb69ca9d247b520924313fe2f8c2eecf30153dec703297ff": {
+      "description": "The lemma asserts, with no explicit premises, that queryContained_val is closed—normally meaning it has no free variables, though the definition of closed_val is not supplied. This value is constructed by applying erase_function to queryContained_fn with tracker_layouts and the listed helper values. The statement concerns closedness only; it provides no contract for query results, no partial-correctness guarantee, and no termination guarantee."
+    },
+    "Tracker.Runtime.queryContained_val:be239cc60a209afcba07e39c6f5617122b43a2bb77b0877826808217a525a792": {
+      "description": "queryContained_val defines a value by evaluating erase_function on queryContained_fn with the tracker layouts and named helper values, leaving the listed helpers unexpanded. The function takes a tracker and two integer minute bounds. It returns code 1 with empty rows if the lower bound is negative, code 2 with empty rows if the upper bound is at most the lower bound, and otherwise code 0 with rows obtained by calling selectPieces on the tracker’s pieces, both bounds, and false. Each result includes the supplied tracker. The exact selection rule is not established because selectPieces_fn is not supplied. This definition states no correctness contract or termination guarantee."
+    },
+    "Tracker.Runtime.queryIntersecting_closed:b0a01accd285cd2ad386f0f64305aa8b11cd607627707e9ef87f1bde09ed69e3": {
+      "description": "The lemma states, with no explicit premises, that queryIntersecting_val satisfies closed_val, normally meaning it has no free program variables, though closed_val is not defined in the supplied input. This value is constructed from queryIntersecting_fn using erase_function with tracker_layouts and named helper values. The statement concerns closedness; it gives no contract for query results and asserts neither partial correctness nor termination."
+    },
+    "Tracker.Runtime.queryIntersecting_val:a0c40f5b764d2cd7d35f15ce624509caed617a1cb1cd06f8e75df6774e4f5141": {
+      "description": "queryIntersecting_val defines a runtime value by applying erase_function to queryIntersecting_fn with the tracker layouts and named helper values, evaluating while leaving those helpers unexpanded. The function accepts a tracker and integer lower and upper minute bounds. It returns code 1 with empty rows if the lower bound is negative, code 2 with empty rows if the upper bound is no greater than the lower bound, and otherwise code 0 with rows obtained by calling selectPieces on the tracker's pieces, both bounds, and true. Every branch returns the supplied tracker as its state. The input does not establish selectPieces' exact intersection rule and provides no correctness or termination contract."
+    },
+    "Tracker.Runtime.removeStart_closed:6b2b0f8e56e7a3003d690a0be2a142c8bcd0ba4eb88662888777111f0fc63ac3": {
+      "description": "The lemma states, without explicit premises, that removeStart_val satisfies closed_val, conventionally meaning it has no free variables, although that predicate’s definition is not supplied. The value is constructed from removeStart_fn using erase_function with tracker_layouts and the listed helper values. This is a closedness statement, not a contract about runtime behavior or termination; no proof is included."
+    },
+    "Tracker.Runtime.removeStart_val:b96eb053baab6315639adef0d881b4f6d7cf68e9be2d0853b29709023605a7b4": {
+      "description": "removeStart_val defines a value by applying erase_function to removeStart_fn with the tracker layouts and named helper values, then computing while leaving those helpers unexpanded. The source function takes a ShiftList and a start minute: it returns an empty list unchanged, recursively skips entries with that start minute, and uses consPiece to rebuild the remaining entries with their start and finish fields. This appears intended to remove all matching entries, though the erasure and constructor implementations are not supplied. No correctness contract or runtime termination guarantee is established here."
+    },
+    "Tracker.Runtime.selectPieces_closed:0b0aa7a1e25e2ccc01eafe57f401618d8132be007d9f53c2610474dd18f88d13": {
+      "description": "The lemma asserts, with no explicit premises, that selectPieces_val is closed—normally meaning it has no free variables, although closed_val is not defined in the input. This value is constructed by applying erase_function to selectPieces_fn with supplied helper values. The statement establishes neither functional correctness nor termination, and no proof is supplied."
+    },
+    "Tracker.Runtime.selectPieces_val:2b18f0ba12b107948a669698c856697d591184e9cb166699b087a31f7a50a768": {
+      "description": "selectPieces_val defines a value by evaluating erase_function on selectPieces_fn with the tracker layouts and named helper values, without unfolding those helpers. The source function recursively filters a ShiftList: when intersect is true, it keeps pieces whose start is strictly below upperMinute and whose finish is strictly above lowerMinute; otherwise, it keeps pieces entirely within the bounds, including equality. It preserves selected pieces’ endpoints and order, and returns an empty-marked list unchanged. The input does not specify erasure’s exact behavior or establish list validity, correctness, or termination; no WP contract is supplied."
+    },
+    "Tracker.Runtime.splitOnto_closed:38ef51b77f5fc1e30ceb0976edc18d533d964166459e4fb2fddb99ed2357ab7a": {
+      "description": "The lemma states that splitOnto_val is closed, ordinarily meaning it has no free variables, although the definition of closed_val is not supplied. It has no explicit premises; the dependencies include corresponding closedness lemmas for the helper values used to construct splitOnto_val. This is a claim about closedness, not a contract establishing runtime behavior or termination."
+    },
+    "Tracker.Runtime.splitOnto_val:b84cd3c918c2074a1aa9b2167fef02a6e5ef89f27d5c4ad27b8c5de549b36584": {
+      "description": "splitOnto_val defines a value by evaluating erase_function on splitOnto_fn with the tracker layouts and six named helper bindings, leaving those helper definitions unexpanded during evaluation. The supplied function takes start and end minutes and an existing ShiftList: if the end is at or before the start, it returns that list; otherwise, it computes a boundary using minMinute(nextMidnight(start), end), recursively processes the remaining interval, and passes the start, boundary, and recursive result to consPiece. This suggests splitting an interval at midnight boundaries before the existing pieces, but the missing helper bodies prevent establishing that interpretation. This definition supplies no correctness contract or guarantee of runtime termination."
+    },
+    "Tracker.Runtime.startShift_closed:c35a966d2801414a1453e224e5689a36f35fe10c512d744abf7b70eb9c9a2d0c": {
+      "description": "The lemma startShift_closed states that startShift_val satisfies closed_val, conventionally meaning it has no free variables, although the predicate’s definition is not supplied. The value is constructed from startShift_fn using erase_function with tracker_layouts and named helper values. There are no explicit premises; this is a closedness assertion, not a contract establishing runtime correctness or termination."
+    },
+    "Tracker.Runtime.startShift_val:190289be1e5daf44afc311e4a64d6c57f80c0addddea8c016e10ae3ddb6114cd": {
+      "description": "startShift_val defines a value by applying erase_function to startShift_fn with the tracker layouts and named helper values, then evaluating while leaving those helper definitions unexpanded. The function takes a tracker and a start minute: it returns code 1 for a negative minute, code 4 if the tracker’s pending field is not −1 or endsAfter reports true for its pieces and the minute, and otherwise code 0 with the same pieces and pending set to that minute. Rejected requests preserve the tracker; every result obtains its rows from emptyPieces. The supplied input does not establish the precise behavior of endsAfter or emptyPieces. This is a definition, with no stated preconditions, correctness contract, or termination guarantee."
+    },
+    "Tracker.Runtime.tracker_linked:82957396604a08bea9e53bba19a3803e7231184ab02b05344aea7e77244898b5": {
+      "description": "The lemma states that linking the twenty tracker function definitions using the ShiftList, TrackerState, and TrackerResult layouts and an empty list produces exactly tracker_runtime, the supplied list of function names paired with values. It has no explicit premises. Since link_functions is not defined in the input, the linking process and the empty list’s role remain unspecified; the equality alone does not establish behavioral correctness or termination."
+    },
+    "Tracker.Runtime.tracker_runtime:6ba92a4cc8486bf44a2f5e217ed9b97178d3bacc8a620e7ca247fcfdf468724c": {
+      "description": "tracker_runtime defines an ordered list of 20 pairs, each linking a string name, such as \"deleteShift\" or \"emptyPieces\", to its corresponding runtime value. The supplied dependencies construct these values using erase_function with tracker_layouts and lists of previously defined values. The names suggest shift tracking, queries, state checks, and time helpers, but the underlying function bodies are absent, so their precise behavior is not established. This definition states no preconditions or WP contracts and provides no correctness or termination guarantee."
+    },
+    "Tracker.Runtime.validPieces_closed:0625c9f914a8a12905a67dcd1f4e3c3d9c9b56bdfc0b038ef572caaa5715b215": {
+      "description": "The lemma validPieces_closed states, with no explicit premises, that validPieces_val satisfies closed_val, conventionally meaning it has no free variables. This value is built from validPieces_fn using erase_function with tracker_layouts and supplied helper values. The definition of closed_val is not included, so its exact meaning is uncertain. The statement concerns closedness; it does not assert functional correctness or termination."
+    },
+    "Tracker.Runtime.validPieces_val:52974bfe9e941a07f122f74197fabff0cf9137f559714c61c622e89a1848f8e2": {
+      "description": "validPieces_val defines a value by applying erase_function to validPieces_fn with the tracker layouts and named helper values, evaluating while leaving those helpers unexpanded. The function returns true for an empty list; otherwise, it checks that the piece’s start is nonnegative and at least previousEnd, its finish is strictly after its start and no later than nextMidnight(start), and its finish is at most pendingMinute unless pendingMinute is −1. If these checks pass, it checks the remaining pieces recursively, using the current finish as previousEnd; a failed check returns false. The supplied input does not establish what nextMidnight computes or guarantee that recursion terminates, and this definition provides no correctness proof or WP contract."
+    },
+    "Tracker.Runtime.validState_closed:36ab9719a77634032ee626317a0359caa7614d073984b06175fc0488c75bb123": {
+      "description": "The lemma states, with no explicit premises, that validState_val satisfies closed_val, conventionally meaning it contains no free variables. This value is constructed by applying erase_function to validState_fn with tracker_layouts and the listed helper values. The definition of closed_val is not supplied, so its exact meaning is uncertain. The statement concerns closedness; it does not assert that state validation behaves correctly or terminates."
+    },
+    "Tracker.Runtime.validState_val:0e3529fc93aea20b305f5b49f882620c6b0b8599477f54eb0dd08316189372a8": {
+      "description": "validState_val defines a value of type val by applying erase_function to validState_fn using the tracker layouts and named helper values, then evaluating while leaving those helpers unexpanded. The underlying function takes a TrackerState and computes whether its pending field is at least −1 and validPieces accepts its pieces field with arguments 0 and pending. The meaning of that additional check is not supplied; this definition states no correctness contract or termination guarantee."
+    },
+    "Tracker.Tracker.addPair_fn:8a0e457eabede0c5a5ad9c2b74856c5309761eb5e8ae5606b31da57c77d1fec8": {
+      "description": "addPair_fn encodes an addPair function taking a tracker and integer start and end minutes. It returns code 1 if the start is negative, code 2 if the end is at or before the start, code 4 if tracker field 1 is not −1 and the end exceeds it, or code 3 if overlaps returns true, checking these conditions in that order. These branches preserve the tracker. Otherwise, it returns code 0 with tracker field 0 replaced by insertDaily’s result and field 1 preserved. Every result includes emptyPieces’s result. The helper definitions and field meanings are not supplied, and this definition provides no correctness or termination guarantee."
+    },
+    "Tracker.Tracker.consPiece_fn:a292a475d656e7cf1c5fa7556aabb78746079325f733d9f5b0277b1e0a5b7441": {
+      "description": "consPiece_fn defines a representation of a function named consPiece that takes two integers, pieceStart and pieceEnd, and a ShiftList named restPieces, and returns a ShiftList constructed from false, the two integers, and a function that ignores its unit argument and returns restPieces. This suggests adding a piece with a deferred tail, but the input does not define ShiftList or establish the meaning of the false field. No ordering condition on the integers or correctness or termination guarantee is stated."
+    },
+    "Tracker.Tracker.deleteShift_fn:9d04a861e821734d195246ef0ba888455b33d6a6e889f3bb2fe782c8cab013b8": {
+      "description": "deleteShift_fn defines a syntax representation of a function named deleteShift, taking a TrackerState and an integer startMinute and returning a TrackerResult. For a negative startMinute, it returns code 1 with the original tracker. Otherwise, it calls hasStart on tracker field 0 and startMinute: if true, it returns code 0 with field 0 replaced by the result of removeStart and field 1 preserved; if false, it returns code 6 with the original tracker. Every branch uses the result of emptyPieces as the third result field. The input does not define these helpers or explain the codes, and supplies no correctness or termination guarantee."
+    },
+    "Tracker.Tracker.emptyPieces_fn:c247b78246cd31ed17d3ab863ad9dd12fad4f4fcba66d74e2876701689552ddc": {
+      "description": "emptyPieces_fn defines a syntax representation of a function named emptyPieces, with no listed parameters and return type ShiftList. Its body constructs a ShiftList from true, two zeros, and a function that ignores a unit argument and calls emptyPieces again. This recursive call appears inside the stored function, rather than being directly executed during construction. The input does not explain the fields’ meanings or establish correctness or termination."
+    },
+    "Tracker.Tracker.emptyState_fn:a42fe6721ab8a4a4dbb04ab1ff35c733f796c85ce8211a37ae7983d7497bb9fc": {
+      "description": "This defines emptyState_fn as a representation of a function named emptyState, with declared return type TrackerState. Its body constructs a TrackerState from two components: the result of calling emptyPieces with empty argument lists, and the integer −1. The input does not establish the components’ meanings or emptyPieces’s behavior, and it provides no correctness or termination contract."
+    },
+    "Tracker.Tracker.endShift_fn:d3d26e47cd108614cc3654ab4d0d5d2f881d0a76a56027fa260a08d729765063": {
+      "description": "endShift_fn defines an encoded function named endShift taking a TrackerState and an integer endMinute and returning a TrackerResult. If the tracker’s field 1 equals −1, it returns a result containing 5, the original tracker, and emptyPieces(). Otherwise, it calls addPair with a tracker constructed from the original field 0 and −1, the original field 1, and endMinute. If the returned result’s field 0 is 0, it returns that result; otherwise, it returns that field’s value alongside the original tracker and emptyPieces(). The meanings of the fields, numeric codes, and helper functions are not supplied, and this definition establishes no correctness or termination guarantee."
+    },
+    "Tracker.Tracker.endsAfter_fn:ae9eca56a475b6352c805d1e3385b7b94d4ed98a4c1c6adf42ffd241754e88ea": {
+      "description": "This definition encodes a Boolean function named endsAfter taking a ShiftList called pieces and an integer startMinute. It returns false if field 0 of pieces is true; otherwise, it returns true if field 2 exceeds startMinute, or recursively calls endsAfter with the result of applying field 3 to unit and the same startMinute. The input does not establish the meanings of these numbered fields or whether the recursion terminates."
+    },
+    "Tracker.Tracker.hasStart_fn:e964f1b191933dab96a6ca6db1f31d4cddfd915dcfa3152c83c29a44fd9a769c": {
+      "description": "hasStart_fn defines an encoded Boolean function named hasStart taking a ShiftList called pieces and an integer startMinute. It returns false if field 0 of pieces is true; otherwise, it returns true if field 1 equals startMinute, or recursively calls hasStart with the result of applying field 3 to unit and the same startMinute. This suggests a search through a list, but the field meanings are not supplied, and the definition alone establishes neither correctness nor termination."
+    },
+    "Tracker.Tracker.insertDaily_fn:6039dddda02541f1ffc2fe95e7b3e7e3620a02bc28c2065c65cd4956b349de40": {
+      "description": "insertDaily_fn describes a function named insertDaily taking a ShiftList and integer start and end minutes, and returning a ShiftList. If field 0 of pieces is true, or startMinute is at most field 1, it calls splitOnto with the two minutes and pieces. Otherwise, it calls consPiece with fields 1 and 2 and the result of recursively calling insertDaily on field 3 applied to unit, using the same minutes. The input does not define the fields or helper functions, so their intended meanings remain uncertain; it supplies no correctness contract or termination guarantee."
+    },
+    "Tracker.Tracker.list_ty:f0c6ac19d0d44dc885225ce137e28aba61cd12fcb68e15d1d147fbb3eb4caffb": {
+      "description": "list_ty is defined as GTNamed applied to the name \"ShiftList\" and an empty list. This appears to describe a named type with no type arguments, but the input does not define GTNamed or establish any properties of ShiftList."
+    },
+    "Tracker.Tracker.minMinute_fn:be48f3865eb0bb781ae13fd7ef4ab60609a4c6dd3937bcca95765e6940cc4edb": {
+      "description": "minMinute_fn describes a function named minMinute with two integer parameters, leftMinute and rightMinute, and an integer result. Its body selects leftMinute when leftMinute ≤ rightMinute and otherwise selects rightMinute. Under the usual interpretation of these constructors, this computes the smaller input, choosing leftMinute on ties. The supplied declaration gives no separate correctness or termination proof."
+    },
+    "Tracker.Tracker.nextMidnight_fn:aa6c2225db35bac2d1aeb25ad9fc5aaf029aceab0f436fb236e6dfd794eb9082": {
+      "description": "This defines a representation of an integer-returning function named nextMidnight, taking one integer argument, minute, with body minute − (minute % 1440) + 1440. Under usual remainder semantics, for nonnegative inputs it gives the next multiple of 1440 strictly after minute, suggesting the next midnight when counting minutes in 1440-minute days. The input does not establish a time origin, remainder behavior for negative inputs, or any correctness or termination guarantee."
+    },
+    "Tracker.Tracker.overlaps_fn:eb51f6b68df085d9d6cd9fac0640a29fc577ec0bee2ec51a8a34f9dc8a33283a": {
+      "description": "This defines an encoded Boolean function named overlaps, taking a ShiftList and integer startMinute and endMinute values. It returns false if field 0 of pieces is true; otherwise, it returns true when endMinute exceeds field 1 and field 2 exceeds startMinute. If that test fails, it recursively calls overlaps with the result of applying field 3 to unit, keeping the same minute bounds. This resembles an interval-overlap search, but the input does not define the fields’ meanings, impose ordering on the bounds, or establish termination."
+    },
+    "Tracker.Tracker.queryContained_fn:2f625c7546dd4ccb1e9bdeea0119a41173dc8209896b9e73bdacfd4a7d070c59": {
+      "description": "This definition encodes a function named queryContained taking a tracker and integer lower and upper minute bounds. If the lower bound is negative, it constructs a TrackerResult containing code 1, the supplied tracker, and emptyPieces(); otherwise, if the upper bound is at most the lower bound, it returns the same structure with code 2. For valid bounds, it constructs a result with code 0, the supplied tracker, and selectPieces applied to the tracker’s first field, both bounds, and false. The input does not establish the helpers’ behavior, the codes’ intended meanings, or any correctness or termination guarantee."
+    },
+    "Tracker.Tracker.queryIntersecting_fn:5b339affd3df491aa076087ce08f02b3877a7d367afa9407b6f6a323d21dd8a1": {
+      "description": "This declaration encodes a function named queryIntersecting taking a TrackerState and integer lower and upper minute bounds, and returning a TrackerResult. If lowerMinute is negative, it returns code 1, the supplied tracker, and emptyPieces(); otherwise, if upperMinute is at most lowerMinute, it returns code 2 with the same tracker and emptyPieces(). Otherwise it returns code 0, the tracker, and selectPieces applied to the tracker’s field 0, both bounds, and true. The helpers’ behavior and the codes’ meanings are not established by this input; no correctness or termination guarantee is stated."
+    },
+    "Tracker.Tracker.removeStart_fn:458b1d9f4e0bbe343f3825b77c90827d8d8f04f85ae60f4869fabd806ae70f0b": {
+      "description": "This definition represents a function named removeStart taking a ShiftList and an integer startMinute. It returns pieces when field 0 is true; otherwise, it recursively processes the value obtained by calling field 3 with unit. If field 1 equals startMinute, it skips the current piece; otherwise, it rebuilds it using consPiece with fields 1 and 2 and the recursive result. Assuming these fields represent emptiness, start time, piece data, and a delayed tail, this removes pieces with the matching start time. Those interpretations and termination are not established by the supplied input."
+    },
+    "Tracker.Tracker.result_ty:437813894a95d0d0a799c6fc730cfc7226db510df816db9a0fcff50cc91a49d4": {
+      "description": "The definition result_ty is shorthand for GTNamed \"TrackerResult\" [], which appears to represent a type named TrackerResult with no type arguments. The input does not define GTNamed or describe TrackerResult, so their precise meaning and properties are not established."
+    },
+    "Tracker.Tracker.selectPieces_fn:94b83548ee662caa8fe7f20ee9608c3eea502d501d37e778d363539ea2d1b9ef": {
+      "description": "This definition encodes a function named selectPieces taking a ShiftList, two integer bounds, and a Boolean mode. Assuming fields 0–3 mean an empty-list flag, start, end, and a callable tail, it returns an empty input unchanged; otherwise, it recursively filters the tail and prepends the current piece when it qualifies. With intersect true, it requires start < upperMinute and lowerMinute < end; otherwise, it requires lowerMinute ≤ start and end ≤ upperMinute. These field meanings and consPiece’s behavior are suggested but not established by the supplied input, which provides no correctness or termination proof."
+    },
+    "Tracker.Tracker.splitOnto_fn:2cdd54d45f29fd9a35fe257b7bcc4e0cd5ed48c01b2ba437ceb825d85efbf059": {
+      "description": "This declaration builds a syntax representation of a function named splitOnto, taking integer startMinute and endMinute values and a ShiftList called restPieces, and returning a ShiftList. If endMinute ≤ startMinute, it returns restPieces. Otherwise, it computes boundary using minMinute(nextMidnight(startMinute), endMinute), recursively calls splitOnto from boundary to endMinute, and passes that result with startMinute and boundary to consPiece. The helper names suggest splitting an interval at midnight boundaries, but their definitions are absent, so their behavior and the recursion’s termination are not established here."
+    },
+    "Tracker.Tracker.startShift_fn:e0388e3b7003afd7d409648aaa79b7df913d73a2c1efd40a9279da1b1eebcaf7": {
+      "description": "This definition encodes a function named startShift taking a TrackerState and an integer startMinute and returning a TrackerResult. It returns code 1 with the original tracker if startMinute is negative, or code 4 with the original tracker if its field 1 differs from −1 or endsAfter(field 0, startMinute) is true. Otherwise, it returns code 0 with a new tracker preserving field 0 and setting field 1 to startMinute. Every result includes a call to emptyPieces. The meanings of the codes, fields, and helper functions are not established here; this is a function definition, not a correctness or termination proof."
+    },
+    "Tracker.Tracker.state_ty:6986b62550383ac6bdc49d413252e551eff027c0f9fad06fcfda93bd7fbdd970": {
+      "description": "state_ty is defined as GTNamed \"TrackerState\" [], apparently representing a named type called TrackerState with no type arguments. The input does not define GTNamed, so its exact meaning is not established."
+    },
+    "Tracker.Tracker.tracker_functions:591a410fe1056b992ff1ad2f3b7623320658d6078b7c0c3b1a2dc6234da46b63": {
+      "description": "tracker_functions defines an ordered list of 20 encoded function definitions for a shift tracker. These cover constructing shift lists and tracker states, calculating minute boundaries, checking overlaps and validity, splitting and inserting shifts into daily pieces, starting and ending shifts, querying pieces, and deleting pieces by their start time. The declaration collects these definitions without calling them or imposing premises; it provides no correctness contract or proof of termination."
+    },
+    "Tracker.Tracker.tracker_layouts:89dc219cd93d53699e0129ddd812e6b5f731d7a02a380b5b54fdd5528d89eb17": {
+      "description": "tracker_layouts defines three struct layout descriptions: ShiftList has a Boolean empty field, integer start and finish fields, and a rest function from unit to ShiftList; TrackerState has a pieces field of type ShiftList and an integer pending field; TrackerResult has an integer code, a state field of type TrackerState, and a rows field of type ShiftList. The aliases list_ty and state_ty refer to ShiftList and TrackerState respectively. This definition specifies field names and types; it does not establish their intended behavior or any invariants."
+    },
+    "Tracker.Tracker.tracker_library:e3285e125fe5750c96a97ac147c13000b1ac5e44be9e8e51564c58b16bc6dfd4": {
+      "description": "tracker_library defines a string by checking tracker_program, which combines the supplied layouts and functions with an initial call to emptyState. If the checker returns an empty list, it concatenates a generated-file header, a newline, the printed layouts, and the printed functions. Otherwise, it returns an “unsupported generic program” message followed by the errors formatted by comma. The checker and printers are not defined in the input, so their precise guarantees are unknown; this declaration supplies no WP contract or proof of generated-code correctness or termination."
+    },
+    "Tracker.Tracker.tracker_program:3f294c39a428f4988ff7dc205dff9793ed3e960f58b8c2c618e54b287e5a362b": {
+      "description": "tracker_program defines a program by combining three data layouts—ShiftList, TrackerState, and TrackerResult—with the listed tracker functions and an initial call named emptyState, with both call lists empty. The layouts describe shift entries, tracker state, and results. The input does not establish the precise execution semantics or emptyState’s behavior, and this definition alone provides no correctness or termination guarantee."
+    },
+    "Tracker.Tracker.tracker_source:2b3d2ef6c7e78495c47bdc13fe5200c49aed9a08849beb9445f5f904750b6d4c": {
+      "description": "tracker_source is defined by applying generic_source to tracker_program. That program uses tracker_layouts and tracker_functions, with an entry expression calling \"emptyState\" with two empty lists. The input does not define generic_source, so the precise meaning of this transformation is unspecified."
+    },
+    "Tracker.Tracker.tracker_source_checked:b26b2f8e7dd0ecee38ae8b9aafaf6d9fff10d2b7ceb3aac641cb0d61280fcc00": {
+      "description": "This example states that check_program reports no errors for tracker_program. Its entry expression calls emptyState with no type arguments and no value arguments: the two empty lists in GECall represent those argument lists, rather than two arguments passed to emptyState. This is a source-checker result; it is not by itself a correctness or termination guarantee for the extracted executable."
+    },
+    "Tracker.Tracker.validPieces_fn:0bd73c3b216acf6176ba1211803ee77723d4cbf35bd607d8430678e14e41b90b": {
+      "description": "validPieces_fn describes a Boolean function named validPieces taking a ShiftList, a previous end time, and a pending minute. Assuming fields 0–3 represent an empty-list flag, start, end, and a delayed tail, it returns true for an empty list; otherwise it requires a nonnegative start at least as large as previousEnd, an end strictly after the start and no later than nextMidnight(start), and an end no later than pendingMinute unless pendingMinute is -1. If these checks pass, it evaluates the tail and recursively checks it with the current end as previousEnd, keeping pendingMinute unchanged; failed checks return false. The field interpretations and nextMidnight’s behavior are not established by the supplied input, and this definition provides no proof of correctness or termination."
+    },
+    "Tracker.Tracker.validState_fn:8a27137624dc3174df0a0ddc0354e7abf632cbc77c4195a8b3f8ab88e7082b60": {
+      "description": "This definition represents a Boolean function named validState taking one tracker of type TrackerState. Its body combines two checks: field 1 of tracker is at least −1, and validPieces holds when called with field 0 of tracker, 0, and field 1 of tracker. The input does not explain what these fields represent or what validPieces checks, and it provides no correctness or termination guarantee."
+    },
+    "Tracker.Validation.and_expression:39031326781bc7e3acfc8abf0dfc11f43a777dc89d1986a3600773cfc5da01af": {
+      "description": "The lemma states that if expression a evaluates to Boolean x and expression b evaluates to Boolean y, then their binary AND expression evaluates to the Boolean conjunction x && y. Here boolv wraps a Boolean as a language value. Both premises assert terminating evaluations through executes; this is not merely a partial-correctness WP contract. The proof and underlying definition of AndOp evaluation are not supplied."
+    },
+    "Tracker.Validation.eq_expression:b0ababaebdd4c616e82c8225ac079091054193fbbc501537d104aa71276c4182": {
+      "description": "The lemma states that if expression a evaluates to integer x and expression b evaluates to integer y, then their equality comparison evaluates to the Boolean result of testing whether x and y are equal. The premises describe completed evaluations, so the conclusion gives a completed evaluation of the comparison under those assumptions; it does not assert that arbitrary operands terminate."
+    },
+    "Tracker.Validation.ite_bool_expression:d5e0a2c725058d5604db36c8525586c829ac59e9a595d73ee25e64997256c5e7": {
+      "description": "The lemma states that if c evaluates to Boolean b, yes evaluates to Boolean x, and no evaluates to Boolean y, then If c yes no evaluates to Boolean x when b is true and Boolean y otherwise. Both branches must have the stated evaluations as premises, although the conditional evaluates only the selected branch. Here executes describes terminating evaluation to a value, so the conclusion includes termination, rather than merely partial correctness."
+    },
+    "Tracker.Validation.ite_expression:9863b33d9c9e616ea9bd462e668d64e417bff1c74a329163ac10d5b2ca703325": {
+      "description": "The lemma states that if condition c evaluates to the Boolean value b, and the branch selected by b (yes when true, no when false) evaluates to w, then the whole conditional If c yes no evaluates to w. These premises establish terminating evaluations in the supplied executes relation; the unselected branch has no execution requirement."
+    },
+    "Tracker.Validation.le_expression:3f6392cd50537bdf7bfa8f27b174fb4f8fd91d30fcbb24ece08ef429570d6e5c": {
+      "description": "The lemma states that if expressions a and b evaluate to integer values x and y, respectively, then the expression a <= b evaluates to the Boolean result of testing whether x is less than or equal to y. Because executes describes completed evaluation, this asserts termination with that result under the given premises, rather than merely correctness if evaluation terminates."
+    },
+    "Tracker.Validation.lt_expression:d070085bddb3cc733fd43917d1bf4ee287d6e8704c1c842120358630b58415fb": {
+      "description": "The lemma states that if a evaluates to integer x and b evaluates to integer y, then testing b <= a and returning false when it holds and true otherwise evaluates to the Boolean x <? y. This expresses strict less-than under the intended comparison meanings, though their definitions are not supplied. Because executes describes completed evaluations, the conclusion asserts termination with that result under the premises, rather than merely partial correctness conditional on termination."
+    },
+    "Tracker.Validation.pending_code:734de6d4ca4e778ffcabd42122e5d48ad385b8299c26d7567a2fbb198b79f7f3": {
+      "description": "pending_code reads the pending field of a tracker state st and returns its integer value when it is Some p, or -1 when it is None. Because pending can contain any integer, the result -1 does not distinguish an absent value from a stored value of -1."
+    },
+    "Tracker.Validation.pending_good:86edc4a25f0c6347350b8536086c71e887e9aecee545c35fb6e0f9dc46c01793": {
+      "description": "Using the apparent meanings of the comparison notation, pending_good p b returns true when p equals −1; otherwise, it returns whether b is less than or equal to p. The input does not specify the parameter types or explain any special significance of −1."
+    },
+    "Tracker.Validation.piece_good:81074b5d08bfe56badbdd6f2fbb031af18258e5c3f77977b61911f7a60f0bc5a": {
+      "description": "piece_good previous a b returns true exactly when a is nonnegative, previous is at most a, a is strictly less than b, and b is at most next_midnight a. Here next_midnight a is defined as a minus its remainder modulo 1440, plus 1440; for nonnegative a, this is the next strictly greater multiple of 1440. The input does not establish the units or time interpretation."
+    },
+    "Tracker.Validation.validState_correct:d447690287c455ac32802cfd10d7c6479dd78ef96548ceb894558a0d43ed1e2c": {
+      "description": "Assuming the required cjrGS Σ and invGS_gen HasLc Σ instances, this theorem states that calling “validState” on the encoded state st satisfies a partial-correctness WP contract: if the call returns, its result equals the Boolean value valid_state st. That Boolean checks that pending_code st is at least −1 and that valid_list accepts the state’s shifts with arguments 0 and pending_code st. The input does not define pending_code or valid_list, so their precise meaning is unclear. The WP contract does not itself guarantee termination."
+    },
+    "Tracker.Validation.valid_list:3358fbe408fdbd7f5a799c1457748e6c0fbe2f4e59296758276c6626fddcdcf8": {
+      "description": "valid_list returns true for an empty list. For each pair (a, b), it requires 0 ≤ a, previous ≤ a, a < b, and b ≤ next_midnight(a); it also requires b ≤ p unless p equals −1. If these checks pass, it checks the remaining pairs using b as the new previous value and keeping p unchanged; any failed check returns false. The precise numeric types and the meaning of next_midnight are not supplied."
+    },
+    "Tracker.Validation.valid_list_exec:3c29206d3a775a1da86746e16de216b66ca543605c9f2c17224a7b4f8a0b2487": {
+      "description": "The lemma states that, for any list xs and integers previous and p, calling validPieces_val with their encoded values terminates under the supplied execution relation and returns the Boolean computed by valid_list. This check accepts an empty list; for each pair (a,b), it requires 0 ≤ a, previous ≤ a, a < b, and b ≤ next_midnight(a), plus b ≤ p unless p = -1, then checks the remaining pairs with previous updated to b. There are no additional premises. The definition of next_midnight is not supplied, so its precise meaning is uncertain. This statement asserts terminating evaluation, which is stronger than a partial-correctness contract that only specifies the result if execution terminates."
+    },
+    "Tracker.Validation.valid_list_sound:cb7c19dc49376f93fcbb69126e344448ff0cbefca0508697a1935b5e57febb1c": {
+      "description": "The lemma states that if valid_list xs previous p returns true, then every earlier shift in xs finishes no later than every later shift starts; each shift has a nonnegative start, finishes strictly after it starts, and finishes no later than next_midnight of its start; and every shift starts at or after previous. Additionally, either p equals -1, disabling the final bound, or every shift finishes at or before p. The definition of next_midnight is not supplied, so its precise meaning is unspecified here."
+    },
+    "Tracker.Validation.valid_state:1a311bb1d4fe8f9a28332ee68b2ea044d81d75e8fc54a58047f78225ed001fe0": {
+      "description": "valid_state is a Boolean check requiring the state's pending code to be at least −1 and its shifts list to pass valid_list. The pending code is −1 when pending is absent, or the stored integer when present. Starting with previous value 0, valid_list requires each pair (a, b) to satisfy piece_good previous a b and pending_good with the pending code and b, then uses b as the previous value for the next pair; an empty list passes. The meanings of piece_good and pending_good are not supplied, so the precise conditions they enforce are unknown."
+    },
+    "Tracker.Validation.valid_state_exec:70cd16f9494a802123cbb71d90a888d729e262bddda366327a436a587e2879de": {
+      "description": "The lemma states that, for every tracker state st, calling validState_val on its encoded representation terminates with the Boolean result valid_state st, with no explicit preconditions. The encoding contains the shifts and the pending integer, using −1 when no integer is pending. The result checks that this encoded integer is at least −1 and that valid_list accepts the shifts with initial value 0 and that integer. The definition of valid_list is absent, so its precise validity conditions are unspecified here. Since executes describes finite evaluation, the statement asserts termination with the stated result, unlike a partial-correctness WP contract that only constrains a result if execution terminates."
+    },
+    "Tracker.Validation.validation_implies_invariant:2aa9849393070eb9fff48fdebdece19a67d3939589604306a4d54168f73f9713": {
+      "description": "The theorem states that if a tracker’s pending value is absent or nonnegative, and valid_state returns true, then its shifts are ordered, every shift satisfies daily_valid, and any pending value is nonnegative and at least every shift’s finish value. The separate pending_valid premise excludes negative pending values, including −1, which the validator also uses to represent absence. The precise meanings of ordered and daily_valid are not supplied, and no proof is shown."
+    }
+  },
+  "version": 1
+}

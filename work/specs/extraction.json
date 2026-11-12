@@ -1,0 +1,23 @@
+{
+  "source": "work/specs/Tracker.v",
+  "generated": "work/code/tracker.cj",
+  "printer": "tools/extraction/rocq/generic_print.v",
+  "sha256": "d9ca20b71d03e5d171060522a63589e716cba095dad1e8b3c496ee0ea6dec172",
+  "source_sha256": "0d42ce1ddf5c685076b7fb890d414c3df333a5199c5ea3b3703ccfc97c098464",
+  "printer_sha256": "8065fb9781453cc9a006d85c857aef1bddf4979db0d8e55c8b72d2aafeaa7191",
+  "command": [
+    "/Users/danghica/.opam/default/bin/coqtop",
+    "-quiet",
+    "-R",
+    "/Users/danghica/pandian/theories",
+    "cjr",
+    "-Q",
+    "/Users/danghica/pandian/tools/extraction/rocq",
+    "cjr.examples",
+    "-Q",
+    "/Users/danghica/pandian/work/specs",
+    "Tracker"
+  ],
+  "checked_program": true,
+  "utc": "2026-11-12T09:36:05.946734+00:00"
+}

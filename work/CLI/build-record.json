@@ -1,0 +1,17 @@
+{
+  "compiler": "Cangjie Compiler: 1.0.5 (cjnative)\nTarget: aarch64-apple-darwin",
+  "command": [
+    "/Users/danghica/cangjiebuild/software/cangjie/bin/cjc",
+    "-O2",
+    "--set-runtime-rpath",
+    "/Users/danghica/pandian/work/code/tracker.cj",
+    "/Users/danghica/pandian/work/code/working_time.cj",
+    "/Users/danghica/pandian/work/CLI/working_time_bridge.cj",
+    "/Users/danghica/pandian/work/CLI/bridge.cj",
+    "/Users/danghica/pandian/work/CLI/main.cj",
+    "/Users/danghica/pandian/work/CLI/help.cj",
+    "-o",
+    "/Users/danghica/pandian/work/CLI/bin/tracker-core"
+  ],
+  "entry": "/Users/danghica/pandian/work/CLI/bin/tracker"
+}

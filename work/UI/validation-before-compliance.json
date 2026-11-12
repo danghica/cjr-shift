@@ -1,0 +1,87 @@
+{
+  "status": "passed",
+  "checked_utc": "2026-11-11T17:15:00.669933+00:00",
+  "hexagonal_boundary": {
+    "verified_core_sources_unchanged": true,
+    "extracted_implementation_unchanged": true,
+    "adapters": [
+      "JavaScript browser and clock",
+      "local HTTP adapter",
+      "native core representation bridge",
+      "existing atomic file adapter"
+    ],
+    "reset": "Adapter obtains core emptyState and atomically replaces the store; no new core operation."
+  },
+  "checks": {
+    "adapter_and_http_tests": {
+      "status": "passed",
+      "count": 13,
+      "log": "tests.log"
+    },
+    "javascript_tests": {
+      "status": "passed",
+      "count": 7,
+      "log": "javascript-tests.log"
+    },
+    "cli_regression": {
+      "status": "passed",
+      "evidence": "../code/test/test-results.json",
+      "log": "cli-regression-tests.log"
+    },
+    "browser": {
+      "status": "passed",
+      "browser": "Safari",
+      "url": "http://127.0.0.1:8765",
+      "store": "temporary preview file only",
+      "observed": [
+        "phone-proportioned desktop home screen",
+        "start saves and changes to stop",
+        "same-minute stop error preserves running shift",
+        "reload restores running shift",
+        "successful stop returns button to start",
+        "newest-first date groups and midnight pieces",
+        "daily and overall totals",
+        "back navigation",
+        "confirmation dialog and cancellation"
+      ],
+      "limits": [
+        "Physical mobile-device testing not performed. Confirmed reset and failed-save rollback tested through the API on temporary stores."
+      ]
+    },
+    "missed_shift": {
+      "status": "passed",
+      "core_port": "prepareAddPair",
+      "tests": [
+        "persisted addition and restart",
+        "midnight splitting",
+        "duplicate and overlap rejection",
+        "nonpositive ranges",
+        "running-shift reservation",
+        "failed-save rollback",
+        "HTTP payload validation"
+      ],
+      "browser": "Preview showed completed additions. Direct form inspection was interrupted by concurrent browser activity."
+    },
+    "error_messages": {
+      "status": "passed",
+      "regressions": [
+        "old-server missed-shift route returns restart guidance",
+        "domain validation messages preserved",
+        "unknown and network failures explained",
+        "background refresh retains action errors",
+        "retry/dismiss does not resubmit a write"
+      ]
+    }
+  },
+  "sources": {
+    "work/UI/README.md": "81e63e8e26da05ea6d92db74b0b483d2cffed8872ba4db4c138621c830c942d4",
+    "work/UI/adapters.py": "0eaaa3548b4ad5109987e551563d358682418d479dabaa9c49a11a798b00c8d5",
+    "work/UI/server.py": "d7afadbabdc0b9c45ea7a7967ed44a54cd157fea999700d0ee1874796e243964",
+    "work/UI/static/app.js": "c62df1fd8af08ec0e1ae521f8683ec58eb7a9142486f48a327343bb9acfb606c",
+    "work/UI/static/index.html": "98c8673f1d59375861ba96f09a06b3b1e3e41a1d36418e8f4cae629b0ebc1997",
+    "work/UI/static/style.css": "5af94f2033a1e134f339fe379d1111df3b49b8fbdc4677e82afe52ff745722f5",
+    "work/UI/static/time.mjs": "e57a1684372e8d20e4fc169703f89ff4411dbcfa7af5d5371d1780190770231a",
+    "work/UI/test_server.py": "59a73212ca7be0941064c75ebf179ca49b78431fab7148beda9bc4ead77fc7f4",
+    "work/UI/test_ui.mjs": "1f300bc30ce4c677f4a6aca3834c3c2dc031e660f6546841e75162067e0cdd7d"
+  }
+}

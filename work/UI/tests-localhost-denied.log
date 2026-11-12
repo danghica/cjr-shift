@@ -1,0 +1,98 @@
+test_external_changes_reconcile_and_corruption_is_preserved (__main__.AdapterTests.test_external_changes_reconcile_and_corruption_is_preserved) ... ok
+test_failed_stop_and_failed_reset_preserve_file_and_pending (__main__.AdapterTests.test_failed_stop_and_failed_reset_preserve_file_and_pending) ... ok
+test_midnight (__main__.AdapterTests.test_midnight) ... ok
+test_missed_shift_persists_and_splits_at_midnight (__main__.AdapterTests.test_missed_shift_persists_and_splits_at_midnight) ... ok
+test_missed_shift_rejection_and_disk_failure_preserve_state (__main__.AdapterTests.test_missed_shift_rejection_and_disk_failure_preserve_state) ... ok
+test_only_one_concurrent_start_succeeds (__main__.AdapterTests.test_only_one_concurrent_start_succeeds) ... ok
+test_reset_clears_saved_and_running_shifts (__main__.AdapterTests.test_reset_clears_saved_and_running_shifts) ... ok
+test_same_minute_and_duplicate_start (__main__.AdapterTests.test_same_minute_and_duplicate_start) ... ok
+test_start_stop_and_restart (__main__.AdapterTests.test_start_stop_and_restart) ... ok
+test_assets_and_start_stop (__main__.HTTPTests.test_assets_and_start_stop) ... ERROR
+test_missed_shift_api (__main__.HTTPTests.test_missed_shift_api) ... ERROR
+test_reset_confirmation_and_request_validation (__main__.HTTPTests.test_reset_confirmation_and_request_validation) ... ERROR
+test_save_failure_returns_old_state (__main__.HTTPTests.test_save_failure_returns_old_state) ... ERROR
+
+======================================================================
+ERROR: test_assets_and_start_stop (__main__.HTTPTests.test_assets_and_start_stop)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/danghica/pandian/work/UI/test_server.py", line 118, in setUp
+    self.server = make_server(self.path, 0)
+                  ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/danghica/pandian/work/UI/server.py", line 92, in make_server
+    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 457, in __init__
+    self.server_bind()
+    ~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/http/server.py", line 144, in server_bind
+    socketserver.TCPServer.server_bind(self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 478, in server_bind
+    self.socket.bind(self.server_address)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_missed_shift_api (__main__.HTTPTests.test_missed_shift_api)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/danghica/pandian/work/UI/test_server.py", line 118, in setUp
+    self.server = make_server(self.path, 0)
+                  ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/danghica/pandian/work/UI/server.py", line 92, in make_server
+    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 457, in __init__
+    self.server_bind()
+    ~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/http/server.py", line 144, in server_bind
+    socketserver.TCPServer.server_bind(self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 478, in server_bind
+    self.socket.bind(self.server_address)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_reset_confirmation_and_request_validation (__main__.HTTPTests.test_reset_confirmation_and_request_validation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/danghica/pandian/work/UI/test_server.py", line 118, in setUp
+    self.server = make_server(self.path, 0)
+                  ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/danghica/pandian/work/UI/server.py", line 92, in make_server
+    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 457, in __init__
+    self.server_bind()
+    ~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/http/server.py", line 144, in server_bind
+    socketserver.TCPServer.server_bind(self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 478, in server_bind
+    self.socket.bind(self.server_address)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 1] Operation not permitted
+
+======================================================================
+ERROR: test_save_failure_returns_old_state (__main__.HTTPTests.test_save_failure_returns_old_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/danghica/pandian/work/UI/test_server.py", line 118, in setUp
+    self.server = make_server(self.path, 0)
+                  ~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/danghica/pandian/work/UI/server.py", line 92, in make_server
+    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 457, in __init__
+    self.server_bind()
+    ~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/http/server.py", line 144, in server_bind
+    socketserver.TCPServer.server_bind(self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.0_1/Frameworks/Python.framework/Versions/3.14/lib/python3.14/socketserver.py", line 478, in server_bind
+    self.socket.bind(self.server_address)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 1] Operation not permitted
+
+----------------------------------------------------------------------
+Ran 13 tests in 4.568s
+
+FAILED (errors=4)

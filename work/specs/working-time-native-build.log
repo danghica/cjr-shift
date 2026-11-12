@@ -1,0 +1,61 @@
++ /Users/danghica/.opam/default/bin/coqtop -quiet -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker
++ /Users/danghica/.opam/default/bin/coqtop -quiet -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/danghica/pandian/work/CLI/build.py
++ /Users/danghica/cangjiebuild/software/cangjie/bin/cjc -O2 --set-runtime-rpath /Users/danghica/pandian/work/code/tracker.cj /Users/danghica/pandian/work/code/working_time.cj /Users/danghica/pandian/work/CLI/working_time_bridge.cj /Users/danghica/pandian/work/CLI/bridge.cj /Users/danghica/pandian/work/CLI/main.cj /Users/danghica/pandian/work/CLI/help.cj -o /Users/danghica/pandian/work/CLI/bin/tracker-core
+[33mwarning[0m: class 'Console' is deprecated. Use related global functions in the std.env instead.
+  [36m==>[0m /Users/danghica/pandian/work/CLI/main.cj:71:9:
+   [36m| [0m
+[36m71[0m [36m| [0m        Console.stdErr.writeln("error: ${err.message}")[0m
+   [36m| [0m        [33m^^^^^^^ deprecated[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff deprecated`
+
+[33mwarning[0m: unused variable:'unused'
+  [36m==>[0m /Users/danghica/pandian/work/code/tracker.cj:45:32:
+   [36m| [0m
+[36m45[0m [36m| [0mreturn ShiftList(true, 0, 0, { unused: Unit => ({ cjrTypedValue: ShiftList => cjrTypedValue })(emptyPieces()) })[0m
+   [36m| [0m                               [33m^^^^^^ unused variable[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+  [36m==>[0m /Users/danghica/pandian/work/code/tracker.cj:48:49:
+   [36m| [0m
+[36m48[0m [36m| [0mreturn ShiftList(false, pieceStart, pieceEnd, { unused: Unit => ({ cjrTypedValue: ShiftList => cjrTypedValue })(restPieces) })[0m
+   [36m| [0m                                                [33m^^^^^^ unused variable[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+   [36m==>[0m /Users/danghica/pandian/work/code/working_time.cj:122:57:
+    [36m| [0m
+[36m122[0m [36m| [0mreturn WTPeriods(true, 0, 0, 0, 0, 0, 0, 0, 0, false, { unused: Unit => ({ cjrTypedValue: WTPeriods => cjrTypedValue })(wtEmptyPeriods()) })[0m
+    [36m| [0m                                                        [33m^^^^^^ unused variable[0m
+    [36m| [0m
+    [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+   [36m==>[0m /Users/danghica/pandian/work/code/working_time.cj:125:120:
+    [36m| [0m
+[36m125[0m [36m| [0mreturn WTPeriods(false, rule, start, finish, calendar, extraStart, extraEnd, evidence, restScheme, dailyRestOverlap, { unused: Unit => ({ cjrTypedValue: WTPeriods => cjrTypedValue })(rest) })[0m
+    [36m| [0m                                                                                                                       [33m^^^^^^ unused variable[0m
+    [36m| [0m
+    [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+   [36m==>[0m /Users/danghica/pandian/work/code/working_time.cj:128:56:
+    [36m| [0m
+[36m128[0m [36m| [0mreturn WTFindings(true, WTFinding(0, 0, 0, 0, 0, 0), { unused: Unit => ({ cjrTypedValue: WTFindings => cjrTypedValue })(wtEmptyFindings()) })[0m
+    [36m| [0m                                                       [33m^^^^^^ unused variable[0m
+    [36m| [0m
+    [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+   [36m==>[0m /Users/danghica/pandian/work/code/working_time.cj:131:35:
+    [36m| [0m
+[36m131[0m [36m| [0mreturn WTFindings(false, entry, { unused: Unit => ({ cjrTypedValue: WTFindings => cjrTypedValue })(rest) })[0m
+    [36m| [0m                                  [33m^^^^^^ unused variable[0m
+    [36m| [0m
+    [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+7 warnings generated, 7 warnings printed.

@@ -1,0 +1,30 @@
+{
+  "source": "work/specs/WorkingTimeSource.v",
+  "generated": "work/code/working_time.cj",
+  "sha256": "78c2791d3e3ac30775400e106e7dd76d837ef0d882ee25e5cc59d0b30fe1c49f",
+  "sources": {
+    "work/specs/WorkingTimeModel.v": "21ed358e6880fdbc8606258a97383c359e58d9ee4cb8a9cbe6b9b578f4d056bf",
+    "work/specs/WorkingTimeSource.v": "2bad07eb2d785d045dc027af5a22154abe2db7ebfb600d6f24e498659c178eb9",
+    "work/specs/WorkingTimeRuntime.v": "810ab3f14ba1ef40a95c78b0070558b4b100cae80af44a8e35feac3559910b93",
+    "work/specs/WorkingTimeIntervals.v": "48b7bb18ac8d21b108f6cee7c9bfbaf6c404fce330363b79481711c52e90c0b3",
+    "work/specs/WorkingTimeBase.v": "906e48c30736e2d60b45856e2e0b2098321817174ed7d9e3c1d0ba937281570a",
+    "work/specs/WorkingTimeRules.v": "dbb012cf6d4398531bdc4052c75e331a1f5d2fbb2547c56c5398c0785404e048",
+    "work/specs/WorkingTimeContracts.v": "9cbbfa8c41a3de78f55ef7735a7d8dc3fe60c8702a2a7420658317d9d7397369",
+    "tools/extraction/rocq/generic_print.v": "8065fb9781453cc9a006d85c857aef1bddf4979db0d8e55c8b72d2aafeaa7191"
+  },
+  "command": [
+    "/Users/danghica/.opam/default/bin/coqtop",
+    "-quiet",
+    "-R",
+    "/Users/danghica/pandian/theories",
+    "cjr",
+    "-Q",
+    "/Users/danghica/pandian/tools/extraction/rocq",
+    "cjr.examples",
+    "-Q",
+    "/Users/danghica/pandian/work/specs",
+    "Tracker"
+  ],
+  "imports_public_contract": true,
+  "utc": "2026-11-12T09:36:06.778147+00:00"
+}

@@ -1,0 +1,975 @@
+File "./work/specs/WorkingTimeContracts.v", line 26, characters 98-109:
+Error:
+In environment
+p : period
+rest : val
+H : closed_val rest
+x : string
+w : val
+Unable to unify
+ "StructV
+    [boolv false; intv (rule p); intv (from_minute p); 
+     intv (to_minute p); intv (calendar_minutes p); 
+     intv (extra_from p); intv (extra_to p); intv (evidence p);
+     intv (rest_scheme p); boolv (daily_rest_overlap p);
+     RecV None (Some "unused") (Val rest)]" with
+ "StructV
+    [LitV (LitBool false); LitV (LitInt (rule p));
+     LitV (LitInt (from_minute p)); LitV (LitInt (to_minute p));
+     LitV (LitInt (calendar_minutes p)); LitV (LitInt (extra_from p));
+     LitV (LitInt (extra_to p)); LitV (LitInt (evidence p));
+     LitV (LitInt (rest_scheme p)); LitV (LitBool (daily_rest_overlap p));
+     RecV None (Some "unused")
+       (if bool_decide (x = "unused") then Val rest else Val rest)]".
+
+File "./work/specs/WorkingTimeContracts.v", line 98, characters 33-117:
+Error: No applicable tactic.
+
+File "./work/specs/WorkingTimeContracts.v", line 98, characters 33-130:
+Error: No applicable tactic.
+
+File "./work/specs/WorkingTimeContracts.v", line 104, characters 39-41:
+Error:
+In environment
+a, b : Z
+xs : list shift
+IH :
+  ∀ ys : list shift,
+    executes (invoke wtMerge_val [listv xs; listv ys])
+      (listv (merge_work xs ys))
+c, d : Z
+ys : list shift
+IHy :
+  executes (invoke wtMerge_val [listv ((a, b) :: xs); listv ys])
+    (listv (merge_work ((a, b) :: xs) ys))
+H : "wtMerge" ≠ "$args"
+H0 : "$args" ≠ "left"
+H1 : "wtMerge" ≠ "left"
+H2 : "wtMerge" ≠ "right"
+H4 : "$args" ≠ "right"
+H5 : "$args" ≠ "left"
+H3 : "left" ≠ "right"
+Hac : a ≤ c
+Unable to unify
+ "executes (invoke wtMerge_val [listv xs; listv ?M52143])
+    (listv (merge_work xs ?M52143))" with
+ "executes (invoke wtMerge_val [listv xs; nodev c d (listv ys)]) ?av".
+
+File "./work/specs/WorkingTimeContracts.v", line 125, characters 0-4:
+Error:  (in proof wtRestCount_exec): Attempt to save an incomplete proof
+(the proof term is not complete).
+
+File "./work/specs/WorkingTimeContracts.v", line 125, characters 0-4:
+Error:  (in proof wtRestCount_exec): Attempt to save an incomplete proof
+(the proof term is not complete).
+
+File "./work/specs/WorkingTimeContracts.v", line 60, characters 10-29:
+Error:
+In environment
+xs : list shift
+pending0 : Z
+m : metadata
+p : period
+rest : val
+Hp : 0 ≤ pending0
+Hr : closed_val rest
+H : "wtPeriodKnown" ≠ "$args"
+H0 : "$args" ≠ "tracker"
+H1 : "wtPeriodKnown" ≠ "tracker"
+H2 : "wtPeriodKnown" ≠ "metadata"
+H3 : "wtPeriodKnown" ≠ "period"
+H5 : "$args" ≠ "metadata"
+H6 : "$args" ≠ "period"
+H7 : "$args" ≠ "tracker"
+H4 : "tracker" ≠ "metadata"
+H8 : "tracker" ≠ "period"
+H9 : "metadata" ≠ "period"
+H10 : "metadata" ≠ "unused"
+H11 : "tracker" ≠ "unused"
+Unable to unify
+ "executes (If ?M98085 ?M98086 ?M98087)
+    (boolv (if ?M98088 then ?M98089 else ?M98090))" with
+ "executes
+    (If
+       (BinOp EqOp
+          (StructLoad
+             (Val (statev {| shifts := xs; pending := Some pending0 |})) 1)
+          (Val (LitV (LitInt (-1))))) (Val (LitV (LitBool true)))
+       (BinOp LeOp
+          (StructLoad
+             (Val
+                (StructV
+                   [LitV (LitBool false); LitV (LitInt (rule p));
+                    LitV (LitInt (from_minute p));
+                    LitV (LitInt (to_minute p));
+                    LitV (LitInt (calendar_minutes p));
+                    LitV (LitInt (extra_from p)); 
+                    LitV (LitInt (extra_to p)); LitV (LitInt (evidence p));
+                    LitV (LitInt (rest_scheme p));
+                    LitV (LitBool (daily_rest_overlap p));
+                    RecV None (Some "unused")
+                      (Val
+                         ((fix subst
+                             (x : string) (v : val) (e : expr) {struct e} :
+                               expr :=
+                             match e with
+                             | Val w => Val (subst_val x v w)
+                             | Var y =>
+                                 if bool_decide (x = y) then Val v else Var y
+                             | Rec f y e1 =>
+                                 Rec f y
+                                   (if binds x f || binds x y
+                                    then e1
+                                    else subst x v e1)
+                             | App e1 e2 => App (subst x v e1) (subst x v e2)
+                             | Let b e1 e2 =>
+                                 Let b (subst x v e1)
+                                   (if binds x b then e2 else subst x v e2)
+                             | VarBind y e1 e2 =>
+                                 VarBind y (subst x v e1)
+                                   (if bool_decide (x = y)
+                                    then e2
+                                    else subst x v e2)
+                             | Assign y e1 => Assign y (subst x v e1)
+                             | Pop l e1 => Pop l (subst x v e1)
+                             | StackLoad e1 => StackLoad (subst x v e1)
+                             | StackAssign e1 e2 =>
+                                 StackAssign (subst x v e1) (subst x v e2)
+                             | StackFieldStore e1 i e2 =>
+                                 StackFieldStore (subst x v e1) i
+                                   (subst x v e2)
+                             | If e0 e1 e2 =>
+                                 If (subst x v e0) 
+                                   (subst x v e1) 
+                                   (subst x v e2)
+                             | While e1 e2 =>
+                                 While (subst x v e1) (subst x v e2)
+                             | Seq e1 e2 => Seq (subst x v e1) (subst x v e2)
+                             | BinOp op e1 e2 =>
+                                 BinOp op (subst x v e1) (subst x v e2)
+                             | Alloc e1 => Alloc (subst x v e1)
+                             | Free e1 => Free (subst x v e1)
+                             | Load e1 => Load (subst x v e1)
+                             | Store e1 e2 =>
+                                 Store (subst x v e1) (subst x v e2)
+                             | Offset e1 e2 =>
+                                 Offset (subst x v e1) (subst x v e2)
+                             | Struct vs es =>
+                                 Struct
+                                   ((fix go (vs0 : list val) : list val :=
+                                       match vs0 with
+                                       | [] => []
+                                       | w :: vs1 =>
+                                           subst_val x v w :: go vs1
+                                       end) vs)
+                                   ((fix go (es0 : list expr) : list expr :=
+                                       match es0 with
+                                       | [] => []
+                                       | e0 :: es1 => subst x v e0 :: go es1
+                                       end) es)
+                             | StructLoad e1 i => StructLoad (subst x v e1) i
+                             | StructStore y i e1 =>
+                                 StructStore y i (subst x v e1)
+                             | New vs es =>
+                                 New
+                                   ((fix go (vs0 : list val) : list val :=
+                                       match vs0 with
+                                       | [] => []
+                                       | w :: vs1 =>
+                                           subst_val x v w :: go vs1
+                                       end) vs)
+                                   ((fix go (es0 : list expr) : list expr :=
+                                       match es0 with
+                                       | [] => []
+                                       | e0 :: es1 => subst x v e0 :: go es1
+                                       end) es)
+                             | FieldLoad e1 i => FieldLoad (subst x v e1) i
+                             | FieldStore e1 i e2 =>
+                                 FieldStore (subst x v e1) i (subst x v e2)
+                             end
+                           with subst_val
+                             (x : string) (v w : val) {struct w} : val :=
+                             match w with
+                             | LitV _ => w
+                             | RecV f y e =>
+                                 RecV f y
+                                   (if binds x f || binds x y
+                                    then e
+                                    else subst x v e)
+                             | StructV vs =>
+                                 StructV
+                                   ((fix go (vs0 : list val) : list val :=
+                                       match vs0 with
+                                       | [] => []
+                                       | w0 :: vs1 =>
+                                           subst_val x v w0 :: go vs1
+                                       end) vs)
+                             end
+                           for
+                           subst_val) "metadata"
+                            (StructV
+                               [LitV (LitInt (jurisdiction m));
+                                LitV (LitBool (adult m));
+                                LitV (LitBool (ordinary_regime m));
+                                LitV (LitInt (coverage_from m));
+                                LitV (LitInt (coverage_to m));
+                                LitV (LitBool (period_coverage_complete m));
+                                LitV (LitBool (elapsed_work_known m));
+                                (fix subst
+                                   (x : string) (v : val) 
+                                   (e : expr) {struct e} : expr :=
+                                   match e with
+                                   | Val w => Val (subst_val x v w)
+                                   | Var y =>
+                                       if bool_decide (x = y)
+                                       then Val v
+                                       else Var y
+                                   | Rec f y e1 =>
+                                       Rec f y
+                                         (if binds x f || binds x y
+                                          then e1
+                                          else subst x v e1)
+                                   | App e1 e2 =>
+                                       App (subst x v e1) (subst x v e2)
+                                   | Let b e1 e2 =>
+                                       Let b (subst x v e1)
+                                         (if binds x b
+                                          then e2
+                                          else subst x v e2)
+                                   | VarBind y e1 e2 =>
+                                       VarBind y (subst x v e1)
+                                         (if bool_decide (x = y)
+                                          then e2
+                                          else subst x v e2)
+                                   | Assign y e1 => Assign y (subst x v e1)
+                                   | Pop l e1 => Pop l (subst x v e1)
+                                   | StackLoad e1 => StackLoad (subst x v e1)
+                                   | StackAssign e1 e2 =>
+                                       StackAssign 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | StackFieldStore e1 i e2 =>
+                                       StackFieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   | If e0 e1 e2 =>
+                                       If (subst x v e0) 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | While e1 e2 =>
+                                       While (subst x v e1) (subst x v e2)
+                                   | Seq e1 e2 =>
+                                       Seq (subst x v e1) (subst x v e2)
+                                   | BinOp op e1 e2 =>
+                                       BinOp op (subst x v e1) (subst x v e2)
+                                   | Alloc e1 => Alloc (subst x v e1)
+                                   | Free e1 => Free (subst x v e1)
+                                   | Load e1 => Load (subst x v e1)
+                                   | Store e1 e2 =>
+                                       Store (subst x v e1) (subst x v e2)
+                                   | Offset e1 e2 =>
+                                       Offset (subst x v e1) (subst x v e2)
+                                   | Struct vs es =>
+                                       Struct
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | StructLoad e1 i =>
+                                       StructLoad (subst x v e1) i
+                                   | StructStore y i e1 =>
+                                       StructStore y i (subst x v e1)
+                                   | New vs es =>
+                                       New
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | FieldLoad e1 i =>
+                                       FieldLoad (subst x v e1) i
+                                   | FieldStore e1 i e2 =>
+                                       FieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   end
+                                 with subst_val
+                                   (x : string) (v w : val) {struct w} :
+                                     val :=
+                                   match w with
+                                   | LitV _ => w
+                                   | RecV f y e =>
+                                       RecV f y
+                                         (if binds x f || binds x y
+                                          then e
+                                          else subst x v e)
+                                   | StructV vs =>
+                                       StructV
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w0 :: vs1 =>
+                                                 subst_val x v w0 :: go vs1
+                                             end) vs)
+                                   end
+                                 for
+                                 subst_val) "tracker"
+                                  (statev
+                                     {|
+                                       shifts := xs; pending := Some pending0
+                                     |}) (listv (other_work m));
+                                (fix subst
+                                   (x : string) (v : val) 
+                                   (e : expr) {struct e} : expr :=
+                                   match e with
+                                   | Val w => Val (subst_val x v w)
+                                   | Var y =>
+                                       if bool_decide (x = y)
+                                       then Val v
+                                       else Var y
+                                   | Rec f y e1 =>
+                                       Rec f y
+                                         (if binds x f || binds x y
+                                          then e1
+                                          else subst x v e1)
+                                   | App e1 e2 =>
+                                       App (subst x v e1) (subst x v e2)
+                                   | Let b e1 e2 =>
+                                       Let b (subst x v e1)
+                                         (if binds x b
+                                          then e2
+                                          else subst x v e2)
+                                   | VarBind y e1 e2 =>
+                                       VarBind y (subst x v e1)
+                                         (if bool_decide (x = y)
+                                          then e2
+                                          else subst x v e2)
+                                   | Assign y e1 => Assign y (subst x v e1)
+                                   | Pop l e1 => Pop l (subst x v e1)
+                                   | StackLoad e1 => StackLoad (subst x v e1)
+                                   | StackAssign e1 e2 =>
+                                       StackAssign 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | StackFieldStore e1 i e2 =>
+                                       StackFieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   | If e0 e1 e2 =>
+                                       If (subst x v e0) 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | While e1 e2 =>
+                                       While (subst x v e1) (subst x v e2)
+                                   | Seq e1 e2 =>
+                                       Seq (subst x v e1) (subst x v e2)
+                                   | BinOp op e1 e2 =>
+                                       BinOp op (subst x v e1) (subst x v e2)
+                                   | Alloc e1 => Alloc (subst x v e1)
+                                   | Free e1 => Free (subst x v e1)
+                                   | Load e1 => Load (subst x v e1)
+                                   | Store e1 e2 =>
+                                       Store (subst x v e1) (subst x v e2)
+                                   | Offset e1 e2 =>
+                                       Offset (subst x v e1) (subst x v e2)
+                                   | Struct vs es =>
+                                       Struct
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | StructLoad e1 i =>
+                                       StructLoad (subst x v e1) i
+                                   | StructStore y i e1 =>
+                                       StructStore y i (subst x v e1)
+                                   | New vs es =>
+                                       New
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | FieldLoad e1 i =>
+                                       FieldLoad (subst x v e1) i
+                                   | FieldStore e1 i e2 =>
+                                       FieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   end
+                                 with subst_val
+                                   (x : string) (v w : val) {struct w} :
+                                     val :=
+                                   match w with
+                                   | LitV _ => w
+                                   | RecV f y e =>
+                                       RecV f y
+                                         (if binds x f || binds x y
+                                          then e
+                                          else subst x v e)
+                                   | StructV vs =>
+                                       StructV
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w0 :: vs1 =>
+                                                 subst_val x v w0 :: go vs1
+                                             end) vs)
+                                   end
+                                 for
+                                 subst_val) "tracker"
+                                  (statev
+                                     {|
+                                       shifts := xs; pending := Some pending0
+                                     |}) (listv (normal_work m));
+                                (fix subst
+                                   (x : string) (v : val) 
+                                   (e : expr) {struct e} : expr :=
+                                   match e with
+                                   | Val w => Val (subst_val x v w)
+                                   | Var y =>
+                                       if bool_decide (x = y)
+                                       then Val v
+                                       else Var y
+                                   | Rec f y e1 =>
+                                       Rec f y
+                                         (if binds x f || binds x y
+                                          then e1
+                                          else subst x v e1)
+                                   | App e1 e2 =>
+                                       App (subst x v e1) (subst x v e2)
+                                   | Let b e1 e2 =>
+                                       Let b (subst x v e1)
+                                         (if binds x b
+                                          then e2
+                                          else subst x v e2)
+                                   | VarBind y e1 e2 =>
+                                       VarBind y (subst x v e1)
+                                         (if bool_decide (x = y)
+                                          then e2
+                                          else subst x v e2)
+                                   | Assign y e1 => Assign y (subst x v e1)
+                                   | Pop l e1 => Pop l (subst x v e1)
+                                   | StackLoad e1 => StackLoad (subst x v e1)
+                                   | StackAssign e1 e2 =>
+                                       StackAssign 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | StackFieldStore e1 i e2 =>
+                                       StackFieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   | If e0 e1 e2 =>
+                                       If (subst x v e0) 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | While e1 e2 =>
+                                       While (subst x v e1) (subst x v e2)
+                                   | Seq e1 e2 =>
+                                       Seq (subst x v e1) (subst x v e2)
+                                   | BinOp op e1 e2 =>
+                                       BinOp op (subst x v e1) (subst x v e2)
+                                   | Alloc e1 => Alloc (subst x v e1)
+                                   | Free e1 => Free (subst x v e1)
+                                   | Load e1 => Load (subst x v e1)
+                                   | Store e1 e2 =>
+                                       Store (subst x v e1) (subst x v e2)
+                                   | Offset e1 e2 =>
+                                       Offset (subst x v e1) (subst x v e2)
+                                   | Struct vs es =>
+                                       Struct
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | StructLoad e1 i =>
+                                       StructLoad (subst x v e1) i
+                                   | StructStore y i e1 =>
+                                       StructStore y i (subst x v e1)
+                                   | New vs es =>
+                                       New
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | FieldLoad e1 i =>
+                                       FieldLoad (subst x v e1) i
+                                   | FieldStore e1 i e2 =>
+                                       FieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   end
+                                 with subst_val
+                                   (x : string) (v w : val) {struct w} :
+                                     val :=
+                                   match w with
+                                   | LitV _ => w
+                                   | RecV f y e =>
+                                       RecV f y
+                                         (if binds x f || binds x y
+                                          then e
+                                          else subst x v e)
+                                   | StructV vs =>
+                                       StructV
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w0 :: vs1 =>
+                                                 subst_val x v w0 :: go vs1
+                                             end) vs)
+                                   end
+                                 for
+                                 subst_val) "tracker"
+                                  (statev
+                                     {|
+                                       shifts := xs; pending := Some pending0
+                                     |}) (listv (weekly_rest m));
+                                (fix subst
+                                   (x : string) (v : val) 
+                                   (e : expr) {struct e} : expr :=
+                                   match e with
+                                   | Val w => Val (subst_val x v w)
+                                   | Var y =>
+                                       if bool_decide (x = y)
+                                       then Val v
+                                       else Var y
+                                   | Rec f y e1 =>
+                                       Rec f y
+                                         (if binds x f || binds x y
+                                          then e1
+                                          else subst x v e1)
+                                   | App e1 e2 =>
+                                       App (subst x v e1) (subst x v e2)
+                                   | Let b e1 e2 =>
+                                       Let b (subst x v e1)
+                                         (if binds x b
+                                          then e2
+                                          else subst x v e2)
+                                   | VarBind y e1 e2 =>
+                                       VarBind y (subst x v e1)
+                                         (if bool_decide (x = y)
+                                          then e2
+                                          else subst x v e2)
+                                   | Assign y e1 => Assign y (subst x v e1)
+                                   | Pop l e1 => Pop l (subst x v e1)
+                                   | StackLoad e1 => StackLoad (subst x v e1)
+                                   | StackAssign e1 e2 =>
+                                       StackAssign 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | StackFieldStore e1 i e2 =>
+                                       StackFieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   | If e0 e1 e2 =>
+                                       If (subst x v e0) 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | While e1 e2 =>
+                                       While (subst x v e1) (subst x v e2)
+                                   | Seq e1 e2 =>
+                                       Seq (subst x v e1) (subst x v e2)
+                                   | BinOp op e1 e2 =>
+                                       BinOp op (subst x v e1) (subst x v e2)
+                                   | Alloc e1 => Alloc (subst x v e1)
+                                   | Free e1 => Free (subst x v e1)
+                                   | Load e1 => Load (subst x v e1)
+                                   | Store e1 e2 =>
+                                       Store (subst x v e1) (subst x v e2)
+                                   | Offset e1 e2 =>
+                                       Offset (subst x v e1) (subst x v e2)
+                                   | Struct vs es =>
+                                       Struct
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | StructLoad e1 i =>
+                                       StructLoad (subst x v e1) i
+                                   | StructStore y i e1 =>
+                                       StructStore y i (subst x v e1)
+                                   | New vs es =>
+                                       New
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | FieldLoad e1 i =>
+                                       FieldLoad (subst x v e1) i
+                                   | FieldStore e1 i e2 =>
+                                       FieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   end
+                                 with subst_val
+                                   (x : string) (v w : val) {struct w} :
+                                     val :=
+                                   match w with
+                                   | LitV _ => w
+                                   | RecV f y e =>
+                                       RecV f y
+                                         (if binds x f || binds x y
+                                          then e
+                                          else subst x v e)
+                                   | StructV vs =>
+                                       StructV
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w0 :: vs1 =>
+                                                 subst_val x v w0 :: go vs1
+                                             end) vs)
+                                   end
+                                 for
+                                 subst_val) "tracker"
+                                  (statev
+                                     {|
+                                       shifts := xs; pending := Some pending0
+                                     |}) (listv (night_work m));
+                                (fix subst
+                                   (x : string) (v : val) 
+                                   (e : expr) {struct e} : expr :=
+                                   match e with
+                                   | Val w => Val (subst_val x v w)
+                                   | Var y =>
+                                       if bool_decide (x = y)
+                                       then Val v
+                                       else Var y
+                                   | Rec f y e1 =>
+                                       Rec f y
+                                         (if binds x f || binds x y
+                                          then e1
+                                          else subst x v e1)
+                                   | App e1 e2 =>
+                                       App (subst x v e1) (subst x v e2)
+                                   | Let b e1 e2 =>
+                                       Let b (subst x v e1)
+                                         (if binds x b
+                                          then e2
+                                          else subst x v e2)
+                                   | VarBind y e1 e2 =>
+                                       VarBind y (subst x v e1)
+                                         (if bool_decide (x = y)
+                                          then e2
+                                          else subst x v e2)
+                                   | Assign y e1 => Assign y (subst x v e1)
+                                   | Pop l e1 => Pop l (subst x v e1)
+                                   | StackLoad e1 => StackLoad (subst x v e1)
+                                   | StackAssign e1 e2 =>
+                                       StackAssign 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | StackFieldStore e1 i e2 =>
+                                       StackFieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   | If e0 e1 e2 =>
+                                       If (subst x v e0) 
+                                         (subst x v e1) 
+                                         (subst x v e2)
+                                   | While e1 e2 =>
+                                       While (subst x v e1) (subst x v e2)
+                                   | Seq e1 e2 =>
+                                       Seq (subst x v e1) (subst x v e2)
+                                   | BinOp op e1 e2 =>
+                                       BinOp op (subst x v e1) (subst x v e2)
+                                   | Alloc e1 => Alloc (subst x v e1)
+                                   | Free e1 => Free (subst x v e1)
+                                   | Load e1 => Load (subst x v e1)
+                                   | Store e1 e2 =>
+                                       Store (subst x v e1) (subst x v e2)
+                                   | Offset e1 e2 =>
+                                       Offset (subst x v e1) (subst x v e2)
+                                   | Struct vs es =>
+                                       Struct
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | StructLoad e1 i =>
+                                       StructLoad (subst x v e1) i
+                                   | StructStore y i e1 =>
+                                       StructStore y i (subst x v e1)
+                                   | New vs es =>
+                                       New
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w :: vs1 =>
+                                                 subst_val x v w :: go vs1
+                                             end) vs)
+                                         ((fix go 
+                                           (es0 : list expr) : 
+                                           list expr :=
+                                             match es0 with
+                                             | [] => []
+                                             | e0 :: es1 =>
+                                                 subst x v e0 :: go es1
+                                             end) es)
+                                   | FieldLoad e1 i =>
+                                       FieldLoad (subst x v e1) i
+                                   | FieldStore e1 i e2 =>
+                                       FieldStore 
+                                         (subst x v e1) i 
+                                         (subst x v e2)
+                                   end
+                                 with subst_val
+                                   (x : string) (v w : val) {struct w} :
+                                     val :=
+                                   match w with
+                                   | LitV _ => w
+                                   | RecV f y e =>
+                                       RecV f y
+                                         (if binds x f || binds x y
+                                          then e
+                                          else subst x v e)
+                                   | StructV vs =>
+                                       StructV
+                                         ((fix go 
+                                           (vs0 : list val) : 
+                                           list val :=
+                                             match vs0 with
+                                             | [] => []
+                                             | w0 :: vs1 =>
+                                                 subst_val x v w0 :: go vs1
+                                             end) vs)
+                                   end
+                                 for
+                                 subst_val) "tracker"
+                                  (statev
+                                     {|
+                                       shifts := xs; pending := Some pending0
+                                     |}) (periodsv (periods m))])
+                            ((fix subst
+                                (x : string) (v : val) (e : expr) {struct e} :
+                                  expr :=
+                                match e with
+                                | Val w => Val (subst_val x v w)
+                                | Var y =>
+                                    if bool_decide (x = y)
+                                    then Val v
+                                    else Var y
+                                | Rec f y e1 =>
+                                    Rec f y
+                                      (if binds x f || binds x y
+                                       then e1
+                                       else subst x v e1)
+                                | App e1 e2 =>
+                                    App (subst x v e1) (subst x v e2)
+                                | Let b e1 e2 =>
+                                    Let b (subst x v e1)
+                                      (if binds x b then e2 else subst x v e2)
+                                | VarBind y e1 e2 =>
+                                    VarBind y (subst x v e1)
+                                      (if bool_decide (x = y)
+                                       then e2
+                                       else subst x v e2)
+                                | Assign y e1 => Assign y (subst x v e1)
+                                | Pop l e1 => Pop l (subst x v e1)
+                                | StackLoad e1 => StackLoad (subst x v e1)
+                                | StackAssign e1 e2 =>
+                                    StackAssign (subst x v e1) (subst x v e2)
+                                | StackFieldStore e1 i e2 =>
+                                    StackFieldStore 
+                                      (subst x v e1) i 
+                                      (subst x v e2)
+                                | If e0 e1 e2 =>
+                                    If (subst x v e0) 
+                                      (subst x v e1) 
+                                      (subst x v e2)
+                                | While e1 e2 =>
+                                    While (subst x v e1) (subst x v e2)
+                                | Seq e1 e2 =>
+                                    Seq (subst x v e1) (subst x v e2)
+                                | BinOp op e1 e2 =>
+                                    BinOp op (subst x v e1) (subst x v e2)
+                                | Alloc e1 => Alloc (subst x v e1)
+                                | Free e1 => Free (subst x v e1)
+                                | Load e1 => Load (subst x v e1)
+                                | Store e1 e2 =>
+                                    Store (subst x v e1) (subst x v e2)
+                                | Offset e1 e2 =>
+                                    Offset (subst x v e1) (subst x v e2)
+                                | Struct vs es =>
+                                    Struct
+                                      ((fix go (vs0 : list val) : list val :=
+                                          match vs0 with
+                                          | [] => []
+                                          | w :: vs1 =>
+                                              subst_val x v w :: go vs1
+                                          end) vs)
+                                      ((fix go (es0 : list expr) :
+                                            list expr :=
+                                          match es0 with
+                                          | [] => []
+                                          | e0 :: es1 =>
+                                              subst x v e0 :: go es1
+                                          end) es)
+                                | StructLoad e1 i =>
+                                    StructLoad (subst x v e1) i
+                                | StructStore y i e1 =>
+                                    StructStore y i (subst x v e1)
+                                | New vs es =>
+                                    New
+                                      ((fix go (vs0 : list val) : list val :=
+                                          match vs0 with
+                                          | [] => []
+                                          | w :: vs1 =>
+                                              subst_val x v w :: go vs1
+                                          end) vs)
+                                      ((fix go (es0 : list expr) :
+                                            list expr :=
+                                          match es0 with
+                                          | [] => []
+                                          | e0 :: es1 =>
+                                              subst x v e0 :: go es1
+                                          end) es)
+                                | FieldLoad e1 i =>
+                                    FieldLoad (subst x v e1) i
+                                | FieldStore e1 i e2 =>
+                                    FieldStore (subst x v e1) i
+                                      (subst x v e2)
+                                end
+                              with subst_val
+                                (x : string) (v w : val) {struct w} : val :=
+                                match w with
+                                | LitV _ => w
+                                | RecV f y e =>
+                                    RecV f y
+                                      (if binds x f || binds x y
+                                       then e
+                                       else subst x v e)
+                                | StructV vs =>
+                                    StructV
+                                      ((fix go (vs0 : list val) : list val :=
+                                          match vs0 with
+                                          | [] => []
+                                          | w0 :: vs1 =>
+                                              subst_val x v w0 :: go vs1
+                                          end) vs)
+                                end
+                              for
+                              subst_val) "tracker"
+                               (statev
+                                  {|
+                                    shifts := xs; pending := Some pending0
+                                  |}) rest)))])) 3)
+          (StructLoad
+             (Val (statev {| shifts := xs; pending := Some pending0 |})) 1)))
+    (boolv (to_minute p <=? pending0))".
+

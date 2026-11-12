@@ -1,0 +1,30 @@
+{
+  "documentation_sources": [
+    "specs"
+  ],
+  "correctness_specification_modules": [
+    "Tracker.Model",
+    "Tracker.Validation",
+    "Tracker.Storage",
+    "Tracker.WorkingTimeModel"
+  ],
+  "main_correctness_contracts": [
+    "Tracker.Public.emptyState_correct",
+    "Tracker.Public.addPair_correct",
+    "Tracker.Public.startShift_correct",
+    "Tracker.Public.endShift_correct",
+    "Tracker.Public.queryContained_correct",
+    "Tracker.Public.queryIntersecting_correct",
+    "Tracker.Public.deleteShift_correct",
+    "Tracker.Validation.validState_correct",
+    "Tracker.Storage.initializeStore_correct",
+    "Tracker.Storage.prepareAddPair_correct",
+    "Tracker.Storage.prepareStartShift_correct",
+    "Tracker.Storage.prepareEndShift_correct",
+    "Tracker.Storage.prepareDeleteShift_correct",
+    "Tracker.Storage.completeStore_correct",
+    "Tracker.Storage.readContained_correct",
+    "Tracker.Storage.readIntersecting_correct",
+    "Tracker.WorkingTimeContracts.validateWorkingTime_correct"
+  ]
+}

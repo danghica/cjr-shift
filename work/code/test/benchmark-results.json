@@ -1,0 +1,269 @@
+{
+  "sources": {
+    "work/code/tracker.cj": "d9ca20b71d03e5d171060522a63589e716cba095dad1e8b3c496ee0ea6dec172",
+    "work/code/working_time.cj": "78c2791d3e3ac30775400e106e7dd76d837ef0d882ee25e5cc59d0b30fe1c49f",
+    "work/CLI/working_time_bridge.cj": "ab0e1d1d2a8dd2385cad30e1171994574d1fdda7724fa4bb9f668588e2ec32be",
+    "work/CLI/working_time_metadata.py": "092bd3c3ad28fc365f6152f1cd2d7a544dd6cec7c80d5da1604ae7bf0ee8a4f0",
+    "work/code/test/working_time_test.cj": "d9ba8b0fa883ab5b5d899565ea65bc59e92fd49d33292cf92528b257da845114",
+    "work/code/test/working_time_benchmark.cj": "2083ca965975dc3e4babb246a097e0d8f7fec9451ab2928a94fb364575819cf6",
+    "work/code/test/test_working_time_cli.py": "f723dd1f8277442abf021dfddd2e4401b7e0cc1fae6366eda97d2c15151f0b23",
+    "work/CLI/bridge.cj": "2d8e310f80e9889da63c5bc40e0acd55dc0a26d9ca34a12002e85f41ba3dfadb",
+    "work/CLI/main.cj": "5c727736525316433e964d4527a740b76e5799e0d02be038d0f11740f08cb807",
+    "work/CLI/help.cj": "2907cf0d82056c43b6c6b0b44339817a2319d3d9ead8b74f28c8fc443db48617",
+    "work/code/test/runtime_test.cj": "d493f18698ac093740a7ea08adfc533e2127d328e682e0160047a056c982e7f6",
+    "work/code/test/benchmark.cj": "bfa779b63167103b19c0c02b3d584290c683045cdc2176787599b95485aff198",
+    "work/code/test/run.py": "05f4e51c5dbd72a2cd8664513cd8521261a64a6e9a4962e681c272a10eaf58c6"
+  },
+  "status": "passed",
+  "finished_utc": "2026-11-12T09:37:58.948294+00:00",
+  "compiler": "Cangjie Compiler: 1.0.5 (cjnative)\nTarget: aarch64-apple-darwin",
+  "flags": [
+    "-O2",
+    "--set-runtime-rpath"
+  ],
+  "machine": {
+    "system": "Darwin",
+    "node": "Dans-Mac-mini.local",
+    "release": "27.2.0",
+    "version": "Darwin Kernel Version 27.2.0: Wed Oct 14 23:47:07 PDT 2026; root:xnu-13432.41.4~25/RELEASE_ARM64_T8132",
+    "machine": "arm64",
+    "processor": "arm"
+  },
+  "warmups": 3,
+  "trials": 7,
+  "repetitions": 100,
+  "units": "nanoseconds per core operation including traversal checksum; excludes process startup, parsing and state construction",
+  "results": [
+    {
+      "operation": "contained",
+      "size": 10,
+      "median_ns": 120.0,
+      "min_ns": 120.0,
+      "max_ns": 160.0
+    },
+    {
+      "operation": "intersecting",
+      "size": 10,
+      "median_ns": 130.0,
+      "min_ns": 120.0,
+      "max_ns": 170.0
+    },
+    {
+      "operation": "add",
+      "size": 10,
+      "median_ns": 190.0,
+      "min_ns": 180.0,
+      "max_ns": 200.0
+    },
+    {
+      "operation": "start",
+      "size": 10,
+      "median_ns": 70.0,
+      "min_ns": 60.0,
+      "max_ns": 120.0
+    },
+    {
+      "operation": "delete",
+      "size": 10,
+      "median_ns": 180.0,
+      "min_ns": 180.0,
+      "max_ns": 190.0
+    },
+    {
+      "operation": "initialize",
+      "size": 10,
+      "median_ns": 80.0,
+      "min_ns": 70.0,
+      "max_ns": 110.0
+    },
+    {
+      "operation": "prepare",
+      "size": 10,
+      "median_ns": 220.0,
+      "min_ns": 210.0,
+      "max_ns": 230.0
+    },
+    {
+      "operation": "commit",
+      "size": 10,
+      "median_ns": 70.0,
+      "min_ns": 60.0,
+      "max_ns": 160.0
+    },
+    {
+      "operation": "rollback",
+      "size": 10,
+      "median_ns": 60.0,
+      "min_ns": 60.0,
+      "max_ns": 70.0
+    },
+    {
+      "operation": "readSession",
+      "size": 10,
+      "median_ns": 140.0,
+      "min_ns": 140.0,
+      "max_ns": 160.0
+    },
+    {
+      "operation": "contained",
+      "size": 100,
+      "median_ns": 1480.0,
+      "min_ns": 1420.0,
+      "max_ns": 1560.0
+    },
+    {
+      "operation": "intersecting",
+      "size": 100,
+      "median_ns": 1470.0,
+      "min_ns": 1400.0,
+      "max_ns": 1540.0
+    },
+    {
+      "operation": "add",
+      "size": 100,
+      "median_ns": 2140.0,
+      "min_ns": 2100.0,
+      "max_ns": 2250.0
+    },
+    {
+      "operation": "start",
+      "size": 100,
+      "median_ns": 540.0,
+      "min_ns": 530.0,
+      "max_ns": 560.0
+    },
+    {
+      "operation": "delete",
+      "size": 100,
+      "median_ns": 2030.0,
+      "min_ns": 1970.0,
+      "max_ns": 3060.0
+    },
+    {
+      "operation": "initialize",
+      "size": 100,
+      "median_ns": 1120.0,
+      "min_ns": 1070.0,
+      "max_ns": 1350.0
+    },
+    {
+      "operation": "prepare",
+      "size": 100,
+      "median_ns": 2000.0,
+      "min_ns": 1940.0,
+      "max_ns": 3090.0
+    },
+    {
+      "operation": "commit",
+      "size": 100,
+      "median_ns": 180.0,
+      "min_ns": 160.0,
+      "max_ns": 200.0
+    },
+    {
+      "operation": "rollback",
+      "size": 100,
+      "median_ns": 170.0,
+      "min_ns": 160.0,
+      "max_ns": 180.0
+    },
+    {
+      "operation": "readSession",
+      "size": 100,
+      "median_ns": 1310.0,
+      "min_ns": 1270.0,
+      "max_ns": 1480.0
+    },
+    {
+      "operation": "contained",
+      "size": 500,
+      "median_ns": 7550.0,
+      "min_ns": 6200.0,
+      "max_ns": 10470.0
+    },
+    {
+      "operation": "intersecting",
+      "size": 500,
+      "median_ns": 7340.0,
+      "min_ns": 7280.0,
+      "max_ns": 7550.0
+    },
+    {
+      "operation": "add",
+      "size": 500,
+      "median_ns": 11510.0,
+      "min_ns": 11270.0,
+      "max_ns": 11900.0
+    },
+    {
+      "operation": "start",
+      "size": 500,
+      "median_ns": 2520.0,
+      "min_ns": 2500.0,
+      "max_ns": 2610.0
+    },
+    {
+      "operation": "delete",
+      "size": 500,
+      "median_ns": 11380.0,
+      "min_ns": 11150.0,
+      "max_ns": 11530.0
+    },
+    {
+      "operation": "initialize",
+      "size": 500,
+      "median_ns": 3660.0,
+      "min_ns": 3410.0,
+      "max_ns": 3690.0
+    },
+    {
+      "operation": "prepare",
+      "size": 500,
+      "median_ns": 11380.0,
+      "min_ns": 11190.0,
+      "max_ns": 11900.0
+    },
+    {
+      "operation": "commit",
+      "size": 500,
+      "median_ns": 700.0,
+      "min_ns": 690.0,
+      "max_ns": 820.0
+    },
+    {
+      "operation": "rollback",
+      "size": 500,
+      "median_ns": 650.0,
+      "min_ns": 640.0,
+      "max_ns": 660.0
+    },
+    {
+      "operation": "readSession",
+      "size": 500,
+      "median_ns": 7390.0,
+      "min_ns": 7130.0,
+      "max_ns": 7460.0
+    },
+    {
+      "operation": "weekly-calculation",
+      "size": 10,
+      "median_ns": 50.0,
+      "min_ns": 40.0,
+      "max_ns": 50.0
+    },
+    {
+      "operation": "weekly-calculation",
+      "size": 100,
+      "median_ns": 960.0,
+      "min_ns": 950.0,
+      "max_ns": 960.0
+    },
+    {
+      "operation": "weekly-calculation",
+      "size": 500,
+      "median_ns": 4630.0,
+      "min_ns": 4620.0,
+      "max_ns": 4660.0
+    }
+  ]
+}

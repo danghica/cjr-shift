@@ -1,0 +1,124 @@
+[
+  {
+    "function": "emptyState",
+    "args": []
+  },
+  {
+    "function": "validState",
+    "args": [
+      "tracker"
+    ]
+  },
+  {
+    "function": "addPair",
+    "args": [
+      "tracker",
+      "startMinute",
+      "endMinute"
+    ]
+  },
+  {
+    "function": "startShift",
+    "args": [
+      "tracker",
+      "startMinute"
+    ]
+  },
+  {
+    "function": "endShift",
+    "args": [
+      "tracker",
+      "endMinute"
+    ]
+  },
+  {
+    "function": "queryContained",
+    "args": [
+      "tracker",
+      "lowerMinute",
+      "upperMinute"
+    ]
+  },
+  {
+    "function": "queryIntersecting",
+    "args": [
+      "tracker",
+      "lowerMinute",
+      "upperMinute"
+    ]
+  },
+  {
+    "function": "deleteShift",
+    "args": [
+      "tracker",
+      "startMinute"
+    ]
+  },
+  {
+    "function": "initializeStore",
+    "args": [
+      "loaded"
+    ]
+  },
+  {
+    "function": "prepareAddPair",
+    "args": [
+      "session",
+      "startMinute",
+      "endMinute"
+    ]
+  },
+  {
+    "function": "prepareStartShift",
+    "args": [
+      "session",
+      "startMinute"
+    ]
+  },
+  {
+    "function": "prepareEndShift",
+    "args": [
+      "session",
+      "endMinute"
+    ]
+  },
+  {
+    "function": "prepareDeleteShift",
+    "args": [
+      "session",
+      "startMinute"
+    ]
+  },
+  {
+    "function": "completeStore",
+    "args": [
+      "session",
+      "succeeded"
+    ]
+  },
+  {
+    "function": "readContained",
+    "args": [
+      "session",
+      "lowerMinute",
+      "upperMinute"
+    ]
+  },
+  {
+    "function": "readIntersecting",
+    "args": [
+      "session",
+      "lowerMinute",
+      "upperMinute"
+    ]
+  },
+  {
+    "function": "validateWorkingTime",
+    "args": [
+      "tracker",
+      "assessmentStart",
+      "assessmentEnd",
+      "metadata"
+    ]
+  }
+]

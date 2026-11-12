@@ -1,0 +1,114 @@
+{
+  "status": "passed",
+  "checked_utc": "2026-11-12T11:02:32.629411+00:00",
+  "scope": "Compliance/settings/classification UI and adapters; core unchanged",
+  "proof_validation_run": false,
+  "hexagonal_boundary": {
+    "verified_core_source_fingerprints_unchanged": true,
+    "extracted_files_unchanged": {
+      "work/code/tracker.cj": true,
+      "work/code/working_time.cj": true
+    },
+    "core_port": "validateWorkingTime",
+    "calculation_boundary": "UI prepares periods and declarations; native core calculates measurements, rest and findings.",
+    "persistence": "shared store lock, atomic sidecar replacement and recovery journal"
+  },
+  "checks": {
+    "adapter_and_http_tests": {
+      "status": "passed",
+      "count": 14,
+      "command": "python3 work/UI/test_server.py",
+      "log": "tests.log"
+    },
+    "compliance_and_recovery_tests": {
+      "status": "passed",
+      "count": 15,
+      "command": "python3 work/UI/test_compliance.py",
+      "log": "compliance-tests.log"
+    },
+    "javascript_tests": {
+      "status": "passed",
+      "count": 10,
+      "command": "node --test work/UI/test_ui.mjs",
+      "log": "javascript-tests.log"
+    },
+    "legislation_link_recheck": {
+      "status": "passed",
+      "log": "legislation-link-tests.log"
+    },
+    "syntax_and_static_controls": {
+      "status": "passed",
+      "checks": [
+        "Python compilation",
+        "JavaScript syntax",
+        "unique HTML IDs",
+        "valid label targets",
+        "JavaScript control references"
+      ]
+    },
+    "browser": {
+      "status": "passed",
+      "browser": "in-app browser",
+      "stores": "isolated synthetic test stores; existing user store not used",
+      "requested_viewports": [
+        {
+          "width": 960,
+          "height": 1000
+        },
+        {
+          "width": 390,
+          "height": 844
+        }
+      ],
+      "observed_css_viewports": [
+        {
+          "width": 873,
+          "height": 909
+        },
+        {
+          "width": 355,
+          "height": 767
+        }
+      ],
+      "horizontal_overflow": false,
+      "console_errors": [],
+      "observed": [
+        "Burger menu entries",
+        "Settings defaults and saved fortnight anchor",
+        "Running attendance toggle without start change",
+        "Running classification restored on reload",
+        "Final classification at stop",
+        "Missed shift with midnight pieces",
+        "Blank assessment endpoints",
+        "Detailed daily-rest violation with legislation links",
+        "Weekly 54-hour average violation",
+        "Scoped opt-out No saved, corrected to Yes and rechecked, corrected back to No",
+        "Opt-out persisted after reload",
+        "Passed period results separated from inapplicable checks",
+        "Desktop phone frame and responsive mobile layout"
+      ],
+      "screenshot": "compliance-preview.jpg",
+      "limits": [
+        "Synthetic data only; physical mobile hardware was not tested."
+      ]
+    },
+    "cli_regression": {
+      "status": "historical; not rerun for this UI change",
+      "evidence": "../code/test/test-results.json"
+    }
+  },
+  "sources": {
+    "work/UI/adapters.py": "3d37f076601b353af79b77f297c054ad3e6e588f5380d6137236f82b54a810a3",
+    "work/UI/compliance.py": "c18331a3c8d45b3cb7e3c365837d59f0f2050327a25fd044f6b529a8e4875fbb",
+    "work/UI/metadata.py": "feba78933bc89a38835da57ca87a0e64b607224afbd22da8462b8cff26cd3f00",
+    "work/UI/server.py": "61b36df3c78cfc239c71077a653e72a036666773996f9608139f48b251308eaa",
+    "work/UI/test_compliance.py": "2e60c9bbf39931fe054a37cbcc0d13c4cc5976ca30b7f54d11dc00f1d00d6658",
+    "work/UI/test_server.py": "0b0b42b5fd4d58c16814ac7fbb9739fb5b34a8e970bf5bd22b6c0db34167a54e",
+    "work/UI/static/app.js": "150ec1cdcfad845a0505b1780d0253ee4ae7b4208ed633c575b4334a65c6cc13",
+    "work/UI/static/index.html": "4ae9751589ee71ccfcb3b0965a20e597eb1c31536a4a73bd6fd6b27b34408046",
+    "work/UI/static/style.css": "488ef187aecec5175768d108cc16bf7c66db351a35cd9b0fb652ed11d38847e2",
+    "work/UI/static/time.mjs": "f9c68f5aae9b9ee1fd3e8b3e39af56643be61abb0b3069bb936937bccfdfab3c",
+    "work/UI/test_ui.mjs": "7182a14cd8f4f32c79db7df11d58fa3e2c1e6b1ca41127581bdddecdd2668b95",
+    "work/UI/README.md": "664593238ebc73da67c22e3b0eeac44d8475af2a7f4968e3b78ac51d61f3117d"
+  }
+}

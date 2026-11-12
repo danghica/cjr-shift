@@ -1,0 +1,23 @@
++ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Tracker.v
++ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Model.v
++ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Pure.v
++ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Runtime.v
++ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Contracts.v
++ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Operations.v
++ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Public.v
++ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Validation.v
++ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Storage.v
+File "/Users/danghica/pandian/work/specs/Storage.v", line 17, characters 22-24:
+Error: Cannot infer a type for this expression.
+
+Traceback (most recent call last):
+  File "/Users/danghica/pandian/work/specs/build.py", line 46, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/Users/danghica/pandian/work/specs/build.py", line 36, in main
+    if (ROOT/'work/specs'/src).exists():run([BIN/'coqc',*FLAGS,ROOT/'work/specs'/src])
+                                        ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/danghica/pandian/work/specs/build.py", line 12, in run
+    if p.returncode: raise subprocess.CalledProcessError(p.returncode,args)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+subprocess.CalledProcessError: Command '[PosixPath('/Users/danghica/.opam/default/bin/coqc'), '-R', '/Users/danghica/pandian/theories', 'cjr', '-Q', '/Users/danghica/pandian/tools/extraction/rocq', 'cjr.examples', '-Q', '/Users/danghica/pandian/work/specs', 'Tracker', PosixPath('/Users/danghica/pandian/work/specs/Storage.v')]' returned non-zero exit status 1.

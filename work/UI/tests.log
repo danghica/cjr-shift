@@ -1,0 +1,55 @@
+test_external_changes_reconcile_and_corruption_is_preserved (__main__.AdapterTests.test_external_changes_reconcile_and_corruption_is_preserved) ... ok
+test_failed_stop_and_failed_reset_preserve_file_and_pending (__main__.AdapterTests.test_failed_stop_and_failed_reset_preserve_file_and_pending) ... ok
+test_midnight (__main__.AdapterTests.test_midnight) ... ok
+test_missed_shift_persists_and_splits_at_midnight (__main__.AdapterTests.test_missed_shift_persists_and_splits_at_midnight) ... ok
+test_missed_shift_rejection_and_disk_failure_preserve_state (__main__.AdapterTests.test_missed_shift_rejection_and_disk_failure_preserve_state) ... ok
+test_only_one_concurrent_start_succeeds (__main__.AdapterTests.test_only_one_concurrent_start_succeeds) ... ok
+test_reset_clears_saved_and_running_shifts (__main__.AdapterTests.test_reset_clears_saved_and_running_shifts) ... ok
+test_same_minute_and_duplicate_start (__main__.AdapterTests.test_same_minute_and_duplicate_start) ... ok
+test_start_stop_and_restart (__main__.AdapterTests.test_start_stop_and_restart) ... ok
+test_assets_and_start_stop (__main__.HTTPTests.test_assets_and_start_stop) ... 127.0.0.1 - - [12/Nov/2026 11:00:44] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:44] "GET /app.js HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:44] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:44] "GET /time.mjs HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:44] "GET /api/state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:44] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:44] "POST /api/stop HTTP/1.1" 409 -
+127.0.0.1 - - [12/Nov/2026 11:00:44] "POST /api/stop HTTP/1.1" 200 -
+ok
+test_metadata_settings_and_compliance_routes (__main__.HTTPTests.test_metadata_settings_and_compliance_routes) ... 127.0.0.1 - - [12/Nov/2026 11:00:45] "GET /api/settings HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/settings HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/settings HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/attendance HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/attendance HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/stop HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/compliance HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/compliance HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/opt-out HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:45] "POST /api/settings HTTP/1.1" 403 -
+ok
+test_missed_shift_api (__main__.HTTPTests.test_missed_shift_api) ... 127.0.0.1 - - [12/Nov/2026 11:00:46] "POST /api/missed-shift HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:46] "POST /api/missed-shift HTTP/1.1" 409 -
+127.0.0.1 - - [12/Nov/2026 11:00:46] "POST /api/missed-shift HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:46] "POST /api/missed-shift HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:46] "POST /api/missed-shift HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:46] "POST /api/missed-shift HTTP/1.1" 400 -
+ok
+test_reset_confirmation_and_request_validation (__main__.HTTPTests.test_reset_confirmation_and_request_validation) ... 127.0.0.1 - - [12/Nov/2026 11:00:47] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:47] "POST /api/reset HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:47] "GET /api/state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:47] "POST /api/reset HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:47] "POST /api/start HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:47] "POST /api/start HTTP/1.1" 400 -
+127.0.0.1 - - [12/Nov/2026 11:00:47] "POST /api/reset HTTP/1.1" 403 -
+127.0.0.1 - - [12/Nov/2026 11:00:47] "POST /api/reset HTTP/1.1" 403 -
+127.0.0.1 - - [12/Nov/2026 11:00:47] "GET /../server.py HTTP/1.1" 404 -
+ok
+test_save_failure_returns_old_state (__main__.HTTPTests.test_save_failure_returns_old_state) ... 127.0.0.1 - - [12/Nov/2026 11:00:48] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 11:00:48] "POST /api/stop HTTP/1.1" 503 -
+ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 8.422s
+
+OK

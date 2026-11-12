@@ -1,0 +1,1660 @@
+Started 2026-11-12T09:46:08.581747+00:00
+$ /Users/danghica/cangjiebuild/software/cangjie/bin/cjc -O2 --set-runtime-rpath /Users/danghica/pandian/work/code/tracker.cj /Users/danghica/pandian/work/code/test/runtime_test.cj -o /Users/danghica/pandian/work/code/test/runtime-tests
+[33mwarning[0m: unused variable:'unused'
+  [36m==>[0m /Users/danghica/pandian/work/code/tracker.cj:45:32:
+   [36m| [0m
+[36m45[0m [36m| [0mreturn ShiftList(true, 0, 0, { unused: Unit => ({ cjrTypedValue: ShiftList => cjrTypedValue })(emptyPieces()) })[0m
+   [36m| [0m                               [33m^^^^^^ unused variable[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+  [36m==>[0m /Users/danghica/pandian/work/code/tracker.cj:48:49:
+   [36m| [0m
+[36m48[0m [36m| [0mreturn ShiftList(false, pieceStart, pieceEnd, { unused: Unit => ({ cjrTypedValue: ShiftList => cjrTypedValue })(restPieces) })[0m
+   [36m| [0m                                                [33m^^^^^^ unused variable[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+2 warnings generated, 2 warnings printed.
+
+EXIT 0
+$ /Users/danghica/pandian/work/code/test/runtime-tests
+PASS 26980 native assertions
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker help
+Work time tracker
+Usage: tracker COMMAND [ARGUMENTS]
+
+emptyState 
+  Return an empty tracker state.
+validState FILE|STATE
+  Check domain invariants in supplied state; return a JSON valid boolean.
+addPair FILE|STATE startMinute endMinute
+  Add a completed interval atomically, splitting at every midnight.
+startShift FILE|STATE startMinute
+  Reserve time from this pending start onward.
+endShift FILE|STATE endMinute
+  Complete the pending shift; retain the pending start on failure.
+queryContained FILE|STATE lowerMinute upperMinute
+  Return daily pieces wholly contained in [lowerMinute, upperMinute).
+queryIntersecting FILE|STATE lowerMinute upperMinute
+  Return daily pieces sharing positive duration with [lowerMinute, upperMinute).
+deleteShift FILE|STATE startMinute
+  Delete the daily piece identified by its full start timestamp.
+initializeStore FILE
+  Load FILE and validate its stored snapshot. Create an empty store if missing. Return the initialized session and absolute storeFile path.
+prepareAddPair FILE|SESSION startMinute endMinute
+  Stage addPair and return one atomic before/after storage request.
+prepareStartShift FILE|SESSION startMinute
+  Stage a pending start; pending starts must also be persisted.
+prepareEndShift FILE|SESSION endMinute
+  Stage every daily piece and removal of the pending start in one request.
+prepareDeleteShift FILE|SESSION startMinute
+  Stage deletion of one daily piece.
+completeStore FILE|SESSION succeeded
+  Acknowledge the outstanding request: succeeded=true commits, false rolls back with code 9.
+readContained FILE|SESSION lowerMinute upperMinute
+  Query committed internal state; code 8 while a save is outstanding.
+readIntersecting FILE|SESSION lowerMinute upperMinute
+  Query committed internal state; code 8 while a save is outstanding.
+validateWorkingTime FILE|STATE assessmentStart assessmentEnd metadata
+  Read-only assessment of supplied statutory periods and metadata; in-work breaks are always outside scope. Public metadata argument is a JSON filename.
+help
+  List every application command and this reference.
+
+Working-time validation:
+tracker validateWorkingTime FILE|STATE assessmentStart assessmentEnd METADATA.json
+The JSON bridge reads the metadata file and passes values to the extracted core.
+No shifts or store contents are changed. Input period identification, applicability,
+working-time classification and complete coverage are asserted metadata facts;
+the core computes totals/rest gaps and findings, not the file adapter.
+Metadata must describe every applicable statutory period, including rolling windows
+where required. A supplied period list alone is not proof of complete legal coverage.
+Codes: 20 invalid metadata; 21 insufficient information; 22 unsupported regime;
+101 weekly hours; 102 daily rest; 103 weekly rest; 105 average night hours;
+106 strict hazardous night work. 104 is reserved and never emitted.
+Code 0 covers only supported checks on accurate, complete metadata; it is not a
+complete UK-law compliance certificate. Break compliance is always not_assessed.
+JSON findings contain period, rule, code, measured and limit; for 101/105 the
+last two values are the integer-scaled comparison operands, not hours.
+Metadata timestamps and native input are bounded to 6000000000 ordinal minutes,
+and interval/period lists to 10000 entries. Native resource limits still apply.
+See working-time.html beside this reference for the exact JSON metadata schema.
+
+File-backed usage:
+tracker initializeStore shifts.store
+tracker addPair shifts.store 2026-11-11T09:00 2026-11-11T17:00
+tracker queryContained shifts.store 2026-11-11T00:00 2026-11-12T00:00
+tracker deleteShift shifts.store 2026-11-11T09:00
+
+initializeStore takes a filename, not encoded state. It creates a missing file
+containing -|, or loads and validates an existing file without replacing its data.
+Use that filename in subsequent state/session commands. Both ordinary mutations
+and prepare* commands with FILE automatically perform prepare, atomic save and
+completion. No manual completeStore is needed for FILE; it returns code 10
+because there is no outstanding save after a completed command.
+Each invocation loads the file once into internal state. Reads do not save.
+Store contents are UTF-8 STATE encoding followed by a newline. Writes use a
+sibling temporary file, fsync, and atomic replacement; a sibling FILE.lock
+serializes cooperating CLI processes. External editors must not bypass the lock.
+Existing file permissions are preserved; new stores use owner-only permissions.
+A failed save returns code 9 with the prior state and a storageError message;
+the previous file remains unchanged. Startup/read/argument failures exit 2.
+Definitive local write failure is handled; power-loss durability of the directory
+entry is not promised. The wrapper requires Python 3 and the bundled tracker-core.
+A filename that does not contain | or # is unambiguous. An existing path takes
+precedence over encoded state/session arguments. Pass an absolute path when in doubt.
+Use storeFile for subsequent file-backed calls; sessionEncoding by itself is
+an unbound pure simulation value and does not remember the filename.
+
+Explicit-state simulation remains available for other commands:
+STATE: PENDING|START,END;START,END (quote the entire argument).
+Use - for no pending start; -| is empty. Pieces must be sorted,
+nonoverlapping, positive-duration and daily, and end before any pending start.
+Timestamp: YYYY-MM-DDTHH:MM (Gregorian 0001..9999), or @N ordinal minutes
+since 0001-01-01T00:00, 0 <= N <= 9223372036854774367.
+No timezone conversion. Adjacent pieces are allowed. Midnight is 00:00
+of the following date, never 24:00.
+
+Result: JSON code, stateEncoding, state {pending, shifts}, rows.
+All output timestamps are ordinal minute integers. stateEncoding can be
+passed unchanged to the next invocation. validState prints a JSON valid boolean (true or false).
+Codes: 0 success, 1 invalid timestamp, 2 nonpositive interval, 3 overlap,
+4 pending/reservation conflict, 5 no pending start, 6 unknown shift.
+All domain failures preserve state. Query and validation leave state unchanged.
+Low-level addPair/startShift/endShift/deleteShift compute candidate state only.
+Use the session protocol for persistence-aware operations:
+native initialization -> prepare* session ... -> external atomic save ->
+completeStore session succeeded. Explicit-state/session calls remain pure apart from terminal I/O.
+SESSION format: STATE#CANDIDATE#WAITING#CODE (quote the entire argument).
+WAITING is true or false; CODE is 0..10. Use sessionEncoding unchanged.
+Session results: code, sessionEncoding, stateEncoding (committed state), waiting,
+storageRequest (null or {before,after} state encodings). The request replaces
+one complete tracker snapshot atomically, including pending start and all pieces.
+Preparation code 0 with waiting=true is provisional, not a successful saved write.
+Only completeStore true reports a successful saved write; false reports code 9.
+Codes additionally: 7 invalid loaded state, 8 outstanding save blocks access,
+9 persistence failed and rolled back, 10 no outstanding request to complete.
+A blocked call retains the original outstanding request; do not apply it twice.
+Read and rejected-mutation calls create no new requests. An invalid initialization
+must not be used as a successful load. The adapter must serialize session access,
+load once, keep the session internally, save atomically, and give a definitive
+outcome. Ambiguous timeouts require external reconciliation before completion.
+The file adapter performs filesystem I/O for filename arguments. Explicit encodings bypass the file adapter. There is no network or clock access.
+Every command prints to stdout; malformed input prints to stderr.
+Exit: 0 success, 1 domain rejection or failed state validation,
+2 malformed arguments (including invalid state for business commands).
+File-backed calls also create/open the sibling lock file; mutations replace the store file. No other external effects.
+
+Examples:
+tracker initializeStore shifts.store
+tracker prepareAddPair '-|#-|#false#0' @1430 @1450
+tracker completeStore '-|#-|@1430,@1440;@1440,@1450#true#0' false
+tracker addPair '-|' 2026-11-09T23:30 2026-11-10T01:00
+tracker startShift '-|' @60
+tracker endShift '@60|' @120
+tracker queryIntersecting '-|@60,@120' @90 @150
+tracker deleteShift '-|@60,@120' @60
+
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -| @60 @120
+{"code":0,"stateEncoding":"-|@60,@120","state":{"pending":null,"shifts":[[60,120]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -| @1430 @4330
+{"code":0,"stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @0 @20
+{"code":0,"stateEncoding":"-|@0,@20;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -|@0,@20;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @100 @200
+{"code":0,"stateEncoding":"-|@0,@20;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -|@0,@20;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @60 @80
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @0 @5000
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @0 @5000
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @1440 @2880
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[[1440,2880]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @1440 @2880
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[[1440,2880]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @1441 @2879
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @1441 @2879
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[[1440,2880]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @4330 @4400
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @4330 @4400
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @1429 @1430
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @1429 @1430
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @20 @60
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @20 @60
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @0 @0
+{"code":2,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @0 @0
+{"code":2,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @100 @99
+{"code":2,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @100 @99
+{"code":2,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @1400 @1440
+{"code":3,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @60 @80
+{"code":3,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @200 @1430
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@200,@1430;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[200,1430],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @4330 @4400
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330;@4330,@4400","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330],[4330,4400]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @4330
+{"code":0,"stateEncoding":"@4330|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":4330,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @4329
+{"code":4,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @10
+{"code":4,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -| @9223372036854774366 @9223372036854774367
+{"code":0,"stateEncoding":"-|@9223372036854774366,@9223372036854774367","state":{"pending":null,"shifts":[[9223372036854774366,9223372036854774367]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @5000
+{"code":0,"stateEncoding":"@5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":5000,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @5000
+{"code":2,"stateEncoding":"@5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":5000,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @6000
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330;@5000,@5760;@5760,@6000","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330],[5000,5760],[5760,6000]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @7000
+{"code":4,"stateEncoding":"@5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":5000,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @5000 @5010
+{"code":4,"stateEncoding":"@5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":5000,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @4990 @5000
+{"code":0,"stateEncoding":"@5000|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330;@4990,@5000","state":{"pending":5000,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330],[4990,5000]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @1440
+{"code":0,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift -|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330 @1441
+{"code":6,"stateEncoding":"-|@0,@20;@60,@80;@100,@200;@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[0,20],[60,80],[100,200],[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -| @389 @889
+{"code":0,"stateEncoding":"-|@389,@889","state":{"pending":null,"shifts":[[389,889]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -|@389,@889 @5071
+{"code":0,"stateEncoding":"@5071|@389,@889","state":{"pending":5071,"shifts":[[389,889]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889 @3474 @3853
+{"code":0,"stateEncoding":"@5071|@389,@889;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@3474,@3853 @66 @541
+{"code":3,"stateEncoding":"@5071|@389,@889;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@3474,@3853 @1680 @2183
+{"code":0,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@3474,@3853 @3053 @3217
+{"code":0,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @5337
+{"code":4,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @2478
+{"code":6,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @1322
+{"code":6,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @3471
+{"code":4,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @1782
+{"code":2,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @5059 @5487
+{"code":0,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @5739
+{"code":6,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @711
+{"code":6,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @1513 @1771
+{"code":3,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @4654 @5118
+{"code":4,"stateEncoding":"@5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@3053,@3217;@3474,@3853 @2432 @2755
+{"code":0,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @5187
+{"code":4,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @1460
+{"code":2,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @1147
+{"code":2,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @1540 @1879
+{"code":0,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @654 @711
+{"code":0,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[[389,889]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @5017 @5259
+{"code":4,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @3194 @3456
+{"code":3,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @2484 @3044
+{"code":3,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @1240 @1910
+{"code":0,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @5601 @6239
+{"code":0,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @3682 @4083
+{"code":0,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[[3474,3853]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @5538
+{"code":6,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @213
+{"code":2,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @4125
+{"code":2,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @850 @1103
+{"code":3,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @370 @571
+{"code":3,"stateEncoding":"@5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @958 @1007
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @1063
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @3541 @3652
+{"code":3,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @1592 @1597
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @5564
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @3399
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @5491
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @3491 @4161
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @5053 @5309
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @4108
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @4965 @5268
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @1328
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @2728
+{"code":6,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @277 @825
+{"code":3,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @5464 @5837
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @2326
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @1668
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @3057 @3524
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[[3053,3217],[3474,3853]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @3373 @3457
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @2913 @3347
+{"code":3,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @3440
+{"code":6,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853 @4067 @4121
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121 @3883
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121 @1837
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121 @3484 @3675
+{"code":3,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121 @4534 @4887
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @4331
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @4684
+{"code":6,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @1347
+{"code":6,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @3548
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @2869 @3193
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @5596
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @1944
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @1833 @2354
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @1984 @2628
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @2047 @2277
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[[1680,2183]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @4789
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @4165
+{"code":6,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @4521
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @207
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @2619 @3179
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @5069
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @4060 @4704
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[[4067,4121],[4534,4887]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @3858 @4154
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[[4067,4121]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @5209 @5701
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @2608 @2821
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[[2432,2755]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @1041 @1294
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @4178
+{"code":6,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @3727 @4134
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[[4067,4121]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @5586 @5990
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @1962 @2319
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @2408 @2408
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @5766
+{"code":6,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @2422
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @93
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @2559
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker endShift @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @1491
+{"code":2,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @1203
+{"code":6,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @5229
+{"code":6,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @3010 @3509
+{"code":3,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4534,@4887 @4356 @4379
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4356,4379],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887 @2838
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4356,4379],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887 @2709 @3321
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4356,4379],[4534,4887]]},"rows":[[2432,2755],[3053,3217]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887 @5963 @6416
+{"code":4,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4356,4379],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887 @1264 @1277
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4356,4379],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887 @979 @1118
+{"code":0,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4356,4379],[4534,4887]]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair @5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887 @910 @1335
+{"code":3,"stateEncoding":"@5071|@389,@889;@958,@1007;@1041,@1294;@1680,@2183;@2432,@2755;@3053,@3217;@3474,@3853;@4067,@4121;@4356,@4379;@4534,@4887","state":{"pending":5071,"shifts":[[389,889],[958,1007],[1041,1294],[1680,2183],[2432,2755],[3053,3217],[3474,3853],[4067,4121],[4356,4379],[4534,4887]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker help
+Work time tracker
+Usage: tracker COMMAND [ARGUMENTS]
+
+emptyState 
+  Return an empty tracker state.
+validState FILE|STATE
+  Check domain invariants in supplied state; return a JSON valid boolean.
+addPair FILE|STATE startMinute endMinute
+  Add a completed interval atomically, splitting at every midnight.
+startShift FILE|STATE startMinute
+  Reserve time from this pending start onward.
+endShift FILE|STATE endMinute
+  Complete the pending shift; retain the pending start on failure.
+queryContained FILE|STATE lowerMinute upperMinute
+  Return daily pieces wholly contained in [lowerMinute, upperMinute).
+queryIntersecting FILE|STATE lowerMinute upperMinute
+  Return daily pieces sharing positive duration with [lowerMinute, upperMinute).
+deleteShift FILE|STATE startMinute
+  Delete the daily piece identified by its full start timestamp.
+initializeStore FILE
+  Load FILE and validate its stored snapshot. Create an empty store if missing. Return the initialized session and absolute storeFile path.
+prepareAddPair FILE|SESSION startMinute endMinute
+  Stage addPair and return one atomic before/after storage request.
+prepareStartShift FILE|SESSION startMinute
+  Stage a pending start; pending starts must also be persisted.
+prepareEndShift FILE|SESSION endMinute
+  Stage every daily piece and removal of the pending start in one request.
+prepareDeleteShift FILE|SESSION startMinute
+  Stage deletion of one daily piece.
+completeStore FILE|SESSION succeeded
+  Acknowledge the outstanding request: succeeded=true commits, false rolls back with code 9.
+readContained FILE|SESSION lowerMinute upperMinute
+  Query committed internal state; code 8 while a save is outstanding.
+readIntersecting FILE|SESSION lowerMinute upperMinute
+  Query committed internal state; code 8 while a save is outstanding.
+validateWorkingTime FILE|STATE assessmentStart assessmentEnd metadata
+  Read-only assessment of supplied statutory periods and metadata; in-work breaks are always outside scope. Public metadata argument is a JSON filename.
+help
+  List every application command and this reference.
+
+Working-time validation:
+tracker validateWorkingTime FILE|STATE assessmentStart assessmentEnd METADATA.json
+The JSON bridge reads the metadata file and passes values to the extracted core.
+No shifts or store contents are changed. Input period identification, applicability,
+working-time classification and complete coverage are asserted metadata facts;
+the core computes totals/rest gaps and findings, not the file adapter.
+Metadata must describe every applicable statutory period, including rolling windows
+where required. A supplied period list alone is not proof of complete legal coverage.
+Codes: 20 invalid metadata; 21 insufficient information; 22 unsupported regime;
+101 weekly hours; 102 daily rest; 103 weekly rest; 105 average night hours;
+106 strict hazardous night work. 104 is reserved and never emitted.
+Code 0 covers only supported checks on accurate, complete metadata; it is not a
+complete UK-law compliance certificate. Break compliance is always not_assessed.
+JSON findings contain period, rule, code, measured and limit; for 101/105 the
+last two values are the integer-scaled comparison operands, not hours.
+Metadata timestamps and native input are bounded to 6000000000 ordinal minutes,
+and interval/period lists to 10000 entries. Native resource limits still apply.
+See working-time.html beside this reference for the exact JSON metadata schema.
+
+File-backed usage:
+tracker initializeStore shifts.store
+tracker addPair shifts.store 2026-11-11T09:00 2026-11-11T17:00
+tracker queryContained shifts.store 2026-11-11T00:00 2026-11-12T00:00
+tracker deleteShift shifts.store 2026-11-11T09:00
+
+initializeStore takes a filename, not encoded state. It creates a missing file
+containing -|, or loads and validates an existing file without replacing its data.
+Use that filename in subsequent state/session commands. Both ordinary mutations
+and prepare* commands with FILE automatically perform prepare, atomic save and
+completion. No manual completeStore is needed for FILE; it returns code 10
+because there is no outstanding save after a completed command.
+Each invocation loads the file once into internal state. Reads do not save.
+Store contents are UTF-8 STATE encoding followed by a newline. Writes use a
+sibling temporary file, fsync, and atomic replacement; a sibling FILE.lock
+serializes cooperating CLI processes. External editors must not bypass the lock.
+Existing file permissions are preserved; new stores use owner-only permissions.
+A failed save returns code 9 with the prior state and a storageError message;
+the previous file remains unchanged. Startup/read/argument failures exit 2.
+Definitive local write failure is handled; power-loss durability of the directory
+entry is not promised. The wrapper requires Python 3 and the bundled tracker-core.
+A filename that does not contain | or # is unambiguous. An existing path takes
+precedence over encoded state/session arguments. Pass an absolute path when in doubt.
+Use storeFile for subsequent file-backed calls; sessionEncoding by itself is
+an unbound pure simulation value and does not remember the filename.
+
+Explicit-state simulation remains available for other commands:
+STATE: PENDING|START,END;START,END (quote the entire argument).
+Use - for no pending start; -| is empty. Pieces must be sorted,
+nonoverlapping, positive-duration and daily, and end before any pending start.
+Timestamp: YYYY-MM-DDTHH:MM (Gregorian 0001..9999), or @N ordinal minutes
+since 0001-01-01T00:00, 0 <= N <= 9223372036854774367.
+No timezone conversion. Adjacent pieces are allowed. Midnight is 00:00
+of the following date, never 24:00.
+
+Result: JSON code, stateEncoding, state {pending, shifts}, rows.
+All output timestamps are ordinal minute integers. stateEncoding can be
+passed unchanged to the next invocation. validState prints a JSON valid boolean (true or false).
+Codes: 0 success, 1 invalid timestamp, 2 nonpositive interval, 3 overlap,
+4 pending/reservation conflict, 5 no pending start, 6 unknown shift.
+All domain failures preserve state. Query and validation leave state unchanged.
+Low-level addPair/startShift/endShift/deleteShift compute candidate state only.
+Use the session protocol for persistence-aware operations:
+native initialization -> prepare* session ... -> external atomic save ->
+completeStore session succeeded. Explicit-state/session calls remain pure apart from terminal I/O.
+SESSION format: STATE#CANDIDATE#WAITING#CODE (quote the entire argument).
+WAITING is true or false; CODE is 0..10. Use sessionEncoding unchanged.
+Session results: code, sessionEncoding, stateEncoding (committed state), waiting,
+storageRequest (null or {before,after} state encodings). The request replaces
+one complete tracker snapshot atomically, including pending start and all pieces.
+Preparation code 0 with waiting=true is provisional, not a successful saved write.
+Only completeStore true reports a successful saved write; false reports code 9.
+Codes additionally: 7 invalid loaded state, 8 outstanding save blocks access,
+9 persistence failed and rolled back, 10 no outstanding request to complete.
+A blocked call retains the original outstanding request; do not apply it twice.
+Read and rejected-mutation calls create no new requests. An invalid initialization
+must not be used as a successful load. The adapter must serialize session access,
+load once, keep the session internally, save atomically, and give a definitive
+outcome. Ambiguous timeouts require external reconciliation before completion.
+The file adapter performs filesystem I/O for filename arguments. Explicit encodings bypass the file adapter. There is no network or clock access.
+Every command prints to stdout; malformed input prints to stderr.
+Exit: 0 success, 1 domain rejection or failed state validation,
+2 malformed arguments (including invalid state for business commands).
+File-backed calls also create/open the sibling lock file; mutations replace the store file. No other external effects.
+
+Examples:
+tracker initializeStore shifts.store
+tracker prepareAddPair '-|#-|#false#0' @1430 @1450
+tracker completeStore '-|#-|@1430,@1440;@1440,@1450#true#0' false
+tracker addPair '-|' 2026-11-09T23:30 2026-11-10T01:00
+tracker startShift '-|' @60
+tracker endShift '@60|' @120
+tracker queryIntersecting '-|@60,@120' @90 @150
+tracker deleteShift '-|@60,@120' @60
+
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker emptyState
+{"code":0,"stateEncoding":"-|","state":{"pending":null,"shifts":[]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker validState -|
+{"valid":true}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker noSuchCommand -|
+error: unknown command: noSuchCommand; run help
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker help extra
+error: help takes no arguments
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -|
+error: addPair requires STATE START END
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| @-1
+error: expected unsigned decimal integer: -1
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| @9223372036854775807
+error: minute exceeds native arithmetic bound
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 2023-02-29T10:00
+error: invalid Gregorian day
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 1900-02-29T10:00
+error: invalid Gregorian day
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 2100-02-29T10:00
+error: invalid Gregorian day
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 2024-02-30T10:00
+error: invalid Gregorian day
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 2024-01-01T24:00
+error: invalid Gregorian timestamp
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 2024-01-01T12:60
+error: invalid Gregorian timestamp
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 0000-01-01T00:00
+error: invalid Gregorian timestamp
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker addPair -|@100,@200;@50,@60 @300 @400
+error: invalid state: pieces must be sorted, positive, daily, disjoint and before any pending start
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryContained -|@100,@100 @0 @200
+error: invalid state: pieces must be sorted, positive, daily, disjoint and before any pending start
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -|@1400,@1500 @2000
+error: invalid state: pieces must be sorted, positive, daily, disjoint and before any pending start
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker deleteShift @50|@40,@60 @40
+error: invalid state: pieces must be sorted, positive, daily, disjoint and before any pending start
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker validState -|@0,@10;
+error: each piece needs START,END
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker queryIntersecting -|@0,@10;@5,@20 @0 @100
+error: invalid state: pieces must be sorted, positive, daily, disjoint and before any pending start
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker validState -|@100,@200;@50,@60
+{"valid":false}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker validState -|@100,@100
+{"valid":false}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker validState -|@1400,@1500
+{"valid":false}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker validState @50|@40,@60
+{"valid":false}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker validState -|@0,@10;@5,@20
+{"valid":false}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 0001-01-01T00:00
+{"code":0,"stateEncoding":"@0|","state":{"pending":0,"shifts":[]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 2000-02-29T23:59
+{"code":0,"stateEncoding":"@1051457759|","state":{"pending":1051457759,"shifts":[]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 2024-02-29T12:34
+{"code":0,"stateEncoding":"@1064080114|","state":{"pending":1064080114,"shifts":[]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker startShift -| 9999-12-31T23:59
+{"code":0,"stateEncoding":"@5258964959|","state":{"pending":5258964959,"shifts":[]},"rows":[]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core initializeStore -|
+{"code":0,"sessionEncoding":"-|#-|#false#0","stateEncoding":"-|","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|#-|#false#0 @1430 @4330
+{"code":0,"sessionEncoding":"-|#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0","stateEncoding":"-|","waiting":true,"storageRequest":{"before":"-|","after":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330"}}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|","state":{"pending":null,"shifts":[]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|","state":{"pending":null,"shifts":[]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 @10000
+{"code":8,"sessionEncoding":"-|#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#8","stateEncoding":"-|","waiting":true,"storageRequest":{"before":"-|","after":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330"}}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 false
+{"code":9,"sessionEncoding":"-|#-|#false#9","stateEncoding":"-|","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 true
+{"code":0,"sessionEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#0","stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#0 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#0 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#0 @5000
+{"code":0,"sessionEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0","stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","after":"@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330"}}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 @10000
+{"code":8,"sessionEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#8","stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","after":"@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330"}}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 false
+{"code":9,"sessionEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#9","stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#true#0 true
+{"code":0,"sessionEncoding":"@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#0","stateEncoding":"@5000|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#9 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#9 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#9 @6000
+{"code":5,"sessionEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#5","stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#5 @1440
+{"code":0,"sessionEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#true#0","stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","after":"-|@1430,@1440;@2880,@4320;@4320,@4330"}}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[1440,2880],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#true#0 @10000
+{"code":8,"sessionEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#true#8","stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","after":"-|@1430,@1440;@2880,@4320;@4320,@4330"}}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#true#0 false
+{"code":9,"sessionEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#false#9","stateEncoding":"-|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@1440,@2880;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#true#0 true
+{"code":0,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#false#0","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#false#0 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330]]},"rows":[[1430,1440],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#false#0 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330]]},"rows":[[1430,1440],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#false#0 @5280
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#false#5 @4639
+{"code":0,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#true#0","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@2880,@4320;@4320,@4330","after":"@4639|@1430,@1440;@2880,@4320;@4320,@4330"}}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#true#0 @10000
+{"code":8,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#true#8","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@2880,@4320;@4320,@4330","after":"@4639|@1430,@1440;@2880,@4320;@4320,@4330"}}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#true#0 false
+{"code":9,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330#false#9","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#true#0 true
+{"code":0,"sessionEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#0","stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained @4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#0 @0 @10000
+{"code":0,"stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","state":{"pending":4639,"shifts":[[1430,1440],[2880,4320],[4320,4330]]},"rows":[[1430,1440],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting @4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#0 @0 @10000
+{"code":0,"stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","state":{"pending":4639,"shifts":[[1430,1440],[2880,4320],[4320,4330]]},"rows":[[1430,1440],[2880,4320],[4320,4330]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift @4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#0 @5958
+{"code":6,"sessionEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#6","stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift @4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#6 @2614
+{"code":2,"sessionEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#2","stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift @4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#2 @4584
+{"code":4,"sessionEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#4","stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift @4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#4 @7926
+{"code":0,"sessionEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0","stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","waiting":true,"storageRequest":{"before":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","after":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926"}}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained @4639|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @0 @10000
+{"code":8,"stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","state":{"pending":4639,"shifts":[[1430,1440],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting @4639|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @0 @10000
+{"code":8,"stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","state":{"pending":4639,"shifts":[[1430,1440],[2880,4320],[4320,4330]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift @4639|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @10000
+{"code":8,"sessionEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#8","stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","waiting":true,"storageRequest":{"before":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","after":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926"}}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore @4639|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 false
+{"code":9,"sessionEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330#@4639|@1430,@1440;@2880,@4320;@4320,@4330#false#9","stateEncoding":"@4639|@1430,@1440;@2880,@4320;@4320,@4330","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore @4639|@1430,@1440;@2880,@4320;@4320,@4330#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 true
+{"code":0,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0 @6600
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @4354
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @4368
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @7757
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @5734
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @5979
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @6656
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @1430
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @4436
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @1259
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @1690
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @6074
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @592 @678
+{"code":0,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","after":"-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926"}}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @10000
+{"code":8,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#8","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","after":"-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926"}}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 false
+{"code":9,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 true
+{"code":0,"sessionEncoding":"-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0","stateEncoding":"-|@592,@678;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9 @7653
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @418
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @1516 @2473
+{"code":0,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","after":"-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926"}}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @10000
+{"code":8,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#8","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","after":"-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926"}}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 false
+{"code":9,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 true
+{"code":0,"sessionEncoding":"-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0","stateEncoding":"-|@1430,@1440;@1516,@2473;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9 @0 @10000
+{"code":0,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9 @5345
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @3903
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @724
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @4473
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @3555
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @5059 @5202
+{"code":3,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @6575
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @671 @2864
+{"code":3,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @2899
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @7223
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @6059
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @2489
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @585
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @401
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @4860
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @6801 @8299
+{"code":3,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @226
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @1610
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @6224
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @3153
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @6492
+{"code":4,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @1573
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @126
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @30
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @2637
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @1518
+{"code":6,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @477
+{"code":5,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @84 @393
+{"code":0,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","after":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926"}}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 @10000
+{"code":8,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#8","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":true,"storageRequest":{"before":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","after":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926"}}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 false
+{"code":9,"sessionEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9","stateEncoding":"-|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#true#0 true
+{"code":0,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0 @0 @10000
+{"code":0,"stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0 @0 @10000
+{"code":0,"stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#0 @5528
+{"code":6,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @7930 @9380
+{"code":0,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380#true#0","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":true,"storageRequest":{"before":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","after":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380"}}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380#true#0 @0 @10000
+{"code":8,"stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[]}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380#true#0 @10000
+{"code":8,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380#true#8","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":true,"storageRequest":{"before":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","after":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380"}}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380#true#0 false
+{"code":9,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380#true#0 true
+{"code":0,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380#false#0","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926;@7930,@8640;@8640,@9380","waiting":false,"storageRequest":null}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9 @0 @10000
+{"code":0,"stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readIntersecting -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9 @0 @10000
+{"code":0,"stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","state":{"pending":null,"shifts":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]},"rows":[[84,393],[1430,1440],[2880,4320],[4320,4330],[4639,5760],[5760,7200],[7200,7926]]}
+
+EXIT 0
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#9 @700
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @517
+{"code":6,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @1930 @3225
+{"code":3,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @7043
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @5729
+{"code":6,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @5447 @7436
+{"code":3,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @4576
+{"code":6,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @1485
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @2702
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @6691
+{"code":6,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @3650 @6467
+{"code":3,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @266 @2667
+{"code":3,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @4546 @6282
+{"code":3,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @6472
+{"code":6,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @5715
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @5138
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareEndShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @824
+{"code":5,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#5 @3114 @4839
+{"code":3,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @3469
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @6641 @9323
+{"code":3,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @6410
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @7843
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @4363 @4906
+{"code":3,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @4669
+{"code":6,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareStartShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @1510
+{"code":4,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#4 @6859
+{"code":6,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 @1531 @3174
+{"code":3,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareDeleteShift -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#3 @4099
+{"code":6,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#6 true
+{"code":10,"sessionEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926#false#10","stateEncoding":"-|@84,@393;@1430,@1440;@2880,@4320;@4320,@4330;@4639,@5760;@5760,@7200;@7200,@7926","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core initializeStore -|@10,@10
+{"code":7,"sessionEncoding":"-|#-|#false#7","stateEncoding":"-|","waiting":false,"storageRequest":null}
+
+EXIT 1
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|#-|#false#0 yes
+error: completeStore requires SESSION true|false
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core prepareAddPair garbage @1 @2
+error: session format: STATE#CANDIDATE#WAITING#CODE
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core readContained -|#-|#maybe#0 @0 @10
+error: WAITING must be true or false
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core completeStore -|#-|#true#11 true
+error: session code must be 0..10
+
+EXIT 2
+$ /Users/danghica/pandian/work/CLI/bin/tracker-core initializeStore
+error: initializeStore requires loaded STATE
+
+EXIT 2
+$ /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/danghica/pandian/work/CLI/test_file_store.py
+test_add_query_delete_restart_and_midnight_split (__main__.FileStoreTests.test_add_query_delete_restart_and_midnight_split) ... ok
+test_concurrent_processes_do_not_lose_updates (__main__.FileStoreTests.test_concurrent_processes_do_not_lose_updates) ... ok
+test_create_load_and_file_permissions (__main__.FileStoreTests.test_create_load_and_file_permissions) ... ok
+test_existing_permissions_and_punctuation_filename (__main__.FileStoreTests.test_existing_permissions_and_punctuation_filename) ... ok
+test_explicit_state_commands_remain_available (__main__.FileStoreTests.test_explicit_state_commands_remain_available) ... ok
+test_failed_replace_rolls_back_and_cleans_temporary_file (__main__.FileStoreTests.test_failed_replace_rolls_back_and_cleans_temporary_file) ... ok
+test_invalid_input_does_not_overwrite_store (__main__.FileStoreTests.test_invalid_input_does_not_overwrite_store) ... ok
+test_missing_file_and_bad_arity (__main__.FileStoreTests.test_missing_file_and_bad_arity) ... ok
+test_pending_start_and_prepare_commands_save_automatically (__main__.FileStoreTests.test_pending_start_and_prepare_commands_save_automatically) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 2.954s
+
+OK
+
+EXIT 0
+$ /Users/danghica/cangjiebuild/software/cangjie/bin/cjc -O2 --set-runtime-rpath /Users/danghica/pandian/work/code/tracker.cj /Users/danghica/pandian/work/code/working_time.cj /Users/danghica/pandian/work/code/test/working_time_test.cj -o /Users/danghica/pandian/work/code/test/working-time-tests
+[33mwarning[0m: unused variable:'unused'
+  [36m==>[0m /Users/danghica/pandian/work/code/tracker.cj:45:32:
+   [36m| [0m
+[36m45[0m [36m| [0mreturn ShiftList(true, 0, 0, { unused: Unit => ({ cjrTypedValue: ShiftList => cjrTypedValue })(emptyPieces()) })[0m
+   [36m| [0m                               [33m^^^^^^ unused variable[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+  [36m==>[0m /Users/danghica/pandian/work/code/tracker.cj:48:49:
+   [36m| [0m
+[36m48[0m [36m| [0mreturn ShiftList(false, pieceStart, pieceEnd, { unused: Unit => ({ cjrTypedValue: ShiftList => cjrTypedValue })(restPieces) })[0m
+   [36m| [0m                                                [33m^^^^^^ unused variable[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+   [36m==>[0m /Users/danghica/pandian/work/code/working_time.cj:122:57:
+    [36m| [0m
+[36m122[0m [36m| [0mreturn WTPeriods(true, 0, 0, 0, 0, 0, 0, 0, 0, false, { unused: Unit => ({ cjrTypedValue: WTPeriods => cjrTypedValue })(wtEmptyPeriods()) })[0m
+    [36m| [0m                                                        [33m^^^^^^ unused variable[0m
+    [36m| [0m
+    [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+   [36m==>[0m /Users/danghica/pandian/work/code/working_time.cj:125:120:
+    [36m| [0m
+[36m125[0m [36m| [0mreturn WTPeriods(false, rule, start, finish, calendar, extraStart, extraEnd, evidence, restScheme, dailyRestOverlap, { unused: Unit => ({ cjrTypedValue: WTPeriods => cjrTypedValue })(rest) })[0m
+    [36m| [0m                                                                                                                       [33m^^^^^^ unused variable[0m
+    [36m| [0m
+    [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+   [36m==>[0m /Users/danghica/pandian/work/code/working_time.cj:128:56:
+    [36m| [0m
+[36m128[0m [36m| [0mreturn WTFindings(true, WTFinding(0, 0, 0, 0, 0, 0), { unused: Unit => ({ cjrTypedValue: WTFindings => cjrTypedValue })(wtEmptyFindings()) })[0m
+    [36m| [0m                                                       [33m^^^^^^ unused variable[0m
+    [36m| [0m
+    [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+   [36m==>[0m /Users/danghica/pandian/work/code/working_time.cj:131:35:
+    [36m| [0m
+[36m131[0m [36m| [0mreturn WTFindings(false, entry, { unused: Unit => ({ cjrTypedValue: WTFindings => cjrTypedValue })(rest) })[0m
+    [36m| [0m                                  [33m^^^^^^ unused variable[0m
+    [36m| [0m
+    [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+6 warnings generated, 6 warnings printed.
+
+EXIT 0
+$ /Users/danghica/pandian/work/code/test/working-time-tests
+PASS 13 working-time boundary checks
+
+EXIT 0
+$ /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/danghica/pandian/work/code/test/test_working_time_cli.py
+PASS 46 working-time CLI cases
+
+EXIT 0

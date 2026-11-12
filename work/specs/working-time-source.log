@@ -1,0 +1,8 @@
+File "./work/specs/WorkingTimeSource.v", line 8, characters 1-8:
+Error: The reference GLayout was not found in the current environment.
+
+File "./work/specs/WorkingTimeSource.v", line 15, characters 25-40:
+Error:
+The term "tracker_layouts" has type "list glayout"
+while it is expected to have type "string".
+

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "./rocq-readable",
+    "render",
+    "example/misc/rocq/swap.v",
+    "--name",
+    "swap_wp",
+    "--explanations",
+    "offline",
+    "--output",
+    "/var/folders/mq/rtbdtgcd44b6bxl9gmby_9xm0000gn/T/pandian-setup-readable-f3va80z1/swap.html"
+  ],
+  "exit_status": 0,
+  "output_directory": "/var/folders/mq/rtbdtgcd44b6bxl9gmby_9xm0000gn/T/pandian-setup-readable-f3va80z1"
+}

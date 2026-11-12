@@ -1,0 +1,16 @@
+{
+  "finished_utc": "2026-11-12T09:46:24.811314+00:00",
+  "status": "passed",
+  "tests": 9,
+  "source_sha256": {
+    "file_store.py": "7151062eb92769eb7896c74ce3467141d31282e6c3053a65be22baa4356545c5",
+    "main.cj": "5c727736525316433e964d4527a740b76e5799e0d02be038d0f11740f08cb807",
+    "bridge.cj": "2d8e310f80e9889da63c5bc40e0acd55dc0a26d9ca34a12002e85f41ba3dfadb",
+    "help.cj": "2907cf0d82056c43b6c6b0b44339817a2319d3d9ead8b74f28c8fc443db48617",
+    "generate_reference.py": "83f2247176455ff20dc0a269d35d9dfea8a1e1da53cc10edc4a465830bc70ddc",
+    "build.py": "e474fa00ef169fc5dc2a0faee1f6d3a29711575d6ceab92eea22ad6b71430e3d",
+    "test_file_store.py": "edfd6c134b233119e810560c1b53caa361d640cca91f2ba646bc94ab146f3191",
+    "bin/tracker": "ee9ba0b8201cf49dc30fff82fc8326a4423e964666b70428084d44d6d7d1a712",
+    "bin/tracker-core": "b605bb3855105ebab77426e1fd75dc012f8c2d1ee5d06c0611a37e659b5a96bd"
+  }
+}

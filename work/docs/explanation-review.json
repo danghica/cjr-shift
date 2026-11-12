@@ -1,0 +1,23 @@
+{
+  "reviewed_utc": "2026-11-09T17:01:49.379469+00:00",
+  "reviewer": "Codex assistant",
+  "corrections": [
+    {
+      "identity": "Tracker.Tracker.tracker_source_checked",
+      "cache_key": "Tracker.Tracker.tracker_source_checked:b26b2f8e7dd0ecee38ae8b9aafaf6d9fff10d2b7ceb3aac641cb0d61280fcc00",
+      "reason": "Distinguish GECall metadata lists from value arguments to emptyState.",
+      "previous_description": "The example states that check_program applied to tracker_program returns an empty list. The program uses tracker_layouts and tracker_functions, with an entry expression calling emptyState with two empty lists. No premises are stated, and the checker’s definition is absent, so the meaning of its empty result and any guarantees about runtime correctness or termination are not established by this input.",
+      "description": "This example states that check_program reports no errors for tracker_program. Its entry expression calls emptyState with no type arguments and no value arguments: the two empty lists in GECall represent those argument lists, rather than two arguments passed to emptyState. This is a source-checker result; it is not by itself a correctness or termination guarantee for the extracted executable."
+    }
+  ],
+  "sampled_declarations": [
+    "Tracker.Model.add_query_round_trip",
+    "Tracker.Model.start_end_equivalent",
+    "Tracker.Model.later_start_rejected",
+    "Tracker.Model.duplicate_rejected",
+    "Tracker.Public.addPair_correct",
+    "Tracker.Public.startShift_correct",
+    "Tracker.Public.endShift_correct",
+    "Tracker.Validation.validation_implies_invariant"
+  ]
+}

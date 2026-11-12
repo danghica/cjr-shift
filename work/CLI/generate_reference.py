@@ -1,0 +1,132 @@
+"""One command inventory produces native help and the offline reference."""
+from pathlib import Path
+import json,html
+ROOT=Path(__file__).resolve().parents[2]
+commands=json.loads((ROOT/'work/specs/commands.json').read_text())
+descriptions={
+'validateWorkingTime':'Read-only assessment of supplied statutory periods and metadata; in-work breaks are always outside scope. Public metadata argument is a JSON filename.',
+'initializeStore':'Load FILE and validate its stored snapshot. Create an empty store if missing. Return the initialized session and absolute storeFile path.',
+'prepareAddPair':'Stage addPair and return one atomic before/after storage request.',
+'prepareStartShift':'Stage a pending start; pending starts must also be persisted.',
+'prepareEndShift':'Stage every daily piece and removal of the pending start in one request.',
+'prepareDeleteShift':'Stage deletion of one daily piece.',
+'completeStore':'Acknowledge the outstanding request: succeeded=true commits, false rolls back with code 9.',
+'readContained':'Query committed internal state; code 8 while a save is outstanding.',
+'readIntersecting':'Query committed internal state; code 8 while a save is outstanding.',
+'emptyState':'Return an empty tracker state.',
+'validState':'Check domain invariants in supplied state; return a JSON valid boolean.',
+'addPair':'Add a completed interval atomically, splitting at every midnight.',
+'startShift':'Reserve time from this pending start onward.',
+'endShift':'Complete the pending shift; retain the pending start on failure.',
+'queryContained':'Return daily pieces wholly contained in [lowerMinute, upperMinute).',
+'queryIntersecting':'Return daily pieces sharing positive duration with [lowerMinute, upperMinute).',
+'deleteShift':'Delete the daily piece identified by its full start timestamp.'}
+text='''Work time tracker
+Usage: tracker COMMAND [ARGUMENTS]
+
+'''
+for c in commands:
+    args=['FILE'] if c['function']=='initializeStore' else [('FILE|STATE' if a=='tracker' else 'FILE|SESSION' if a=='session' else a) for a in c['args']]
+    text+=c['function']+' '+' '.join(args)+'\n  '+descriptions[c['function']]+'\n'
+text+='''help
+  List every application command and this reference.
+
+Working-time validation:
+tracker validateWorkingTime FILE|STATE assessmentStart assessmentEnd METADATA.json
+The JSON bridge reads the metadata file and passes values to the extracted core.
+No shifts or store contents are changed. Input period identification, applicability,
+working-time classification and complete coverage are asserted metadata facts;
+the core computes totals/rest gaps and findings, not the file adapter.
+Metadata must describe every applicable statutory period, including rolling windows
+where required. A supplied period list alone is not proof of complete legal coverage.
+Codes: 20 invalid metadata; 21 insufficient information; 22 unsupported regime;
+101 weekly hours; 102 daily rest; 103 weekly rest; 105 average night hours;
+106 strict hazardous night work. 104 is reserved and never emitted.
+Code 0 covers only supported checks on accurate, complete metadata; it is not a
+complete UK-law compliance certificate. Break compliance is always not_assessed.
+JSON findings contain period, rule, code, measured and limit; for 101/105 the
+last two values are the integer-scaled comparison operands, not hours.
+Metadata timestamps and native input are bounded to 6000000000 ordinal minutes,
+and interval/period lists to 10000 entries. Native resource limits still apply.
+See working-time.html beside this reference for the exact JSON metadata schema.
+
+File-backed usage:
+tracker initializeStore shifts.store
+tracker addPair shifts.store 2026-11-11T09:00 2026-11-11T17:00
+tracker queryContained shifts.store 2026-11-11T00:00 2026-11-12T00:00
+tracker deleteShift shifts.store 2026-11-11T09:00
+
+initializeStore takes a filename, not encoded state. It creates a missing file
+containing -|, or loads and validates an existing file without replacing its data.
+Use that filename in subsequent state/session commands. Both ordinary mutations
+and prepare* commands with FILE automatically perform prepare, atomic save and
+completion. No manual completeStore is needed for FILE; it returns code 10
+because there is no outstanding save after a completed command.
+Each invocation loads the file once into internal state. Reads do not save.
+Store contents are UTF-8 STATE encoding followed by a newline. Writes use a
+sibling temporary file, fsync, and atomic replacement; a sibling FILE.lock
+serializes cooperating CLI processes. External editors must not bypass the lock.
+Existing file permissions are preserved; new stores use owner-only permissions.
+A failed save returns code 9 with the prior state and a storageError message;
+the previous file remains unchanged. Startup/read/argument failures exit 2.
+Definitive local write failure is handled; power-loss durability of the directory
+entry is not promised. The wrapper requires Python 3 and the bundled tracker-core.
+A filename that does not contain | or # is unambiguous. An existing path takes
+precedence over encoded state/session arguments. Pass an absolute path when in doubt.
+Use storeFile for subsequent file-backed calls; sessionEncoding by itself is
+an unbound pure simulation value and does not remember the filename.
+
+Explicit-state simulation remains available for other commands:
+STATE: PENDING|START,END;START,END (quote the entire argument).
+Use - for no pending start; -| is empty. Pieces must be sorted,
+nonoverlapping, positive-duration and daily, and end before any pending start.
+Timestamp: YYYY-MM-DDTHH:MM (Gregorian 0001..9999), or @N ordinal minutes
+since 0001-01-01T00:00, 0 <= N <= 9223372036854774367.
+No timezone conversion. Adjacent pieces are allowed. Midnight is 00:00
+of the following date, never 24:00.
+
+Result: JSON code, stateEncoding, state {pending, shifts}, rows.
+All output timestamps are ordinal minute integers. stateEncoding can be
+passed unchanged to the next invocation. validState prints a JSON valid boolean (true or false).
+Codes: 0 success, 1 invalid timestamp, 2 nonpositive interval, 3 overlap,
+4 pending/reservation conflict, 5 no pending start, 6 unknown shift.
+All domain failures preserve state. Query and validation leave state unchanged.
+Low-level addPair/startShift/endShift/deleteShift compute candidate state only.
+Use the session protocol for persistence-aware operations:
+native initialization -> prepare* session ... -> external atomic save ->
+completeStore session succeeded. Explicit-state/session calls remain pure apart from terminal I/O.
+SESSION format: STATE#CANDIDATE#WAITING#CODE (quote the entire argument).
+WAITING is true or false; CODE is 0..10. Use sessionEncoding unchanged.
+Session results: code, sessionEncoding, stateEncoding (committed state), waiting,
+storageRequest (null or {before,after} state encodings). The request replaces
+one complete tracker snapshot atomically, including pending start and all pieces.
+Preparation code 0 with waiting=true is provisional, not a successful saved write.
+Only completeStore true reports a successful saved write; false reports code 9.
+Codes additionally: 7 invalid loaded state, 8 outstanding save blocks access,
+9 persistence failed and rolled back, 10 no outstanding request to complete.
+A blocked call retains the original outstanding request; do not apply it twice.
+Read and rejected-mutation calls create no new requests. An invalid initialization
+must not be used as a successful load. The adapter must serialize session access,
+load once, keep the session internally, save atomically, and give a definitive
+outcome. Ambiguous timeouts require external reconciliation before completion.
+The file adapter performs filesystem I/O for filename arguments. Explicit encodings bypass the file adapter. There is no network or clock access.
+Every command prints to stdout; malformed input prints to stderr.
+Exit: 0 success, 1 domain rejection or failed state validation,
+2 malformed arguments (including invalid state for business commands).
+File-backed calls also create/open the sibling lock file; mutations replace the store file. No other external effects.
+
+Examples:
+tracker initializeStore shifts.store
+tracker prepareAddPair '-|#-|#false#0' @1430 @1450
+tracker completeStore '-|#-|@1430,@1440;@1440,@1450#true#0' false
+tracker addPair '-|' 2026-11-09T23:30 2026-11-10T01:00
+tracker startShift '-|' @60
+tracker endShift '@60|' @120
+tracker queryIntersecting '-|@60,@120' @90 @150
+tracker deleteShift '-|@60,@120' @60
+'''
+(ROOT/'work/CLI/help.cj').write_text('func helpText(): String {\nreturn '+json.dumps(text)+'\n}\n')
+svg='''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 390" role="img" aria-label="Hexagonal architecture"><defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3z" fill="#475569"/></marker></defs><g fill="#eef2ff" stroke="#475569" stroke-width="2"><rect x="10" y="85" width="150" height="80" rx="12"/><rect x="210" y="85" width="175" height="80" rx="12"/><rect x="435" y="85" width="180" height="80" rx="12"/><path d="M700,25 L870,25 L950,125 L870,225 L700,225 L630,125Z"/></g><g font-family="sans-serif" font-size="17" text-anchor="middle" fill="#172554"><text x="85" y="120">Terminal</text><text x="85" y="145">arguments / JSON</text><text x="298" y="120">CLI adapter</text><text x="298" y="145">command dispatch</text><text x="525" y="120">Bridge</text><text x="525" y="145">dates / state / metadata</text><text x="790" y="102">Pure tracker core</text><text x="790" y="130">state / assessment / outcome</text><text x="790" y="158">storage + working-time ports</text></g><g stroke="#475569" stroke-width="2" marker-end="url(#a)"><path d="M160,112 H207"/><path d="M385,112 H432"/><path d="M615,112 H637"/><path d="M640,145 H618"/><path d="M435,145 H388"/><path d="M210,145 H163"/></g><g font-family="sans-serif" font-size="15" text-anchor="middle" fill="#172554"><rect x="430" y="280" width="520" height="85" rx="12" fill="#f1f5f9" stroke="#475569"/><text x="690" y="307">CLI file adapter (Python; outside the proof boundary)</text><text x="690" y="332">load FILE · lock · atomic replacement · report outcome</text><text x="690" y="354">prepare → request → success: commit / failure: rollback</text></g><path d="M790 230 V275" stroke="#475569" stroke-dasharray="5 4" marker-end="url(#a)"/></svg>'''
+(ROOT/'work/CLI/doc/architecture.svg').write_text(svg)
+page='<!doctype html><html lang="en"><meta charset="utf-8"><title>Tracker CLI reference</title><style>body{font:17px system-ui;max-width:1100px;margin:40px auto;padding:24px;color:#172554}pre{white-space:pre-wrap;background:#f1f5f9;padding:24px;border-radius:12px}svg{width:100%}</style><h1>Work time tracker CLI</h1>'+svg+'<p><a href="../../docs/index.html">Core specifications and AI-generated explanations</a></p><p>Ports: '+', '.join(c['function'] for c in commands)+'. Arguments flow through the CLI and bridge into these extracted functions; results flow back to terminal output. Only the adapter performs I/O. The session ports implement a pure storage protocol. The Python file adapter loads the named file, serializes access with a sibling lock, and performs atomic saves before acknowledging the outcome. The before/after request and completion outcome cross the core boundary.</p><pre>'+html.escape(text)+'</pre><p><a href="working-time.html">Working-time metadata schema, formulas and example</a></p><h2>Bridge and trust boundary</h2><p>The bridge parses Gregorian timestamps into nonnegative ordinal minutes, builds immutable value lists from supplied startup and session encodings, and validates the state with the extracted validState function. It serializes returned state and rows to JSON. The native arithmetic bound leaves headroom for next-midnight calculation. The Python file adapter, CLI parsing, the Gregorian conversion, the CJR printer, native compiler and runtime are outside the Rocq proof boundary. Refer to the verification record for the exact proved claims.</p></html>'
+(ROOT/'work/CLI/doc/index.html').write_text(page)

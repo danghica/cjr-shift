@@ -1,0 +1,10 @@
+{
+  "status": "blocked",
+  "checked_utc": "2026-11-12T09:33:12.247546+00:00",
+  "pages": [
+    "index.html",
+    "working-time.html"
+  ],
+  "reason": "Browser URL policy rejected file:// local HTML preview. No workaround attempted. Static local-link, remote-asset and SVG XML checks are recorded separately in work/docs/link-check.json.",
+  "visual_rendering_confirmed": false
+}

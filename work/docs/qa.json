@@ -1,0 +1,375 @@
+{
+  "status": "passed with documented presentation limits",
+  "checked_utc": "2026-11-12T09:51:07.659786+00:00",
+  "renderer_exit_status": 0,
+  "rendered_sources": 18,
+  "declarations": 477,
+  "file_errors": [],
+  "symbolic_forms": [
+    {
+      "file": "specs/Pure.v",
+      "unsupported": [
+        "CJR Let: symbolic binding name",
+        "CJR Rec: symbolic function binder",
+        "CJR RecV: symbolic function binder"
+      ]
+    }
+  ],
+  "evaluated_cangjie_views": {
+    "Tracker.Contracts.intv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.Contracts.boolv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.Contracts.nilv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Contracts.nodev": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.Contracts.listv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.Contracts.statev": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.Contracts.answerv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.Contracts.invoke": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.Public.port": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.Runtime.emptyPieces_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.consPiece_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.nextMidnight_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.minMinute_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.overlaps_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.endsAfter_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.splitOnto_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.insertDaily_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.selectPieces_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.hasStart_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.removeStart_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.validPieces_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.emptyState_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.validState_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.addPair_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.startShift_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.endShift_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.queryContained_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.queryIntersecting_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.deleteShift_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.initializeStore_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.stageChange_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.prepareAddPair_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.prepareStartShift_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.prepareEndShift_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.prepareDeleteShift_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.completeStore_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.readContained_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Runtime.readIntersecting_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.Storage.sessionv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeContracts.working_time_port": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeIntervals.periodv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeIntervals.pnilv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeIntervals.pnodev": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeIntervals.periodsv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeIntervals.metadatav": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeIntervals.findingv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeIntervals.fnilv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeIntervals.fnodev": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeIntervals.findingsv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeIntervals.reportv": {
+      "status": "unavailable",
+      "reason": "The Gallina printer requires concrete non-expression arguments."
+    },
+    "Tracker.WorkingTimeRuntime.wtMax_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtMin_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtClip_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtMinutes_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtOrdered_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtMerge_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtLongestRest_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtRestCount_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtInside_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtRestValid_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtEmptyPeriods_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtConsPeriod_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtEmptyFindings_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtConsFinding_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtFinding_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtPeriodKnown_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtGoodPeriod_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtGoodPeriods_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtWeekly_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtDaily_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtWeeklyRest_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtAverageNight_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtHazardNight_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtAssess_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtAssessAll_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtHasCode_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtFirstViolation_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtSummary_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtValidMetadata_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtSupported_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtHasRule_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.wtCompletePeriods_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    },
+    "Tracker.WorkingTimeRuntime.validateWorkingTime_val": {
+      "status": "unavailable",
+      "reason": "The Gallina printer reported an unsupported construct or missing layout metadata."
+    }
+  },
+  "english_explanations": {
+    "available": 116,
+    "unavailable": 361,
+    "failed": 0
+  },
+  "links": {
+    "status": "passed",
+    "html_files": 23,
+    "links_checked": 23141,
+    "errors": [],
+    "remote_assets": [],
+    "svg": "parsed successfully"
+  },
+  "visual_preview": {
+    "status": "blocked",
+    "checked_utc": "2026-11-12T09:33:12.247546+00:00",
+    "pages": [
+      "index.html",
+      "working-time.html"
+    ],
+    "reason": "Browser URL policy rejected file:// local HTML preview. No workaround attempted. Static local-link, remote-asset and SVG XML checks are recorded separately in work/docs/link-check.json.",
+    "visual_rendering_confirmed": false
+  }
+}

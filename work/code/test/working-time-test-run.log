@@ -1,0 +1,29 @@
+{
+  "working_time_native": "PASS 13 working-time boundary checks",
+  "working_time_cli": "PASS 46 working-time CLI cases",
+  "protocol_cases": 155,
+  "sources": {
+    "work/code/tracker.cj": "d9ca20b71d03e5d171060522a63589e716cba095dad1e8b3c496ee0ea6dec172",
+    "work/code/working_time.cj": "78c2791d3e3ac30775400e106e7dd76d837ef0d882ee25e5cc59d0b30fe1c49f",
+    "work/CLI/working_time_bridge.cj": "ab0e1d1d2a8dd2385cad30e1171994574d1fdda7724fa4bb9f668588e2ec32be",
+    "work/CLI/working_time_metadata.py": "092bd3c3ad28fc365f6152f1cd2d7a544dd6cec7c80d5da1604ae7bf0ee8a4f0",
+    "work/code/test/working_time_test.cj": "d9ba8b0fa883ab5b5d899565ea65bc59e92fd49d33292cf92528b257da845114",
+    "work/code/test/working_time_benchmark.cj": "2083ca965975dc3e4babb246a097e0d8f7fec9451ab2928a94fb364575819cf6",
+    "work/code/test/test_working_time_cli.py": "7e60ef3a86f19d5ec9d7cff758eef054ec783a2960fe91ccc04484b2dae9648b",
+    "work/CLI/bridge.cj": "2d8e310f80e9889da63c5bc40e0acd55dc0a26d9ca34a12002e85f41ba3dfadb",
+    "work/CLI/main.cj": "5c727736525316433e964d4527a740b76e5799e0d02be038d0f11740f08cb807",
+    "work/CLI/help.cj": "2907cf0d82056c43b6c6b0b44339817a2319d3d9ead8b74f28c8fc443db48617",
+    "work/code/test/runtime_test.cj": "d493f18698ac093740a7ea08adfc533e2127d328e682e0160047a056c982e7f6",
+    "work/code/test/benchmark.cj": "bfa779b63167103b19c0c02b3d584290c683045cdc2176787599b95485aff198",
+    "work/code/test/run.py": "05f4e51c5dbd72a2cd8664513cd8521261a64a6e9a4962e681c272a10eaf58c6"
+  },
+  "status": "passed",
+  "finished_utc": "2026-11-12T09:46:28.093412+00:00",
+  "native": "PASS 26980 native assertions",
+  "oracle_cases": 136,
+  "malformed_cases": 18,
+  "clean_shell_launch_cases": 2,
+  "date_conversion_cases": 4,
+  "invalid_state_validation_cases": 5,
+  "compiler": "Cangjie Compiler: 1.0.5 (cjnative)\nTarget: aarch64-apple-darwin"
+}

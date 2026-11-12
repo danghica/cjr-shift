@@ -1,0 +1,27 @@
++ /Users/danghica/.opam/default/bin/coqtop -quiet -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker
++ /Users/danghica/cangjiebuild/software/cangjie/bin/cjc -O2 --set-runtime-rpath /Users/danghica/pandian/work/code/tracker.cj /Users/danghica/pandian/work/CLI/bridge.cj /Users/danghica/pandian/work/CLI/main.cj /Users/danghica/pandian/work/CLI/help.cj -o /Users/danghica/pandian/work/CLI/bin/tracker
+[33mwarning[0m: class 'Console' is deprecated. Use related global functions in the std.env instead.
+  [36m==>[0m /Users/danghica/pandian/work/CLI/main.cj:64:9:
+   [36m| [0m
+[36m64[0m [36m| [0m        Console.stdErr.writeln("error: ${err.message}")[0m
+   [36m| [0m        [33m^^^^^^^ deprecated[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff deprecated`
+
+[33mwarning[0m: unused variable:'unused'
+  [36m==>[0m /Users/danghica/pandian/work/code/tracker.cj:45:32:
+   [36m| [0m
+[36m45[0m [36m| [0mreturn ShiftList(true, 0, 0, { unused: Unit => ({ cjrTypedValue: ShiftList => cjrTypedValue })(emptyPieces()) })[0m
+   [36m| [0m                               [33m^^^^^^ unused variable[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'unused'
+  [36m==>[0m /Users/danghica/pandian/work/code/tracker.cj:48:49:
+   [36m| [0m
+[36m48[0m [36m| [0mreturn ShiftList(false, pieceStart, pieceEnd, { unused: Unit => ({ cjrTypedValue: ShiftList => cjrTypedValue })(restPieces) })[0m
+   [36m| [0m                                                [33m^^^^^^ unused variable[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+3 warnings generated, 3 warnings printed.

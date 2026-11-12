@@ -1,0 +1,45 @@
+{
+  "repository": "cjr-shift",
+  "operation": "initial local snapshot",
+  "prepared_utc": "2026-11-12T11:39:07.950579+00:00",
+  "git_version": "git version 2.54.0 (Apple Git-157)",
+  "validation_for_this_commit": {
+    "proof_validation_run": false,
+    "tests_rerun": false,
+    "reason": "User requested this version committed without rerunning proof validation. Existing completed test and proof evidence is preserved.",
+    "checks_performed": [
+      "Git file inventory",
+      "private/local artifact exclusions",
+      "current UI source fingerprints match existing UI validation record",
+      "current core source fingerprints match existing verification record"
+    ]
+  },
+  "existing_ui_test_evidence": {
+    "status": "passed",
+    "checked_utc": "2026-11-12T11:02:32.629411+00:00",
+    "automated_tests": 39
+  },
+  "existing_proof_evidence": {
+    "status": "passed",
+    "finished_utc": "2026-11-12T09:45:21.795170+00:00",
+    "assumptions": "all 57 public theorems closed under the global context",
+    "coqchk": "passed",
+    "rerun_for_commit": false
+  },
+  "evidence": {
+    "work/UI/validation.json": "34ffc74bc6ae483fc4e4a00564270e81eb42b1e81a7211a0e7628efbccb309bf",
+    "work/specs/verification.json": "ef279be04a4986a04a0a35f4edfcf452e7682f4a6848d6ccdd813a1a9807147c",
+    "work/specs/extraction.json": "eed8fe9b504b989e9c164dabb812d3eed6ea3b27be25744ff13038a84631002e",
+    "work/specs/working-time-extraction.json": "164b20766ed488c1e27639d87a9b6777c659b8ad283bf623822e4a21540661a6",
+    "work/code/test/test-results.json": "32376f39c689274f3357a8f15bc6b83f631d78bf4d2a296158171e0baf3e314a",
+    "build/verify.log": "d4851f333f13b2bdcb867508222411324cc2380d57fec798acb526b90ed2b4c4"
+  },
+  "excluded": [
+    "private UI store data",
+    "local CLI sample stores",
+    "local SDK environment script",
+    "proof objects and Python caches",
+    "disposable native test/benchmark executables"
+  ],
+  "push_requested": false
+}

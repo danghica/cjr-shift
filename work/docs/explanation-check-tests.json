@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "checked_utc": "2026-11-09T17:02:34.769466+00:00",
+  "case": "A missing explanation must fail the documentation coverage check.",
+  "expected_exit_status": 1,
+  "actual_exit_status": 1,
+  "detected_errors": [
+    "Tracker.Contracts.answerv: missing explanation"
+  ]
+}

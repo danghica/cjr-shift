@@ -1,0 +1,8 @@
+{
+  "compiler": "Cangjie Compiler: 1.0.5 (cjnative)\nTarget: aarch64-apple-darwin",
+  "flags": [
+    "-O2",
+    "--set-runtime-rpath"
+  ],
+  "SDKROOT": "/var/folders/mq/rtbdtgcd44b6bxl9gmby_9xm0000gn/T/cjr-project-sdk"
+}

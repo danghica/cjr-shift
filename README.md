@@ -1,0 +1,75 @@
+# cjr-shift
+
+Local shift tracking with a browser UI, file-backed persistence, working-time
+settings and compliance reports backed by a verified CJR core.
+
+Start with the [browser UI guide](work/UI/README.md),
+[application documentation](work/docs/project.md), or
+[CLI reference](work/CLI/doc/index.html).
+
+This repository includes the CJR library and tooling described below. Its
+internal `repository.json` identity remains `cjr-core` for build compatibility.
+
+## Bundled CJR core
+
+CJR semantics, Iris logic, generic source layer, extraction printers, shared tools, misc and introductory generics. rocq_readable and all its resources live only here.
+
+Open [HTML documentation](docs/index.html) or the [tutorial PDF](paper/tutorial.pdf).
+
+## Setup
+
+For setup with Codex, open the clone and ask **“Set up this repository”** or use
+`$cjr-setup`. The repository's [setup skill](.agents/skills/cjr-setup/SKILL.md)
+installs missing development dependencies and checks proofs, runtime tests,
+readable specifications, and tutorial compilation. Cloning alone does not run
+installers. The skill reuses compatible tools and records any blocked steps.
+
+Use `$cjr-spec-core` to describe an application core, check its hexagonal
+architecture boundary, optionally add algebraic validation properties, and
+produce a specification plan. Implementation of that plan requires the
+`cjr-build-core` skill. See the
+[core specification skill](.agents/skills/cjr-spec-core/SKILL.md).
+
+Use `$cjr-build-core` to implement that plan with Iris specifications, CJR
+implementation and Rocq proofs in `work/specs`, extracted Cangjie in
+`work/code`, executed tests and benchmarks in `work/code/test`, and HTML plus
+concise project documentation in `work/docs`. The command line interface lives
+in `work/CLI`, with its executable in `bin` and its HTML command reference and
+hexagonal architecture diagram in `doc`. See the
+[core build skill](.agents/skills/cjr-build-core/SKILL.md).
+
+Use `$cjr-commit` to run all repository and workspace tests, verify the Rocq
+proofs, and commit sources and documentation together with fresh logs and
+validation records. It commits only after the required checks pass and does
+not push. See the [verified commit skill](.agents/skills/cjr-commit/SKILL.md).
+
+Use Python 3.10+, Cangjie 1.0.5, and pdfLaTeX. Proof work additionally needs Coq 8.20.1, stdpp 1.12.0, Iris 4.4.0 and coq-lsp 0.2.5+8.20 for readable specification regeneration. `CJC`, `CANGJIE_HOME`, and `SDKROOT` override the native toolchain.
+
+Dependencies are pinned in dependencies.lock.json. Place checkouts alongside this repository or set `CJR_CORE_DIR` and `CJR_COLLECTIONS_DIR`. `make dependencies` checks versions and generates Rocq load paths. Public repository: [danghica/cjr-core](https://github.com/danghica/cjr-core).
+
+## Commands
+
+- `make test`: compile and test checked-in Cangjie, without proof builds.
+- `make benchmark`: collect fresh runtime samples, validate checksums, and create charts and HTML.
+- `make docs` or `make report`: assemble offline documentation without checking proofs or rerunning benchmarks.
+- `make paper`: refresh the benchmark chapter and compile the tutorial PDF twice.
+- `make build`: compile this repository's proofs and required dependencies.
+- `make extract`: explicitly build proofs and regenerate Cangjie.
+- `make verify`: proof checking and the local assumption audit, with build/verify.log.
+- `make readable`: regenerate specification HTML using rocq_readable in core; this invokes the proof backend.
+
+Use `ARGS="--example NAME"` to restrict runtime tests or benchmarks. Examples without a benchmark harness are included in runtime tests but have no timing claim. Historical benchmark runs retain original dates and hashes under benchmark/history; current measurements live under benchmark/results.
+
+## Verification status
+
+**Proof validation passed on 2026-11-02** with Coq 8.20.1. All 22 local source modules compiled and passed `coqchk`; all 34/34 entries in the repository assumption audit reported **Closed under the global context**. The source scan rejects admissions, aborted proofs, and declared axioms.
+
+- [Complete verification log](build/verify.log), including build commands, kernel checking, assumption-audit output, timestamps, and exit status.
+- [Machine-readable proof record](build/proof-verification.json), including source SHA-256 fingerprints and pinned dependency commits.
+
+- [Full recompilation](build/recompile.txt) and [readable build](build/readable.txt) logs.
+- [Explanation review](build/readable-explanation-review.json), including coverage and hashes of the reviewed text.
+
+Reproduce with `make verify` after checking out the versions in `dependencies.lock.json`. Proof validation checks the CJR model and stated contracts; native extraction, compilation, external adapters, and machine-integer bounds retain their documented trust boundaries. Runtime checks remain separately recorded in [runtime-validation.json](build/runtime-validation.json).
+
+Proofs were not checked during the initial split; this record supersedes that earlier status for the source files it fingerprints. Readable-specification pages were regenerated after this validation; historical benchmark records retain their original provenance.

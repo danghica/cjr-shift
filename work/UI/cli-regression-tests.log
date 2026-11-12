@@ -1,0 +1,21 @@
+{
+  "protocol_cases": 155,
+  "sources": {
+    "work/code/tracker.cj": "d9ca20b71d03e5d171060522a63589e716cba095dad1e8b3c496ee0ea6dec172",
+    "work/CLI/bridge.cj": "2d8e310f80e9889da63c5bc40e0acd55dc0a26d9ca34a12002e85f41ba3dfadb",
+    "work/CLI/main.cj": "89483d7c35c4e81ca8f3dd0270a4937ba501dd11a4b317fb62d0957efa73c4e9",
+    "work/CLI/help.cj": "6e5b893e810cb63269d172c9ac08385b2177eded41d389901171f644db7d08cc",
+    "work/code/test/runtime_test.cj": "d493f18698ac093740a7ea08adfc533e2127d328e682e0160047a056c982e7f6",
+    "work/code/test/benchmark.cj": "bfa779b63167103b19c0c02b3d584290c683045cdc2176787599b95485aff198",
+    "work/code/test/run.py": "b0c6c94a0049bd3965261c94b953d276d22356d0dbff0f8a367bb6e7dc1de0fc"
+  },
+  "status": "passed",
+  "finished_utc": "2026-11-11T16:58:14.471167+00:00",
+  "native": "PASS 26980 native assertions",
+  "oracle_cases": 136,
+  "malformed_cases": 18,
+  "clean_shell_launch_cases": 2,
+  "date_conversion_cases": 4,
+  "invalid_state_validation_cases": 5,
+  "compiler": "Cangjie Compiler: 1.0.5 (cjnative)\nTarget: aarch64-apple-darwin"
+}

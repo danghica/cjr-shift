@@ -1,0 +1,27 @@
+test_add_query_delete_restart_and_midnight_split (__main__.FileStoreTests.test_add_query_delete_restart_and_midnight_split) ... ok
+test_concurrent_processes_do_not_lose_updates (__main__.FileStoreTests.test_concurrent_processes_do_not_lose_updates) ... ok
+test_create_load_and_file_permissions (__main__.FileStoreTests.test_create_load_and_file_permissions) ... FAIL
+test_existing_permissions_and_punctuation_filename (__main__.FileStoreTests.test_existing_permissions_and_punctuation_filename) ... ok
+test_explicit_state_commands_remain_available (__main__.FileStoreTests.test_explicit_state_commands_remain_available) ... ok
+test_failed_replace_rolls_back_and_cleans_temporary_file (__main__.FileStoreTests.test_failed_replace_rolls_back_and_cleans_temporary_file) ... ok
+test_invalid_input_does_not_overwrite_store (__main__.FileStoreTests.test_invalid_input_does_not_overwrite_store) ... ok
+test_missing_file_and_bad_arity (__main__.FileStoreTests.test_missing_file_and_bad_arity) ... ok
+test_pending_start_and_prepare_commands_save_automatically (__main__.FileStoreTests.test_pending_start_and_prepare_commands_save_automatically) ... ok
+
+======================================================================
+FAIL: test_create_load_and_file_permissions (__main__.FileStoreTests.test_create_load_and_file_permissions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/danghica/pandian/work/CLI/test_file_store.py", line 37, in test_create_load_and_file_permissions
+    self.assertEqual(result['storeFile'], str(self.path))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '/private/var/folders/mq/rtbdtgcd44b6bxl9gm[47 chars]tore' != '/var/folders/mq/rtbdtgcd44b6bxl9gmby_9xm00[39 chars]tore'
+- /private/var/folders/mq/rtbdtgcd44b6bxl9gmby_9xm0000gn/T/tmp4j2l_f_f/shifts with spaces.store
+? --------
++ /var/folders/mq/rtbdtgcd44b6bxl9gmby_9xm0000gn/T/tmp4j2l_f_f/shifts with spaces.store
+
+
+----------------------------------------------------------------------
+Ran 9 tests in 2.968s
+
+FAILED (failures=1)

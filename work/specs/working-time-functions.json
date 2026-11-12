@@ -1,0 +1,47 @@
+{
+  "helpers": [
+    "wtMax",
+    "wtMin",
+    "wtClip",
+    "wtMinutes",
+    "wtOrdered",
+    "wtMerge",
+    "wtLongestRest",
+    "wtRestCount",
+    "wtInside",
+    "wtRestValid",
+    "wtEmptyPeriods",
+    "wtConsPeriod",
+    "wtEmptyFindings",
+    "wtConsFinding",
+    "wtFinding",
+    "wtPeriodKnown",
+    "wtGoodPeriod",
+    "wtGoodPeriods",
+    "wtWeekly",
+    "wtDaily",
+    "wtWeeklyRest",
+    "wtAverageNight",
+    "wtHazardNight",
+    "wtAssess",
+    "wtAssessAll",
+    "wtHasCode",
+    "wtFirstViolation",
+    "wtSummary",
+    "wtValidMetadata",
+    "wtSupported",
+    "wtHasRule",
+    "wtCompletePeriods"
+  ],
+  "ports": [
+    {
+      "function": "validateWorkingTime",
+      "args": [
+        "tracker",
+        "assessmentStart",
+        "assessmentEnd",
+        "metadata"
+      ]
+    }
+  ]
+}
