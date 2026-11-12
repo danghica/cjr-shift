@@ -1583,3 +1583,6 @@ do that for me
 [{"questionItemId":"[\"request_user_input_async\",\"call_16cd0834525642a6af69af8aaad3d057\",0]","question":"Please open https://github.com/login/device, enter code 100A-F3C3, and authorize the GitHub CLI’s workflow permission. GitHub requires this additional permission to push the documentation publishing workflow. Let me know when authorization is complete.","answer":"GitHub authorization complete"}]
 </send_user_message_question_reply>
 
+[2026-11-12T15:28:41+00:00]
+add these to the top of the github README
+
