@@ -1554,3 +1554,32 @@ put the attendence and overtime buttons on the same line
 [2026-11-12T13:24:36+00:00]
 dont check proofs. push to github. 
 
+[2026-11-12T14:43:54+00:00]
+this is violation is reported in a strange way. why?
+
+[2026-11-12T14:44:21+00:00]
+group the overlapping violations and show hours instead of minutes, with the individual windows available as detail. do not change the core or run proof validation. deploy to railway.
+
+[2026-11-12T14:49:11+00:00]
+does the web app use localStorage? 
+
+[2026-11-12T14:49:32+00:00]
+why not use localStorage? 
+
+[2026-11-12T14:50:09+00:00]
+use localStorage so each browser has its own shifts instead of sharing the same store. do not change the core or run proof validation. deploy to railway.
+
+[2026-11-12T15:08:57+00:00]
+when the app runs in a mobile browser remove the mock mobile phone frame because it is in an actual mobile phone frame. 
+
+[2026-11-12T15:17:32+00:00]
+how can i serve the doc pages directly from github? 
+
+[2026-11-12T15:19:08+00:00]
+do that for me
+
+[2026-11-12T15:24:01+00:00]
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_16cd0834525642a6af69af8aaad3d057\",0]","question":"Please open https://github.com/login/device, enter code 100A-F3C3, and authorize the GitHub CLI’s workflow permission. GitHub requires this additional permission to push the documentation publishing workflow. Let me know when authorization is complete.","answer":"GitHub authorization complete"}]
+</send_user_message_question_reply>
+

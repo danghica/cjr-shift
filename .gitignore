@@ -45,3 +45,6 @@ example/authenticator/build/frontend/
 
 # Local Railway account/project linkage (deployment configuration is railway.json).
 /.railway/
+
+# Staged public documentation artifact.
+/build/pages-site/

@@ -1,0 +1,24 @@
+{
+  "preparedAt": "2026-11-12T15:21:37.934718+00:00",
+  "site": "https://danghica.github.io/cjr-shift/",
+  "workflow": ".github/workflows/pages.yml",
+  "htmlPages": 24,
+  "localLinksChecked": 23143,
+  "publishedFiles": 31,
+  "proofValidationRun": false,
+  "coreBuildRun": false,
+  "source": "existing generated documentation",
+  "publicDirectories": [
+    "work/docs",
+    "work/CLI/doc"
+  ],
+  "excluded": [
+    "private stores",
+    "browser data",
+    "prompt logs",
+    "executables",
+    "source/proof build tooling"
+  ],
+  "verifyLogPreserved": true,
+  "verifyLogSha256": "d4851f333f13b2bdcb867508222411324cc2380d57fec798acb526b90ed2b4c4"
+}
