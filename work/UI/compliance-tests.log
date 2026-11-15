@@ -19,12 +19,6 @@ test_running_metadata_failure_does_not_claim_saved (__main__.ComplianceTests.tes
 test_weekly_optout_specific_period_persists_and_can_be_corrected (__main__.ComplianceTests.test_weekly_optout_specific_period_persists_and_can_be_corrected) ... ok
 
 ----------------------------------------------------------------------
-Ran 19 tests in 39.726s
-
-OK
-test_recover_before_and_after_crash_and_preserve_external_change (__main__.ComplianceTests.test_recover_before_and_after_crash_and_preserve_external_change) ... ok
-
-----------------------------------------------------------------------
-Ran 1 test in 0.284s
+Ran 19 tests in 40.661s
 
 OK

@@ -1,0 +1,28 @@
+✔ each browser saves its own snapshot and sends it on reload (0.84ms)
+✔ tabs coordinate through one lock and read the latest saved state (0.671917ms)
+✔ quota failure rejects a save and preserves the prior snapshot (0.223292ms)
+✔ invalid or blocked storage is never erased or sent to the server (0.189458ms)
+✔ domain failures never overwrite browser data and unsupported locking fails clearly (0.101291ms)
+✔ unexpected changes and invalid server responses cannot clobber a saved store (0.126291ms)
+✔ civil minute bridge has the correct epoch and round trips current local time (5.239209ms)
+✔ midnight splits group by their start day without timezone drift (0.701292ms)
+✔ newest first grouping preserves every independent piece (0.076375ms)
+✔ duration totals use minutes, including long shifts and empty days (0.054875ms)
+✔ missing missed-shift route explains server restart and preserves form guidance (0.19825ms)
+✔ specific domain errors remain useful and unknown errors do not leak generic not-found text (0.077917ms)
+✔ background refresh preserves an unsupported-action error and does not resubmit the shift (3.799333ms)
+✔ validator violations are successful reports, not failed HTTP actions (0.78425ms)
+✔ start and stop send attendance, regular overtime and timezone without changing timestamps (24.119667ms)
+✔ older servers explain missing compliance routes (0.196542ms)
+✔ hosted shared-demo disclosure follows the server response (0.779167ms)
+✔ overlapping violation windows group transitively and preserve every original (0.157667ms)
+✔ different rules, incomplete results and touching windows remain distinct (0.072375ms)
+✔ hours and worst-window summaries retain the direction of each limit (0.17775ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 107.983083

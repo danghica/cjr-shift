@@ -1,0 +1,12 @@
+python3 scripts/project.py test 
+misc: 11 passed cases; status passed
+generics: 10 passed cases; status passed
+Traceback (most recent call last):
+  File "/Users/danghica/pandian/scripts/project.py", line 11, in <module>
+    main(ROOT)
+    ~~~~^^^^^^
+  File "/Users/danghica/pandian/tools/project_tools/workspace.py", line 226, in main
+    if result['errors']:raise RuntimeError(f"{len(result['errors'])} broken documentation links; see docs/link-check.json")
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: 4 broken documentation links; see docs/link-check.json
+make: *** [test] Error 1

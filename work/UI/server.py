@@ -7,28 +7,56 @@ import argparse
 import json
 import os
 import sys
+from tempfile import TemporaryDirectory
+from metadata import validate as validate_metadata
 
 from adapters import AdapterError, TrackerAdapter
 
 HERE = Path(__file__).resolve().parent
 STATIC = {'/': ('index.html', 'text/html; charset=utf-8'),
           '/time.mjs': ('time.mjs', 'text/javascript; charset=utf-8'),
+          '/storage.mjs': ('storage.mjs', 'text/javascript; charset=utf-8'),
           '/app.js': ('app.js', 'text/javascript; charset=utf-8'),
           '/style.css': ('style.css', 'text/css; charset=utf-8')}
 
 
-def make_server(store, port=8765, host='127.0.0.1', public_origin=None, demo=False):
+def perform(tracker, action, data):
+    if action == 'state':
+        return 200, tracker.state()
+    if action == 'settings':
+        return 200, tracker.save_settings(data)
+    if action == 'attendance':
+        return 200, tracker.attendance(data.get('start'), data.get('attendance'), data.get('timeZone', 'Europe/London'), data.get('overtime'))
+    if action in ('compliance', 'opt-out'):
+        for key in ('start', 'end'):
+            if not isinstance(data.get(key, ''), str):
+                raise ValueError('Assessment dates must be strings or blank.')
+        return 200, tracker.compliance(data.get('start', ''), data.get('end', ''),
+            data.get('optOut') if action == 'opt-out' else None, data.get('timeZone', 'Europe/London'))
+    timestamp = data.get('start') if action == 'missed-shift' else data.get('timestamp')
+    end = data.get('end')
+    if action == 'missed-shift' and (not isinstance(end, str) or len(end) != 16):
+        raise ValueError('An end timestamp in YYYY-MM-DDTHH:MM format is required.')
+    if action != 'reset' and (not isinstance(timestamp, str) or len(timestamp) != 16):
+        raise ValueError('A local timestamp in YYYY-MM-DDTHH:MM format is required.')
+    if action == 'reset' and data.get('confirmed') is not True:
+        raise ValueError('Reset requires confirmation.')
+    result = tracker.change(action, timestamp, end, data.get('attendance'), data.get('timeZone', 'Europe/London'), data.get('overtime'))
+    return (200 if result['code'] == 0 else 503 if result['code'] == 9 else 409), result
+
+
+def make_server(store, port=8765, host='127.0.0.1', public_origin=None, demo=False, browser_storage=False):
     if public_origin:
         origin = urlsplit(public_origin)
         if origin.scheme not in ('http', 'https') or not origin.hostname or origin.username or origin.password or origin.path not in ('', '/') or origin.query or origin.fragment:
             raise ValueError('The public address must be an HTTP(S) origin without a path or credentials.')
         public_origin = origin.scheme.lower() + '://' + origin.netloc.lower()
-    tracker = TrackerAdapter(store)
+    tracker = None if browser_storage else TrackerAdapter(store)
 
     class Handler(BaseHTTPRequestHandler):
         def reply(self, status, payload, content_type='application/json; charset=utf-8'):
             if isinstance(payload, dict) and 'state' in payload:
-                payload = dict(payload, demo=demo)
+                payload = dict(payload, demo=demo and not browser_storage, browserStorage=browser_storage)
             body = json.dumps(payload).encode() if isinstance(payload, dict) else payload
             self.send_response(status)
             self.send_header('Content-Type', content_type)
@@ -55,6 +83,8 @@ def make_server(store, port=8765, host='127.0.0.1', public_origin=None, demo=Fal
             if path in STATIC:
                 name, content_type = STATIC[path]
                 return self.reply(200, (HERE/'static'/name).read_bytes(), content_type)
+            if browser_storage:
+                return self.reply(409, {'message': 'This app uses browser storage. Reload the page to use your own saved shifts.'})
             if path not in ('/api/state', '/api/settings'):
                 return self.reply(404, {'message': 'This page or action is not available on this server. Restart the UI server and reload the tracker page.'})
             try:
@@ -70,36 +100,38 @@ def make_server(store, port=8765, host='127.0.0.1', public_origin=None, demo=Fal
             if not self.valid_host() or (origin is not None and origin not in allowed) or self.headers.get('X-Tracker-UI') != '1':
                 return self.reply(403, {'message': 'This action must come from this tracker page.'})
             path = urlsplit(self.path).path
-            if path not in ('/api/start', '/api/stop', '/api/reset', '/api/missed-shift', '/api/settings', '/api/attendance', '/api/compliance', '/api/opt-out'):
+            if browser_storage and path != '/api/browser':
+                return self.reply(409, {'message': 'The shared store is disabled. Reload the page to use browser storage.'})
+            if path != '/api/browser' and path not in ('/api/start', '/api/stop', '/api/reset', '/api/missed-shift', '/api/settings', '/api/attendance', '/api/compliance', '/api/opt-out'):
                 return self.reply(404, {'message': 'This page or action is not available on this server. Restart the UI server and reload the tracker page.'})
             try:
                 size = int(self.headers.get('Content-Length', '0'))
-                if not 0 < size <= 4096 or self.headers.get_content_type() != 'application/json':
+                if not 0 < size <= (2*1024*1024 if browser_storage else 4096) or self.headers.get_content_type() != 'application/json':
                     return self.reply(400, {'message': 'Expected a small JSON request.'})
                 data = json.loads(self.rfile.read(size))
                 if not isinstance(data, dict):
                     raise ValueError('Expected an object.')
-                action = path.rsplit('/', 1)[1]
-                if action == 'settings':
-                    return self.reply(200, tracker.save_settings(data))
-                if action == 'attendance':
-                    return self.reply(200, tracker.attendance(data.get('start'), data.get('attendance'), data.get('timeZone', 'Europe/London'), data.get('overtime')))
-                if action in ('compliance', 'opt-out'):
-                    for key in ('start', 'end'):
-                        if not isinstance(data.get(key, ''), str):
-                            raise ValueError('Assessment dates must be strings or blank.')
-                    return self.reply(200, tracker.compliance(data.get('start', ''), data.get('end', ''),
-                        data.get('optOut') if action == 'opt-out' else None, data.get('timeZone', 'Europe/London')))
-                timestamp = data.get('start') if action == 'missed-shift' else data.get('timestamp')
-                end = data.get('end')
-                if action == 'missed-shift' and (not isinstance(end, str) or len(end) != 16):
-                    raise ValueError('An end timestamp in YYYY-MM-DDTHH:MM format is required.')
-                if action != 'reset' and (not isinstance(timestamp, str) or len(timestamp) != 16):
-                    raise ValueError('A local timestamp in YYYY-MM-DDTHH:MM format is required.')
-                if action == 'reset' and data.get('confirmed') is not True:
-                    raise ValueError('Reset requires confirmation.')
-                result = tracker.change(action, timestamp, end, data.get('attendance'), data.get('timeZone', 'Europe/London'), data.get('overtime'))
-                return self.reply(200 if result['code'] == 0 else 503 if result['code'] == 9 else 409, result)
+                if browser_storage:
+                    if set(data) != {'action','data','snapshot'} or data['action'] not in ('state','settings','attendance','compliance','opt-out','start','stop','reset','missed-shift') or not isinstance(data['data'], dict):
+                        raise ValueError('Invalid browser-store request. Reload the page.')
+                    with TemporaryDirectory(prefix='shift-browser-') as folder:
+                        temporary_store = Path(folder)/'shifts.store'
+                        snapshot = data['snapshot']
+                        if snapshot is not None:
+                            if not isinstance(snapshot, dict) or set(snapshot) != {'version','encoding','metadata'} or type(snapshot['version']) is not int or snapshot['version'] != 1 or not isinstance(snapshot['encoding'], str):
+                                raise ValueError('The browser store has an unsupported format. Its data has not been overwritten.')
+                            metadata = validate_metadata(snapshot['metadata'])
+                            temporary_store.write_text(snapshot['encoding'], encoding='utf-8')
+                            Path(str(temporary_store)+'.metadata.json').write_text(json.dumps(metadata), encoding='utf-8')
+                        temporary_tracker = TrackerAdapter(temporary_store)
+                        status, result = perform(temporary_tracker, data['action'], data['data'])
+                        if status == 200:
+                            result['snapshot'] = {'version':1, 'encoding':temporary_tracker.repository.read(), 'metadata':temporary_tracker.metadata}
+                    return self.reply(status, result)
+                if path == '/api/browser':
+                    return self.reply(409, {'message':'Browser storage is not enabled on this server.'})
+                status, result = perform(tracker, path.rsplit('/',1)[1], data)
+                return self.reply(status, result)
             except (ValueError, json.JSONDecodeError) as error:
                 return self.reply(400, {'message': str(error)})
             except (AdapterError, OSError) as error:
@@ -120,18 +152,19 @@ def main():
     domain = os.environ.get('RAILWAY_PUBLIC_DOMAIN')
     parser.add_argument('--public-origin', default=os.environ.get('TRACKER_PUBLIC_ORIGIN') or ('https://'+domain if domain else None))
     parser.add_argument('--demo', action='store_true', default=os.environ.get('TRACKER_DEMO', '').lower() == 'true')
+    parser.add_argument('--file-store', action='store_true', help='Serve the legacy file API instead of the browser-storage UI API.')
     args = parser.parse_args()
-    if os.environ.get('RAILWAY_ENVIRONMENT_ID'):
+    if args.file_store and os.environ.get('RAILWAY_ENVIRONMENT_ID'):
         if not volume or not args.store.resolve().is_relative_to(Path(volume).resolve()):
             parser.exit(1, 'Attach a persistent Railway volume and put the store inside its mount path.\n')
-    if args.store == HERE/'data'/'shifts.store' or volume:
+    if args.file_store and (args.store == HERE/'data'/'shifts.store' or volume):
         args.store.parent.mkdir(parents=True, exist_ok=True)
     try:
-        server = make_server(args.store, args.port, args.host, args.public_origin, args.demo)
+        server = make_server(args.store, args.port, args.host, args.public_origin, args.demo, not args.file_store)
     except (OSError, ValueError, AdapterError) as error:
         parser.exit(1, f'Could not start tracker: {error}\nBuild the CLI first with python3 work/CLI/build.py if needed.\n')
     print(f'Work tracker: {args.public_origin or ("http://"+args.host+":"+str(server.server_port))}', flush=True)
-    print(f'Store: {server.tracker.repository.path}', flush=True)
+    print(f'Store: {server.tracker.repository.path if args.file_store else "browser localStorage"}', flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

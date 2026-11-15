@@ -22,6 +22,14 @@ Print Assumptions Public.endShift_correct.
 Print Assumptions Public.queryContained_correct.
 Print Assumptions Public.queryIntersecting_correct.
 Print Assumptions Public.deleteShift_correct.
+Print Assumptions Validation.first_violation_zero_or_error.
+Print Assumptions Validation.first_violation_detects_error.
+Print Assumptions Validation.summary_preserves_error.
+Print Assumptions Validation.daily_rest_under_eleven_hours_finding.
+Print Assumptions Validation.insufficient_daily_rest_returns_error.
+Print Assumptions Validation.longest_rest_between_covering_shifts.
+Print Assumptions Validation.short_inter_shift_gap_returns_error.
+Print Assumptions Validation.short_gap_alone_can_pass.
 Print Assumptions Validation.validState_correct.
 Print Assumptions Validation.validation_implies_invariant.
 Print Assumptions Storage.rollback_restores.

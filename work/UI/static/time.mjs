@@ -43,3 +43,32 @@ export function responseFailure(status, path, result) {
   if (status === 403) return {message: 'This action must be sent from the local tracker. Open the localhost address printed by the UI server and try again.', recovery: 'dismiss'};
   return {message: 'The server could not complete this request. Check your saved shifts before trying again. If this continues, restart the UI server.', recovery: 'dismiss'};
 }
+
+// Group only overlapping violations of the same rule. Keep every original
+// finding so declarations and detailed evidence remain period-specific.
+export function groupViolations(findings) {
+  const groups = [];
+  for (const finding of [...findings].sort((a,b) => a.start-b.start || a.end-b.end)) {
+    const group = finding.code >= 100 && groups.findLast(g => g.code === finding.code && g.rule === finding.rule && finding.start < g.end);
+    if (group) {
+      group.end = Math.max(group.end, finding.end);
+      group.windows.push(finding);
+    } else groups.push({code:finding.code, rule:finding.rule, start:finding.start, end:finding.end, windows:[finding]});
+  }
+  return groups.sort((a,b) => Number(b.code >= 100)-Number(a.code >= 100) || a.start-b.start);
+}
+export function hours(minutes) {
+  const value = Number((minutes/60).toFixed(2));
+  return `${value} ${value === 1 ? 'hour' : 'hours'}`;
+}
+export function findingExplanation(finding) {
+  if (finding.code === 106) return `${hours(finding.measured)} of actual work within a 24-hour window; maximum permitted: ${hours(finding.limit)}.`;
+  if (finding.code === 102) return `Longest continuous rest: ${hours(finding.measured)}; required: ${hours(finding.limit)}.`;
+  return finding.explanation;
+}
+export function worstWindow(windows) {
+  return windows.reduce((worst, next) => {
+    const score = f => (f.code === 102 || f.code === 103) ? -f.measured/(f.limit || 1) : f.limit > 0 ? f.measured/f.limit : f.measured;
+    return score(next) > score(worst) ? next : worst;
+  });
+}

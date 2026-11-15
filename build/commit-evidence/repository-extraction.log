@@ -1,0 +1,3 @@
+python3 scripts/project.py extract 
+make[2]: Nothing to be done for `real-all'.
+Extracted 9 programs into their example directories.

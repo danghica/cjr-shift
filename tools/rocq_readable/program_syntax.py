@@ -25,6 +25,19 @@ def phrase(template, children, atomic=False):
     return Doc(Token(''), children, template=template, template_indent=2, plain_indent=2, atomic=atomic)
 
 
+class Conditional(Doc):
+    """Keep a condition's scope explicit when its inline header cannot fit."""
+
+    def lines(self, indent=0, width=92, indent_size=None):
+        indent_size = self.plain_indent if indent_size is None else indent_size
+        condition = self.children[0]
+        tokens = self.argument(condition)
+        if tokens is None or indent * indent_size + 4 + sum(len(t.text) for t in tokens) > width:
+            template = 'if:\n  condition:\n    {0}\n  then:\n    {1}\n  else:\n    {2}'
+            return Doc.lines(replace(self, template=template), indent, width, indent_size)
+        return super().lines(indent, width, indent_size)
+
+
 def call(label, children):
     return Doc(Token(label), children, plain_indent=2)
 
@@ -222,7 +235,9 @@ class ProgramSyntax:
         if name == 'Seq':
             return sequence(term(args[0]), term(args[1]))
         if name == 'If':
-            return phrase('if {0}:\n  {1}\nelse:\n  {2}', [term(a) for a in args])
+            return Conditional(Token(''), [term(a) for a in args],
+                               template='if {0}:\n  {1}\nelse:\n  {2}',
+                               template_indent=2, plain_indent=2)
         if name == 'While':
             return phrase('while {0}:\n  {1}', [term(a) for a in args])
         if name == 'BinOp':
@@ -233,6 +248,8 @@ class ProgramSyntax:
         if name in ('Struct', 'StructV', 'New'):
             lists = [self.listing(a) for a in args]
             if all(xs is not None for xs in lists):
+                if name in ('Struct', 'StructV') and not any(lists):
+                    return leaf('struct()')
                 return call('new object' if name == 'New' else 'struct', [term(a) for xs in lists for a in xs])
             labels = ['values', 'pending expressions'] if len(args) == 2 else ['values']
             return Doc(Token('new object' if name == 'New' else 'struct'),

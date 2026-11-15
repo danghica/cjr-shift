@@ -1,6 +1,6 @@
 {
   "status": "passed",
-  "started_utc": "2026-11-09T14:28:33.980107+00:00",
+  "started_utc": "2026-11-15T12:06:24.398387+00:00",
   "dependencies": {},
   "coqchk": "passed",
   "assumptions": "all audited declarations closed under the global context",
@@ -33,7 +33,7 @@
   "toolchain": "The Coq Proof Assistant, version 8.20.1\ncompiled with OCaml 5.4.0",
   "expected_closed": 34,
   "closed": 34,
-  "finished_utc": "2026-11-09T14:29:06.309693+00:00",
+  "finished_utc": "2026-11-15T12:06:59.488114+00:00",
   "exit_status": 0,
-  "verify_log_sha256": "d4851f333f13b2bdcb867508222411324cc2380d57fec798acb526b90ed2b4c4"
+  "verify_log_sha256": "fe1d1f49051bac52166369a57d0bc8ce15cd1c1a6f43e433ff9da5f76258a319"
 }

@@ -1,6 +1,6 @@
-<!doctype html><html lang="en"><meta charset="utf-8"><title>Tracker validation</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:20px;color:#172554}pre{white-space:pre-wrap;background:#f1f5f9;padding:20px;border-radius:12px;overflow-wrap:anywhere}section{margin:40px 0}</style><h1>Tracker validation evidence</h1><p>Generated from actual local run records. Proof, runtime and benchmark evidence have separate scopes.</p><section><h2>Proof verification: passed</h2><p><a href="../specs/verification.json">Full record</a></p><pre>{
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Tracker validation</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:20px;color:#172554}pre{white-space:pre-wrap;background:#f1f5f9;padding:20px;border-radius:12px;overflow-wrap:anywhere}section{margin:40px 0}</style><h1>Tracker validation evidence</h1><p>Generated from actual local run records. Proof, runtime and benchmark evidence have separate scopes.</p><section id="explanation-status" class="panel"><h2>English explanations</h2><p>Explanation consistency: <strong>passed</strong>.</p><p>Explanation coverage: <strong>incomplete</strong> — 168 of 485 available; 317 missing.</p></section><section><h2>Proof verification: passed</h2><p><a href="../specs/verification.json">Full record</a></p><pre>{
   &quot;status&quot;: &quot;passed&quot;,
-  &quot;started_utc&quot;: &quot;2026-11-12T09:36:18.608228+00:00&quot;,
+  &quot;started_utc&quot;: &quot;2026-11-15T11:16:56.530724+00:00&quot;,
   &quot;commands&quot;: [
     {
       &quot;argv&quot;: [
@@ -126,6 +126,22 @@
         &quot;-Q&quot;,
         &quot;/Users/danghica/pandian/work/specs&quot;,
         &quot;Tracker&quot;,
+        &quot;/Users/danghica/pandian/work/specs/WorkingTimeModel.v&quot;
+      ],
+      &quot;exit_status&quot;: 0
+    },
+    {
+      &quot;argv&quot;: [
+        &quot;/Users/danghica/.opam/default/bin/coqc&quot;,
+        &quot;-R&quot;,
+        &quot;/Users/danghica/pandian/theories&quot;,
+        &quot;cjr&quot;,
+        &quot;-Q&quot;,
+        &quot;/Users/danghica/pandian/tools/extraction/rocq&quot;,
+        &quot;cjr.examples&quot;,
+        &quot;-Q&quot;,
+        &quot;/Users/danghica/pandian/work/specs&quot;,
+        &quot;Tracker&quot;,
         &quot;/Users/danghica/pandian/work/specs/Validation.v&quot;
       ],
       &quot;exit_status&quot;: 0
@@ -143,22 +159,6 @@
         &quot;/Users/danghica/pandian/work/specs&quot;,
         &quot;Tracker&quot;,
         &quot;/Users/danghica/pandian/work/specs/Storage.v&quot;
-      ],
-      &quot;exit_status&quot;: 0
-    },
-    {
-      &quot;argv&quot;: [
-        &quot;/Users/danghica/.opam/default/bin/coqc&quot;,
-        &quot;-R&quot;,
-        &quot;/Users/danghica/pandian/theories&quot;,
-        &quot;cjr&quot;,
-        &quot;-Q&quot;,
-        &quot;/Users/danghica/pandian/tools/extraction/rocq&quot;,
-        &quot;cjr.examples&quot;,
-        &quot;-Q&quot;,
-        &quot;/Users/danghica/pandian/work/specs&quot;,
-        &quot;Tracker&quot;,
-        &quot;/Users/danghica/pandian/work/specs/WorkingTimeModel.v&quot;
       ],
       &quot;exit_status&quot;: 0
     },
@@ -310,9 +310,9 @@
         &quot;Tracker.Contracts&quot;,
         &quot;Tracker.Operations&quot;,
         &quot;Tracker.Public&quot;,
+        &quot;Tracker.WorkingTimeModel&quot;,
         &quot;Tracker.Validation&quot;,
         &quot;Tracker.Storage&quot;,
-        &quot;Tracker.WorkingTimeModel&quot;,
         &quot;Tracker.WorkingTimeSource&quot;,
         &quot;Tracker.WorkingTimeRuntime&quot;,
         &quot;Tracker.WorkingTimeIntervals&quot;,
@@ -375,6 +375,14 @@
       &quot;deleteShift_correct&quot;
     ],
     &quot;Validation&quot;: [
+      &quot;first_violation_zero_or_error&quot;,
+      &quot;first_violation_detects_error&quot;,
+      &quot;summary_preserves_error&quot;,
+      &quot;daily_rest_under_eleven_hours_finding&quot;,
+      &quot;insufficient_daily_rest_returns_error&quot;,
+      &quot;longest_rest_between_covering_shifts&quot;,
+      &quot;short_inter_shift_gap_returns_error&quot;,
+      &quot;short_gap_alone_can_pass&quot;,
       &quot;validState_correct&quot;,
       &quot;validation_implies_invariant&quot;
     ],
@@ -424,7 +432,7 @@
     ]
   },
   &quot;coqchk&quot;: &quot;passed&quot;,
-  &quot;assumptions&quot;: &quot;all 57 public theorems closed under the global context&quot;,
+  &quot;assumptions&quot;: &quot;all 65 public theorems closed under the global context&quot;,
   &quot;toolchain&quot;: &quot;The Coq Proof Assistant, version 8.20.1\ncompiled with OCaml 5.4.0&quot;,
   &quot;packages&quot;: &quot;angstrom                0.16.1\nastring                 0.8.5\nbase                    v0.17.3\nbase-bigarray           base\nbase-bytes              base\nbase-domains            base\nbase-effects            base\nbase-nnp                base\nbase-threads            base\nbase-unix               base\nbigstringaf             0.10.0\ncamlp-streams           5.0.1\nchrome-trace            3.21.0\ncmdliner                2.1.1\nconf-gmp                5\nconf-pkg-config         5\ncoq                     8.20.1\ncoq-core                8.20.1\ncoq-iris                4.4.0\ncoq-lsp                 0.2.5+8.20\ncoq-stdlib              8.20.1\ncoq-stdpp               1.12.0\ncoqide-server           8.20.1\ncppo                    1.8.0\ncsexp                   1.5.2\ndune                    3.21.0\ndune-build-info         3.21.0\ndune-configurator       3.21.0\ndune-rpc                3.21.0\ndyn                     3.21.0\nfiber                   3.7.0\nfs-io                   3.21.0\njane-street-headers     v0.17.0\njsonrpc                 1.25.0\njst-config              v0.17.0\nlambda-term             3.3.3\nlogs                    0.10.0\nlsp                     1.25.0\nlwt                     6.0.0\nlwt_react               1.2.0\nmemprof-limits          0.3.0\nmenhir                  20260209\nmenhirCST               20260209\nmenhirGLR               20260209\nmenhirLib               20260209\nmenhirSdk               20260209\nmerlin-lib              5.6.1-504\nmew                     0.1.0\nmew_vi                  0.5.0\nnum                     1.6\nocaml                   5.4.0\nocaml-base-compiler     5.4.0\nocaml-compiler          5.4.0\nocaml-compiler-libs     v0.17.0\nocaml-config            3\nocaml-index             5.6.1-504\nocaml-lsp-server        1.25.0\nocaml-options-vanilla   1\nocaml-syntax-shims      1.0.0\nocaml_intrinsics_kernel v0.17.1\nocamlbuild              0.16.1\nocamlc-loc              3.21.0\nocamlfind               1.9.8\nocamlformat-rpc-lib     0.28.1\nocplib-endian           1.2\nordering                3.21.0\nparsexp                 v0.17.0\npp                      2.0.0\nppx_assert              v0.17.0\nppx_base                v0.17.0\nppx_cold                v0.17.0\nppx_compare             v0.17.0\nppx_derivers            1.2.1\nppx_deriving            6.2.0\nppx_deriving_yojson     3.10.0\nppx_enumerate           v0.17.0\nppx_globalize           v0.17.2\nppx_hash                v0.17.0\nppx_here                v0.17.0\nppx_import              1.12.0\nppx_inline_test         v0.17.1\nppx_optcomp             v0.17.1\nppx_sexp_conv           v0.17.1\nppx_yojson_conv_lib     v0.17.0\nppxlib                  0.38.0\nppxlib_jane             v0.17.4\nre                      1.14.0\nreact                   1.2.2\nresult                  1.5\nseq                     base\nsexplib                 v0.17.0\nsexplib0                v0.17.0\nspawn                   v0.17.0\nstdio                   v0.17.0\nstdlib-shims            0.3.0\nstdune                  3.21.0\nstringext               1.6.0\ntime_now                v0.17.0\ntop-closure             3.21.0\ntopkg                   1.1.1\ntrie                    1.0.0\ntyxml                   5.0.0\nuchar                   0.0.2\nuri                     4.4.0\nutop                    2.16.0\nuucp                    17.0.0\nuuseg                   17.0.0\nuutf                    1.0.4\nxdg                     3.21.0\nyojson                  3.0.0\nzarith                  1.14\nzed                     3.2.3&quot;,
   &quot;sources&quot;: {
@@ -435,9 +443,9 @@
     &quot;work/specs/Contracts.v&quot;: &quot;16bef03116cd750c0abde600c34ab186bf4b50a7ad437841c56c513d299efb81&quot;,
     &quot;work/specs/Operations.v&quot;: &quot;5d7ab6f2465dc666f0fdd2d9ff3242ecdfcc0e1c2029a2f4fdee42b88c3c17e9&quot;,
     &quot;work/specs/Public.v&quot;: &quot;3fc686446e2fef2ee973956575d755d601f828bb24f5d4bb97b7fcacec0c4caa&quot;,
-    &quot;work/specs/Validation.v&quot;: &quot;3113a82bedbacb9a5e900439ec0654193267df36f5c4d1563a50748f483b26d8&quot;,
-    &quot;work/specs/Storage.v&quot;: &quot;0744f5066956eb04bf46000066952870c5a67a3607e69a5f631ea7f3a64e68a6&quot;,
     &quot;work/specs/WorkingTimeModel.v&quot;: &quot;21ed358e6880fdbc8606258a97383c359e58d9ee4cb8a9cbe6b9b578f4d056bf&quot;,
+    &quot;work/specs/Validation.v&quot;: &quot;165fb4cb0c24bc587cc6418c3bce276d2f680f54868fc5cc664ec5fbf1dbdcfe&quot;,
+    &quot;work/specs/Storage.v&quot;: &quot;0744f5066956eb04bf46000066952870c5a67a3607e69a5f631ea7f3a64e68a6&quot;,
     &quot;work/specs/WorkingTimeSource.v&quot;: &quot;2bad07eb2d785d045dc027af5a22154abe2db7ebfb600d6f24e498659c178eb9&quot;,
     &quot;work/specs/WorkingTimeRuntime.v&quot;: &quot;810ab3f14ba1ef40a95c78b0070558b4b100cae80af44a8e35feac3559910b93&quot;,
     &quot;work/specs/WorkingTimeIntervals.v&quot;: &quot;48b7bb18ac8d21b108f6cee7c9bfbaf6c404fce330363b79481711c52e90c0b3&quot;,
@@ -445,11 +453,11 @@
     &quot;work/specs/WorkingTimeRules.v&quot;: &quot;dbb012cf6d4398531bdc4052c75e331a1f5d2fbb2547c56c5398c0785404e048&quot;,
     &quot;work/specs/WorkingTimeContracts.v&quot;: &quot;9cbbfa8c41a3de78f55ef7735a7d8dc3fe60c8702a2a7420658317d9d7397369&quot;,
     &quot;work/specs/WorkingTimeExamples.v&quot;: &quot;c58b6b84da83d137a2db3d31be0d922eeca74eb0a7d441800a143d15fc4bfe6d&quot;,
-    &quot;work/specs/Audit.v&quot;: &quot;d5a9eb1b0ea2c5a8c4907bccf7aefe09db7e2c08be7537cc99656745376c5f89&quot;,
+    &quot;work/specs/Audit.v&quot;: &quot;f2f174413f678164b20e23a89f93c55907d6fb0311ed6915073cbced0a49925a&quot;,
     &quot;tools/extraction/rocq/generic_print.v&quot;: &quot;8065fb9781453cc9a006d85c857aef1bddf4979db0d8e55c8b72d2aafeaa7191&quot;,
     &quot;tools/extraction/rocq/cj_print.v&quot;: &quot;9df5d8fdc3e4c6cb861eb429f739808238ab7197e24f69ec6cd50c0e6433dcd6&quot;
   },
-  &quot;finished_utc&quot;: &quot;2026-11-12T09:45:21.795170+00:00&quot;
+  &quot;finished_utc&quot;: &quot;2026-11-15T11:26:02.286966+00:00&quot;
 }</pre></section><section><h2>Runtime tests: passed</h2><p><a href="../code/test/test-results.json">Full record</a></p><pre>{
   &quot;working_time_native&quot;: &quot;PASS 13 working-time boundary checks&quot;,
   &quot;working_time_cli&quot;: &quot;PASS 46 working-time CLI cases&quot;,
@@ -470,7 +478,7 @@
     &quot;work/code/test/run.py&quot;: &quot;05f4e51c5dbd72a2cd8664513cd8521261a64a6e9a4962e681c272a10eaf58c6&quot;
   },
   &quot;status&quot;: &quot;passed&quot;,
-  &quot;finished_utc&quot;: &quot;2026-11-12T09:46:28.093412+00:00&quot;,
+  &quot;finished_utc&quot;: &quot;2026-11-15T12:13:22.171047+00:00&quot;,
   &quot;native&quot;: &quot;PASS 26980 native assertions&quot;,
   &quot;oracle_cases&quot;: 136,
   &quot;malformed_cases&quot;: 18,

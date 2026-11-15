@@ -1,0 +1,1 @@
+$ /Users/danghica/.opam/default/bin/coqchk -silent -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker -norec Tracker.Audit

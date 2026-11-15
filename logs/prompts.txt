@@ -1586,3 +1586,94 @@ do that for me
 [2026-11-12T15:28:41+00:00]
 add these to the top of the github README
 
+[2026-11-12T15:33:22+00:00]
+when you push the 'start' button it usually doesn't start at 0 seconds. why?
+
+[2026-11-13T10:56:14+00:00]
+explain this theorem: Theorem prepareStartShift_correct t s : pending_valid (committed t) ->
+ ⊢ WP port "prepareStartShift" [sessionv t;intv s] {{ v, ⌜v = sessionv (prepare t (start_shift (committed t) s))⌝ }}.
+
+[2026-11-14T11:00:37+00:00]
+add to the Validation.v the following validation Lemma and prove it from the specification only: it there are less than 11 consecutive hours between shift the validation function of the app will return an error code. 
+
+[2026-11-14T11:10:46+00:00]
+# Response annotations:
+Each item contains text selected from an earlier Codex response and may include a user comment. Treat items as Annotation 1, Annotation 2, and so on in array order. Use every selection as context and address every comment. For every annotation you address, include its inline directive `:codex-annotation{index="N"}`, where N is its one-based array position (for example, `:codex-annotation{index="1"}`). Do not use unstructured annotation labels.
+<response-annotations>
+[{"text":"The unrestricted “short gap between shifts” claim is false: another long rest may exist in that day. I included a proved counterexample (line 282) and a two-shift corollary (line 253) with explicit conditions.","source":{"messageId":"msg_02cdd99e76721660016af84138e56c87d298b29e51fdc3b6eb","startOffset":205,"endOffset":414}}]
+</response-annotations>
+
+# Selected text:
+
+## Selection 1: /Users/danghica/pandian/work/specs/Validation.v (line 253)
+Lemma short_inter_shift_gap_returns_error st lower upper m p a b c d :
+
+
+## My request:
+what does this mean? how does it relate to the lemma itself? 
+
+[2026-11-14T11:12:39+00:00]
+so the app does not correctly check uk labour law requirements on rest intervals? 
+
+[2026-11-14T11:37:20+00:00]
+does the specification cover the legal requirement? 
+
+[2026-11-15T10:48:37+00:00]
+# AGENTS.md instructions for /Users/danghica/pandian
+
+<INSTRUCTIONS>
+# Prompt logging
+
+For every new human user prompt in this repository, append its exact text to
+`logs/prompts.txt` before starting work. Use `python3 scripts/log_prompt.py`
+with the prompt supplied on standard input; it adds the UTC recording time.
+Use literal input (for example a quoted heredoc), so shell syntax in a prompt
+is never evaluated. Log follow-up prompts too, but do not duplicate prompts
+already recorded in the current session, or log tool output and system messages.
+Do not invent timestamps or reconstruct historical prompts with current dates.
+
+Keep the prompt log and `build/verify.log` with the changes when the user asks
+to commit or push. `make verify` refreshes the verification log and preserves
+the check's exit status. Commit and push through the normal Git workflow.
+
+</INSTRUCTIONS><environment_context>
+  <cwd>/Users/danghica/pandian</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-11-15</current_date>
+  <timezone>Europe/London</timezone>
+  <filesystem><workspace_roots><root>/Users/danghica/pandian</root></workspace_roots><permission_profile type="managed"><file_system type="restricted"><entry access="read"><special>:root</special></entry><entry access="write"><path>/Users/danghica/pandian</path></entry><entry access="write"><special>:slash_tmp</special></entry><entry access="write"><special>:tmpdir</special></entry><entry access="read"><path>/Users/danghica/pandian/.git</path></entry><entry access="read"><path>/Users/danghica/pandian/.agents</path></entry><entry access="read"><path>/Users/danghica/pandian/.codex</path></entry><entry access="read"><path>/Users/danghica/pandian/.aws</path></entry></file_system></permission_profile></filesystem>
+</environment_context>
+
+[2026-11-15T10:48:37+00:00]
+If you look inside the generated docs you can see quite a few errors. Propose fixes. Do not fix until confirmed each time 
+
+[2026-11-15T10:51:32+00:00]
+Approve 1. Fix then ask again 
+
+[2026-11-15T10:55:24+00:00]
+Approve. Fix then ask again 
+
+[2026-11-15T10:59:55+00:00]
+Yes. Then ask again 
+
+[2026-11-15T11:05:20+00:00]
+Yes. 
+
+[2026-11-15T11:11:03+00:00]
+Example? 
+
+[2026-11-15T11:11:36+00:00]
+Fix. 
+
+[2026-11-15T11:16:48+00:00]
+Yes
+
+[2026-11-15T11:39:06+00:00]
+Apply this fixes to cjr-core too 
+
+[2026-11-15T12:02:21+00:00]
+Push to cjr-shift and cjr-core 
+
+[2026-11-15T12:21:33+00:00]
+Yes to both 
+

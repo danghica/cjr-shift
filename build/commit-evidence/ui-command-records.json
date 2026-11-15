@@ -1,0 +1,41 @@
+[
+  {
+    "name": "ui-python-tests",
+    "argv": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "work/UI",
+      "-p",
+      "test_*.py",
+      "-v"
+    ],
+    "cwd": "/Users/danghica/pandian",
+    "started_utc": "2026-11-15T12:23:55.920783+00:00",
+    "finished_utc": "2026-11-15T12:24:57.291361+00:00",
+    "exit_status": 0,
+    "log": "build/commit-evidence/ui-python-tests.log",
+    "unittest_counts": [
+      45
+    ],
+    "skips": 0
+  },
+  {
+    "name": "ui-javascript-tests",
+    "argv": [
+      "node",
+      "--test",
+      "work/UI/test_ui.mjs",
+      "work/UI/test_storage.mjs"
+    ],
+    "cwd": "/Users/danghica/pandian",
+    "started_utc": "2026-11-15T12:24:57.291913+00:00",
+    "finished_utc": "2026-11-15T12:24:57.542297+00:00",
+    "exit_status": 0,
+    "log": "build/commit-evidence/ui-javascript-tests.log",
+    "unittest_counts": [],
+    "skips": 0
+  }
+]

@@ -52,16 +52,16 @@ class HostingConfigurationTests(unittest.TestCase):
             fake=MagicMock();fake.server_port=8080;fake.serve_forever.side_effect=KeyboardInterrupt
             env={'PORT':'8080','RAILWAY_ENVIRONMENT_ID':'test','RAILWAY_VOLUME_MOUNT_PATH':str(volume),
                  'RAILWAY_PUBLIC_DOMAIN':'shift.up.railway.app','TRACKER_DEMO':'true'}
-            with patch.dict('os.environ',env,clear=True),patch('sys.argv',['server.py']),patch('server.make_server',return_value=fake) as build:
+            with patch.dict('os.environ',env,clear=True),patch('sys.argv',['server.py','--file-store']),patch('server.make_server',return_value=fake) as build:
                 main()
-            build.assert_called_once_with(volume/'shifts.store',8080,'0.0.0.0','https://shift.up.railway.app',True)
+            build.assert_called_once_with(volume/'shifts.store',8080,'0.0.0.0','https://shift.up.railway.app',True,False)
             self.assertTrue(volume.exists());fake.server_close.assert_called_once()
 
     def test_railway_refuses_ephemeral_or_wrong_mount_store(self):
         with TemporaryDirectory() as folder:
             for env in [dict(PORT='8080',RAILWAY_ENVIRONMENT_ID='test'),
                         dict(PORT='8080',RAILWAY_ENVIRONMENT_ID='test',RAILWAY_VOLUME_MOUNT_PATH=folder,TRACKER_STORE_FILE='/app/shifts.store')]:
-                with patch.dict('os.environ',env,clear=True),patch('sys.argv',['server.py']),patch('server.make_server') as build:
+                with patch.dict('os.environ',env,clear=True),patch('sys.argv',['server.py','--file-store']),patch('server.make_server') as build:
                     with self.assertRaises(SystemExit) as caught:main()
                     self.assertEqual(caught.exception.code,1);build.assert_not_called()
 
@@ -69,8 +69,8 @@ class HostingConfigurationTests(unittest.TestCase):
         with TemporaryDirectory() as folder:
             path=Path(folder)/'store'
             fake=MagicMock();fake.server_port=8765;fake.serve_forever.side_effect=KeyboardInterrupt
-            with patch.dict('os.environ',{},clear=True),patch('sys.argv',['server.py','--store',str(path)]),patch('server.make_server',return_value=fake) as build:
+            with patch.dict('os.environ',{},clear=True),patch('sys.argv',['server.py','--file-store','--store',str(path)]),patch('server.make_server',return_value=fake) as build:
                 main()
-            build.assert_called_once_with(path,8765,'127.0.0.1',None,False)
+            build.assert_called_once_with(path,8765,'127.0.0.1',None,False,False)
 
 if __name__=='__main__':unittest.main(verbosity=2)

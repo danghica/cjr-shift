@@ -1,12 +1,60 @@
 #!/usr/bin/env python3
 """Generate project prose and a linked offline validation report from actual evidence."""
 from pathlib import Path
-import json,html,datetime,hashlib
+import json,html,datetime,hashlib,re,sys
 ROOT=Path(__file__).resolve().parents[2]
 HERE=ROOT/'work/docs'
 def read(path):
     p=ROOT/path
     return json.loads(p.read_text()) if p.exists() else {'status':'not completed'}
+def explanation_coverage(rendering):
+    entries=rendering.get('explanations',{}).get('declarations',{})
+    available=sum(e.get('status')=='available' and isinstance(e.get('description'),str) and bool(e['description'].strip()) for e in entries.values())
+    return {'status':'complete' if available==len(entries) else 'incomplete','available':available,'total':len(entries),'missing':len(entries)-available}
+
+def explanation_state():
+    rendering=json.loads((HERE/'report.json').read_text())
+    check_path=HERE/'explanation-check.json'
+    check=json.loads(check_path.read_text()) if check_path.exists() else {}
+    current=check.get('report_sha256')==hashlib.sha256((HERE/'report.json').read_bytes()).hexdigest()
+    consistency=check.get('consistency',{}).get('status','not checked') if current else 'not checked'
+    return explanation_coverage(rendering),consistency,check.get('checked_utc') if current else None
+
+def explanation_summary(coverage,consistency):
+    return f"Explanation consistency: **{consistency}**. Explanation coverage: **{coverage['status']}** — {coverage['available']} of {coverage['total']} available; {coverage['missing']} missing."
+
+def refresh_explanation_status():
+    """Update only explanation status; preserve proof/runtime evidence and prose."""
+    coverage,consistency,checked=explanation_state()
+    summary=explanation_summary(coverage,consistency)
+    section='<section id="explanation-status" class="panel"><h2>English explanations</h2><p>Explanation consistency: <strong>'+html.escape(consistency)+'</strong>.</p><p>Explanation coverage: <strong>'+coverage['status']+'</strong> — '+str(coverage['available'])+' of '+str(coverage['total'])+' available; '+str(coverage['missing'])+' missing.</p></section>'
+    for filename,marker in [('index.html','</header>'),('validation.html','<section>')]:
+        path=HERE/filename
+        if not path.exists():continue
+        text=path.read_text()
+        if '<section id="explanation-status"' in text:
+            text=re.sub(r'<section id="explanation-status".*?</section>',lambda _:section,text,count=1,flags=re.S)
+        elif marker in text:
+            replacement=marker+section if filename=='index.html' else section+marker
+            text=text.replace(marker,replacement,1)
+        path.write_text(text)
+    path=HERE/'project.md'
+    if path.exists():
+        text=path.read_text()
+        pattern=r'AI-generated explanations are available for \d+ of \d+ declarations; \d+ unavailable and \d+ failed\.|Explanation consistency: \*\*[^*]+\*\*\. Explanation coverage: \*\*[^*]+\*\* — \d+ of \d+ available; \d+ missing\.'
+        text=re.sub(pattern,lambda _:summary,text,count=1)
+        path.write_text(text)
+    path=HERE/'qa.json'
+    if path.exists():
+        qa=json.loads(path.read_text())
+        qa['explanation_consistency']={'status':consistency,'checked_utc':checked}
+        qa['explanation_coverage']=coverage
+        qa['status']='failed' if qa.get('file_errors') or consistency=='failed' else 'passed with documented presentation limits'
+        if qa['status']!='failed':
+            if coverage['status']=='incomplete':qa['status']+='; explanation coverage incomplete'
+            if consistency=='not checked':qa['status']+='; explanation consistency not checked'
+        path.write_text(json.dumps(qa,indent=2)+'\n')
+
 def main():
     proof=read('work/specs/verification.json');tests=read('work/code/test/test-results.json');bench=read('work/code/test/benchmark-results.json')
     source_records=proof.get('sources',{})
@@ -16,7 +64,8 @@ def main():
     rendering=read('work/docs/report.json')
     explanations=rendering.get('explanations',{}).get('declarations',{})
     explanation_counts={status:sum(x.get('status')==status for x in explanations.values()) for status in ('available','unavailable','failed')}
-    explanation_summary=f"AI-generated explanations are available for {explanation_counts['available']} of {len(explanations)} declarations; {explanation_counts['unavailable']} unavailable and {explanation_counts['failed']} failed. Explanations are cached in [explanations.json](explanations.json) and embedded in the HTML for offline reading. See the [coverage check](explanation-check.json) and [review notes](explanation-review.json)."
+    coverage,consistency,_=explanation_state()
+    summary=explanation_summary(coverage,consistency)+" Explanations are cached in [explanations.json](explanations.json) and embedded in the HTML for offline reading. See the [coverage check](explanation-check.json) and [review notes](explanation-review.json)."
     text='''# Work time tracker
 
 ## prompt
@@ -114,7 +163,7 @@ The illustrative metadata deliberately declares incomplete coverage and returns 
     text=text.replace('The CLI simulates protocol exchanges with explicit encodings; it does not bundle a permanent-store adapter. An application adapter loads once and keeps the session between calls.', 'The CLI supports explicit protocol simulation and a local-file adapter. `initializeStore FILE` creates or validates a snapshot; subsequent file-backed calls load under a sibling lock, and mutations atomically save before acknowledging the pure session protocol. The browser UI uses that adapter; its JavaScript and local server remain outside the core.')
     text=text.replace('Native tests: **', 'The working-time harness checks exact limits and one-minute failures for each calculation; the CLI harness covers both jurisdictions, caller-declared opt-outs, normal/night classifications, additional work, 17-week and replacement boundaries, simultaneous findings, pending starts, incomplete/unsupported/invalid metadata, rejected break fields and unchanged store bytes. Fresh results: '+tests.get('working_time_native','not executed')+'; '+tests.get('working_time_cli','not executed')+'. See [native working-time tests](../code/test/working_time_test.cj) and [CLI tests](../code/test/test_working_time_cli.py).\n\nNative tests: **',1)
     text += '\nWorking-time benchmarking adds [working_time_benchmark.cj](../code/test/working_time_benchmark.cj): the private weekly calculation at 10, 100 and 500 pieces, with three warmups and seven trials of 100 calls. Its checksum consumes both scaled comparison operands and the result code. This isolates the calculation from process startup, JSON parsing, state construction and public metadata validation; it is not a benchmark of complete legal assessment. Samples and environment appear in the shared benchmark record.\n'
-    text=text.replace('Offline mode has no cached English explanations for the new declarations; the project prose here supplies the domain explanation.',explanation_summary)
+    text=text.replace('Offline mode has no cached English explanations for the new declarations; the project prose here supplies the domain explanation.',summary)
     text=text.replace('Never hand-edit extracted Cangjie.', 'Documentation builds generate missing AI explanations by default through the authenticated Codex CLI. Set `CJR_EXPLANATIONS=offline` for a cache-only rebuild. Never hand-edit extracted Cangjie.')
     (HERE/'project.md').write_text(text)
     qa_path=HERE/'qa.json'
@@ -133,4 +182,7 @@ The illustrative metadata deliberately declares incomplete coverage and returns 
     for label,data,link in [('Proof verification',proof,'../specs/verification.json'),('Runtime tests',tests,'../code/test/test-results.json'),('Core benchmarks',bench,'../code/test/benchmark-results.json')]:
         body+='<section><h2>'+label+': '+html.escape(data['status'])+'</h2><p><a href="'+link+'">Full record</a></p><pre>'+html.escape(json.dumps(data,indent=2))+'</pre></section>'
     (HERE/'validation.html').write_text('<!doctype html><html lang="en"><meta charset="utf-8"><title>Tracker validation</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:20px;color:#172554}pre{white-space:pre-wrap;background:#f1f5f9;padding:20px;border-radius:12px;overflow-wrap:anywhere}section{margin:40px 0}</style>'+body+'</html>')
-if __name__=='__main__':main()
+    refresh_explanation_status()
+if __name__=='__main__':
+    if sys.argv[1:]==['--explanations-only']:refresh_explanation_status()
+    else:main()

@@ -1,0 +1,33 @@
+[2026-11-15T10:48:37+00:00]
+If you look inside the generated docs you can see quite a few errors. Propose fixes. Do not fix until confirmed each time 
+
+[2026-11-15T10:51:32+00:00]
+Approve 1. Fix then ask again 
+
+[2026-11-15T10:55:24+00:00]
+Approve. Fix then ask again 
+
+[2026-11-15T10:59:55+00:00]
+Yes. Then ask again 
+
+[2026-11-15T11:05:20+00:00]
+Yes. 
+
+[2026-11-15T11:11:03+00:00]
+Example? 
+
+[2026-11-15T11:11:36+00:00]
+Fix. 
+
+[2026-11-15T11:16:48+00:00]
+Yes
+
+[2026-11-15T11:39:06+00:00]
+Apply this fixes to cjr-core too 
+
+[2026-11-15T12:02:21+00:00]
+Push to cjr-shift and cjr-core 
+
+[2026-11-15T12:21:33+00:00]
+Yes to both 
+

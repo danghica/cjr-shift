@@ -1,0 +1,126 @@
+test_full_snapshot_round_trip_settings_midnight_reset_and_compliance (test_browser_store.BrowserStoreTests.test_full_snapshot_round_trip_settings_midnight_reset_and_compliance) ... 127.0.0.1 - - [15/Nov/2026 12:23:56] "POST /api/browser HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:23:56] "POST /api/browser HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:23:56] "POST /api/browser HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:23:56] "POST /api/browser HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:23:56] "POST /api/browser HTTP/1.1" 200 -
+ok
+test_invalid_and_failed_requests_do_not_return_a_saveable_snapshot (test_browser_store.BrowserStoreTests.test_invalid_and_failed_requests_do_not_return_a_saveable_snapshot) ... 127.0.0.1 - - [15/Nov/2026 12:23:57] "POST /api/browser HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:23:57] "POST /api/browser HTTP/1.1" 409 -
+127.0.0.1 - - [15/Nov/2026 12:23:57] "POST /api/browser HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:23:57] "POST /api/browser HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:23:57] "POST /api/browser HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:23:57] "POST /api/browser HTTP/1.1" 400 -
+ok
+test_main_defaults_to_browser_storage_without_volume (test_browser_store.BrowserStoreTests.test_main_defaults_to_browser_storage_without_volume) ... Work tracker: http://0.0.0.0:8080
+Store: browser localStorage
+ok
+test_temporary_files_are_removed_after_each_request (test_browser_store.BrowserStoreTests.test_temporary_files_are_removed_after_each_request) ... 127.0.0.1 - - [15/Nov/2026 12:23:58] "POST /api/browser HTTP/1.1" 200 -
+ok
+test_two_browsers_are_independent_and_old_shared_api_is_disabled (test_browser_store.BrowserStoreTests.test_two_browsers_are_independent_and_old_shared_api_is_disabled) ... 127.0.0.1 - - [15/Nov/2026 12:23:59] "POST /api/browser HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:23:59] "POST /api/browser HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:23:59] "POST /api/browser HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:23:59] "POST /api/reset HTTP/1.1" 409 -
+127.0.0.1 - - [15/Nov/2026 12:23:59] "GET /api/state HTTP/1.1" 409 -
+ok
+test_ambiguous_calendar_window_does_not_hide_known_daily_violation (test_compliance.ComplianceTests.test_ambiguous_calendar_window_does_not_hide_known_daily_violation) ... ok
+test_classification_pending_restart_final_change_and_midnight (test_compliance.ComplianceTests.test_classification_pending_restart_final_change_and_midnight) ... ok
+test_clock_conversion_and_ambiguous_history_are_explicit (test_compliance.ComplianceTests.test_clock_conversion_and_ambiguous_history_are_explicit) ... ok
+test_complete_records_treat_gaps_before_first_shift_as_no_work (test_compliance.ComplianceTests.test_complete_records_treat_gaps_before_first_shift_as_no_work) ... ok
+test_daily_and_hazardous_violations_with_known_normal_hours (test_compliance.ComplianceTests.test_daily_and_hazardous_violations_with_known_normal_hours) ... ok
+test_defaults_settings_validation_reset_and_reload (test_compliance.ComplianceTests.test_defaults_settings_validation_reset_and_reload) ... ok
+test_empty_pending_bounds_and_invalid_dates (test_compliance.ComplianceTests.test_empty_pending_bounds_and_invalid_dates) ... ok
+test_external_changes_invalidate_reports_and_journal_keeps_actual_before_metadata (test_compliance.ComplianceTests.test_external_changes_invalidate_reports_and_journal_keeps_actual_before_metadata) ... ok
+test_external_cli_records_and_partial_deletion_stay_unclassified (test_compliance.ComplianceTests.test_external_cli_records_and_partial_deletion_stay_unclassified) ... ok
+test_fortnight_variants_use_declared_calendar_anchor (test_compliance.ComplianceTests.test_fortnight_variants_use_declared_calendar_anchor) ... ok
+test_metadata_save_failure_rolls_back_core_and_classification (test_compliance.ComplianceTests.test_metadata_save_failure_rolls_back_core_and_classification) ... ok
+test_missed_attendance_and_legacy_are_not_assumed_work (test_compliance.ComplianceTests.test_missed_attendance_and_legacy_are_not_assumed_work) ... ok
+test_non_night_worker_does_not_receive_night_work_violation (test_compliance.ComplianceTests.test_non_night_worker_does_not_receive_night_work_violation) ... ok
+test_overtime_defaults_running_changes_restart_and_midnight (test_compliance.ComplianceTests.test_overtime_defaults_running_changes_restart_and_midnight) ... ok
+test_recover_before_and_after_crash_and_preserve_external_change (test_compliance.ComplianceTests.test_recover_before_and_after_crash_and_preserve_external_change) ... ok
+test_regular_overtime_cannot_hide_night_average_or_weekly_violation (test_compliance.ComplianceTests.test_regular_overtime_cannot_hide_night_average_or_weekly_violation) ... ok
+test_regular_overtime_included_in_normal_hours_and_old_metadata_defaults (test_compliance.ComplianceTests.test_regular_overtime_included_in_normal_hours_and_old_metadata_defaults) ... ok
+test_running_metadata_failure_does_not_claim_saved (test_compliance.ComplianceTests.test_running_metadata_failure_does_not_claim_saved) ... ok
+test_weekly_optout_specific_period_persists_and_can_be_corrected (test_compliance.ComplianceTests.test_weekly_optout_specific_period_persists_and_can_be_corrected) ... ok
+test_healthcheck_has_no_data_and_accepts_railway_health_host (test_hosting.HostedHTTPTests.test_healthcheck_has_no_data_and_accepts_railway_health_host) ... 127.0.0.1 - - [15/Nov/2026 12:24:45] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:45] "GET /api/state HTTP/1.1" 403 -
+ok
+test_public_origin_demo_and_same_origin_write (test_hosting.HostedHTTPTests.test_public_origin_demo_and_same_origin_write) ... 127.0.0.1 - - [15/Nov/2026 12:24:46] "GET /api/state HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:46] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:46] "POST /api/stop HTTP/1.1" 403 -
+127.0.0.1 - - [15/Nov/2026 12:24:46] "GET /api/state HTTP/1.1" 403 -
+127.0.0.1 - - [15/Nov/2026 12:24:46] "POST /api/start HTTP/1.1" 403 -
+ok
+test_public_origin_must_be_an_origin (test_hosting.HostedHTTPTests.test_public_origin_must_be_an_origin) ... ok
+test_local_defaults_stay_on_loopback_without_demo (test_hosting.HostingConfigurationTests.test_local_defaults_stay_on_loopback_without_demo) ... Work tracker: http://127.0.0.1:8765
+Store: <MagicMock name='mock.tracker.repository.path' id='4403966176'>
+ok
+test_railway_refuses_ephemeral_or_wrong_mount_store (test_hosting.HostingConfigurationTests.test_railway_refuses_ephemeral_or_wrong_mount_store) ... Attach a persistent Railway volume and put the store inside its mount path.
+Attach a persistent Railway volume and put the store inside its mount path.
+ok
+test_railway_uses_platform_port_volume_and_domain (test_hosting.HostingConfigurationTests.test_railway_uses_platform_port_volume_and_domain) ... Work tracker: https://shift.up.railway.app
+Store: <MagicMock name='mock.tracker.repository.path' id='4403965840'>
+ok
+test_external_changes_reconcile_and_corruption_is_preserved (test_server.AdapterTests.test_external_changes_reconcile_and_corruption_is_preserved) ... ok
+test_failed_stop_and_failed_reset_preserve_file_and_pending (test_server.AdapterTests.test_failed_stop_and_failed_reset_preserve_file_and_pending) ... ok
+test_midnight (test_server.AdapterTests.test_midnight) ... ok
+test_missed_shift_persists_and_splits_at_midnight (test_server.AdapterTests.test_missed_shift_persists_and_splits_at_midnight) ... ok
+test_missed_shift_rejection_and_disk_failure_preserve_state (test_server.AdapterTests.test_missed_shift_rejection_and_disk_failure_preserve_state) ... ok
+test_only_one_concurrent_start_succeeds (test_server.AdapterTests.test_only_one_concurrent_start_succeeds) ... ok
+test_reset_clears_saved_and_running_shifts (test_server.AdapterTests.test_reset_clears_saved_and_running_shifts) ... ok
+test_same_minute_and_duplicate_start (test_server.AdapterTests.test_same_minute_and_duplicate_start) ... ok
+test_start_stop_and_restart (test_server.AdapterTests.test_start_stop_and_restart) ... ok
+test_assets_and_start_stop (test_server.HTTPTests.test_assets_and_start_stop) ... 127.0.0.1 - - [15/Nov/2026 12:24:51] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:51] "GET /app.js HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:51] "GET /style.css HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:51] "GET /time.mjs HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:51] "GET /api/state HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:51] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:51] "POST /api/stop HTTP/1.1" 409 -
+127.0.0.1 - - [15/Nov/2026 12:24:52] "POST /api/stop HTTP/1.1" 200 -
+ok
+test_metadata_settings_and_compliance_routes (test_server.HTTPTests.test_metadata_settings_and_compliance_routes) ... 127.0.0.1 - - [15/Nov/2026 12:24:52] "GET /api/settings HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:52] "POST /api/settings HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:52] "POST /api/settings HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:52] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:52] "POST /api/attendance HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:52] "POST /api/attendance HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:52] "POST /api/stop HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/compliance HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/compliance HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/opt-out HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/settings HTTP/1.1" 403 -
+ok
+test_missed_shift_api (test_server.HTTPTests.test_missed_shift_api) ... 127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/missed-shift HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/missed-shift HTTP/1.1" 409 -
+127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/missed-shift HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/missed-shift HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/missed-shift HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:53] "POST /api/missed-shift HTTP/1.1" 400 -
+ok
+test_overtime_http_round_trip_and_rejection (test_server.HTTPTests.test_overtime_http_round_trip_and_rejection) ... 127.0.0.1 - - [15/Nov/2026 12:24:54] "GET /api/state HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:54] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:54] "POST /api/attendance HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:54] "POST /api/attendance HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:54] "POST /api/stop HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:54] "GET /api/state HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:55] "POST /api/missed-shift HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:55] "POST /api/missed-shift HTTP/1.1" 400 -
+ok
+test_reset_confirmation_and_request_validation (test_server.HTTPTests.test_reset_confirmation_and_request_validation) ... 127.0.0.1 - - [15/Nov/2026 12:24:55] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:55] "POST /api/reset HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:55] "GET /api/state HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:55] "POST /api/reset HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:55] "POST /api/start HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:56] "POST /api/start HTTP/1.1" 400 -
+127.0.0.1 - - [15/Nov/2026 12:24:56] "POST /api/reset HTTP/1.1" 403 -
+127.0.0.1 - - [15/Nov/2026 12:24:56] "POST /api/reset HTTP/1.1" 403 -
+127.0.0.1 - - [15/Nov/2026 12:24:56] "GET /../server.py HTTP/1.1" 404 -
+ok
+test_save_failure_returns_old_state (test_server.HTTPTests.test_save_failure_returns_old_state) ... 127.0.0.1 - - [15/Nov/2026 12:24:56] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [15/Nov/2026 12:24:56] "POST /api/stop HTTP/1.1" 503 -
+ok
+
+----------------------------------------------------------------------
+Ran 45 tests in 61.274s
+
+OK

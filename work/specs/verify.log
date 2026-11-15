@@ -1,4 +1,4 @@
-Workspace proof verification 2026-11-12T09:36:18.608228+00:00
+Workspace proof verification 2026-11-15T11:16:56.530724+00:00
 $ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Tracker.v
 
 EXIT 0
@@ -20,13 +20,13 @@ EXIT 0
 $ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Public.v
 
 EXIT 0
+$ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/WorkingTimeModel.v
+
+EXIT 0
 $ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Validation.v
 
 EXIT 0
 $ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Storage.v
-
-EXIT 0
-$ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/WorkingTimeModel.v
 
 EXIT 0
 $ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/WorkingTimeSource.v
@@ -108,9 +108,17 @@ Closed under the global context
 Closed under the global context
 Closed under the global context
 Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
 
 EXIT 0
-$ /Users/danghica/.opam/default/bin/coqchk -silent -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker Tracker.Tracker Tracker.Model Tracker.Pure Tracker.Runtime Tracker.Contracts Tracker.Operations Tracker.Public Tracker.Validation Tracker.Storage Tracker.WorkingTimeModel Tracker.WorkingTimeSource Tracker.WorkingTimeRuntime Tracker.WorkingTimeIntervals Tracker.WorkingTimeBase Tracker.WorkingTimeRules Tracker.WorkingTimeContracts Tracker.WorkingTimeExamples
+$ /Users/danghica/.opam/default/bin/coqchk -silent -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker Tracker.Tracker Tracker.Model Tracker.Pure Tracker.Runtime Tracker.Contracts Tracker.Operations Tracker.Public Tracker.WorkingTimeModel Tracker.Validation Tracker.Storage Tracker.WorkingTimeSource Tracker.WorkingTimeRuntime Tracker.WorkingTimeIntervals Tracker.WorkingTimeBase Tracker.WorkingTimeRules Tracker.WorkingTimeContracts Tracker.WorkingTimeExamples
 
 EXIT 0
 $ /Users/danghica/.opam/default/bin/coqc --version

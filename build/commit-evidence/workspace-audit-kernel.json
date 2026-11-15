@@ -1,0 +1,23 @@
+{
+  "name": "workspace-audit-kernel",
+  "argv": [
+    "/Users/danghica/.opam/default/bin/coqchk",
+    "-silent",
+    "-R",
+    "/Users/danghica/pandian/theories",
+    "cjr",
+    "-Q",
+    "/Users/danghica/pandian/tools/extraction/rocq",
+    "cjr.examples",
+    "-Q",
+    "/Users/danghica/pandian/work/specs",
+    "Tracker",
+    "-norec",
+    "Tracker.Audit"
+  ],
+  "cwd": "/Users/danghica/pandian",
+  "started_utc": "2026-11-15T12:29:08.201016+00:00",
+  "finished_utc": "2026-11-15T12:29:08.670517+00:00",
+  "exit_status": 0,
+  "log": "build/commit-evidence/workspace-audit-kernel.log"
+}

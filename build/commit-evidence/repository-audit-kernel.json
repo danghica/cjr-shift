@@ -1,0 +1,29 @@
+{
+  "name": "repository-audit-kernel",
+  "argv": [
+    "/Users/danghica/.opam/default/bin/coqchk",
+    "-silent",
+    "-R",
+    "/Users/danghica/pandian/theories",
+    "cjr",
+    "-Q",
+    "/Users/danghica/pandian/tools/extraction/rocq",
+    "cjr.examples",
+    "-Q",
+    "/Users/danghica/pandian/example/generics/rocq",
+    "cjr.examples",
+    "-Q",
+    "/Users/danghica/pandian/example/misc/rocq",
+    "cjr.examples",
+    "-Q",
+    "/Users/danghica/pandian/audit",
+    "cjr.audit",
+    "-norec",
+    "cjr.audit.assumptions"
+  ],
+  "cwd": "/Users/danghica/pandian",
+  "started_utc": "2026-11-15T12:30:24.924844+00:00",
+  "finished_utc": "2026-11-15T12:30:25.334140+00:00",
+  "exit_status": 0,
+  "log": "build/commit-evidence/repository-audit-kernel.log"
+}

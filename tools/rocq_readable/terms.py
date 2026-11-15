@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 
 from .layout import Doc, Token, anchor, leaf
 from .program_syntax import ProgramSyntax, LEMMAS, custom_rule, type_alias
@@ -33,6 +34,11 @@ INFIX = {
 }
 WP = {'iris.bi.weakestpre.wp', 'iris.bi.weakestpre.twp'}
 QUANTIFIERS = {BI + 'bi_forall': 'every', BI + 'bi_exist': 'exists', 'Coq.Init.Logic.ex': 'exists'}
+# Older version-1 exports omitted constructor binder counts. Only these exact
+# standard constructors have a known arity without fresh exporter metadata.
+LEGACY_CONSTRUCTOR_BINDERS = {'Coq.Init.Datatypes.' + name: count for name, count in
+                              [('true', 0), ('false', 0), ('Some', 1), ('None', 0),
+                               ('nil', 0), ('cons', 2), ('pair', 2), ('O', 0), ('S', 1)]}
 
 
 def identity(node):
@@ -89,6 +95,16 @@ def block(label, children, **token):
 
 def phrase(text, children):
     return Doc(Token(''), children, template=text, template_indent=2, plain_indent=2)
+
+
+class MatchBranch(Doc):
+    def lines(self, indent=0, width=92, indent_size=None):
+        indent_size = self.plain_indent if indent_size is None else indent_size
+        tokens = self.children[0].inline()
+        if tokens is None or indent * indent_size + 6 + sum(len(t.text) for t in tokens) > width:
+            template = 'when:\n  pattern:\n    {0}\n  body:\n    {1}'
+            return Doc.lines(replace(self, template=template), indent, width, indent_size)
+        return super().lines(indent, width, indent_size)
 
 
 class Renderer:
@@ -173,9 +189,7 @@ class Renderer:
         if tag == 'app':
             return self.app(node, env)
         if tag == 'match':
-            branches = [block('when ' + b['constructor'].split('.')[-1], [self.term(b['body'], env)], identity=b['constructor'])
-                        for b in node['branches']]
-            return block('match', [self.term(node['scrutinee'], env), block('return', [self.term(node['return'], env)]), *branches])
+            return self.match(node, env)
         if tag in ('fix', 'cofix'):
             definitions = node['definitions']
             tokens = [self.binding(d['name'], env) for d in definitions]
@@ -192,6 +206,47 @@ class Renderer:
                          block('default', [self.term(node['default'], env)])])
         self.unsupported.append('elaborated ' + tag)
         return leaf('unresolved: ' + node.get('text', tag) + ' (see elaboration details)', css='unsupported')
+
+    def match(self, node, env):
+        branches = []
+        for branch in node['branches']:
+            constructor = branch['constructor']
+            count = branch.get('binder_count', LEGACY_CONSTRUCTOR_BINDERS.get(constructor))
+            body = branch['body']
+            binders = []
+            if type(count) is int and count >= 0:
+                for _ in range(count):
+                    if body['tag'] != 'lambda':
+                        break
+                    binders.append(body)
+                    body = body['body']
+            if type(count) is not int or count < 0 or len(binders) != count:
+                # Unknown constructor arities and local definitions keep the
+                # explicit expanded form rather than guessing a pattern.
+                branches.append(block('when ' + constructor.split('.')[-1],
+                                      [self.term(branch['body'], env)], identity=constructor))
+                continue
+            nested, parameters = list(env), []
+            for binder in binders:
+                token = self.binding(binder['name'], nested)
+                type_ = self.term(binder['type'], nested)
+                self.hidden.append(block('pattern binding', [phrase('{0}: {1}', [self.use(token), type_])]))
+                nested.append(token)
+                parameters.append(Doc(token))
+            pattern = Doc(Token(constructor.split('.')[-1], identity=constructor), parameters)
+            branches.append(MatchBranch(Token(''), [pattern, self.term(body, nested)],
+                                        template='when {0}:\n  {1}', template_indent=2, plain_indent=2))
+        scrutinee = self.term(node['scrutinee'], env)
+        return_ = block('return', [self.term(node['return'], env)])
+        motive, count = node['return'], 0
+        while motive['tag'] == 'lambda':
+            count += 1
+            motive = motive['body']
+        from .program_syntax import uses_rel
+        if count and not node.get('indices') and not any(uses_rel(motive, i) for i in range(1, count + 1)):
+            self.hidden.append(block('match return type', return_.children))
+            return block('match', [scrutinee, *branches])
+        return block('match', [scrutinee, return_, *branches])
 
     def app(self, node, env):
         key, args = application(node)

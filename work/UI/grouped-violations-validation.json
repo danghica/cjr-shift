@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-11-12T14:46:50.672882+00:00",
+  "coreChanged": false,
+  "proofValidationRun": false,
+  "javascriptTestsPassed": 14,
+  "checks": [
+    "same-rule and same-code overlapping violations grouped transitively",
+    "separate rules, touching windows and incomplete checks remain separate",
+    "worst-window summary respects maximum-work and minimum-rest limits",
+    "hours formatting replaces minute durations in work/rest violation text",
+    "original periods and weekly opt-out associations retained",
+    "real-validator browser check groups 7 hazardous-night windows",
+    "individual-window disclosure expands and collapses",
+    "no browser console errors"
+  ],
+  "preview": "grouped-violations-preview.jpg",
+  "sourceHashes": {
+    "work/UI/static/app.js": "60675b49630e12890d5af3989fb959a2c9f7148f02084c8b1b2821b51f5264df",
+    "work/UI/static/time.mjs": "dc51fbd38fe09811bad74b60b4d98a94400a3afbb01f5eb9ec27ba59e1961b7a",
+    "work/UI/static/style.css": "eae9b0a1e24366aa3264b10583a5c3973f6630acf07d3c731cdb9f4c33fc8930"
+  },
+  "deployedUrl": "https://cjr-shift-production.up.railway.app",
+  "liveAssetsMatchSource": true,
+  "deploymentVerifiedAt": "2026-11-12T14:48:46.755668+00:00"
+}

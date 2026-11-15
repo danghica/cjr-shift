@@ -62,6 +62,7 @@ test('background refresh preserves an unsupported-action error and does not resu
     fetch:async (path,options) => {calls.push([path,options]); const next=responses.shift();return {...next,json:async()=>next.body};}});
   const source = await readFile(new URL('./static/app.js', import.meta.url),'utf8');
   const prefix = source.slice(source.indexOf('const $'),source.indexOf('function tick()'));
+  context.browserRequest=async (path,data)=>context.fetch(`/api/${path}`,data===undefined?{cache:'no-store'}:{method:'POST',body:JSON.stringify(data)});
   vm.runInContext(prefix+'\nglobalThis.api = {refresh,change};',context);
   await context.api.refresh();
   await context.api.change('missed-shift',{start:'2026-11-11T09:00',end:'2026-11-11T10:00'});
@@ -85,6 +86,7 @@ test('validator violations are successful reports, not failed HTTP actions', asy
   const context=vm.createContext({document:{getElementById:node,querySelectorAll:()=>[]},responseFailure,Intl,
     render(){},fetch:async()=>({ok:true,status:200,json:async()=>result})});
   const source=await readFile(new URL('./static/app.js',import.meta.url),'utf8');
+  context.browserRequest=async (path,data)=>context.fetch(`/api/${path}`,data===undefined?{cache:'no-store'}:{method:'POST',body:JSON.stringify(data)});
   vm.runInContext(source.slice(source.indexOf('const $'),source.indexOf('function tick()'))+'\nglobalThis.api={request};',context);
   assert.equal((await context.api.request('compliance',{start:'',end:''})).report.validatorCode,101);
 });
@@ -104,6 +106,7 @@ test('start and stop send attendance, regular overtime and timezone without chan
       return {ok:true,status:200,json:async()=>({code:0,state:saved})};
     }});
   const source=await readFile(new URL('./static/app.js',import.meta.url),'utf8');
+  context.browserRequest=async (path,data)=>context.fetch(`/api/${path}`,data===undefined?{cache:'no-store'}:{method:'POST',body:JSON.stringify(data)});
   vm.runInContext(source.slice(source.indexOf('const $'),source.indexOf('function tick()'))+'\nglobalThis.api={refresh,change};',context);
   await context.api.refresh();await context.api.change('start');
   node('attendance-time').checked=true;
@@ -130,7 +133,37 @@ test('hosted shared-demo disclosure follows the server response', async () => {
   let demo=true;
   const context=vm.createContext({document:{getElementById:node},responseFailure,Intl,render(){},fetch:async()=>({ok:true,status:200,json:async()=>({code:0,state:{pending:null,shifts:[]},demo})})});
   const source=await readFile(new URL('./static/app.js',import.meta.url),'utf8');
+  context.browserRequest=async (path,data)=>context.fetch(`/api/${path}`,data===undefined?{cache:'no-store'}:{method:'POST',body:JSON.stringify(data)});
   vm.runInContext(source.slice(source.indexOf('const $'),source.indexOf('function tick()'))+'\nglobalThis.api={request};',context);
   await context.api.request('state');assert.equal(node('demo-notice').hidden,false);
   demo=false;await context.api.request('state');assert.equal(node('demo-notice').hidden,true);
+});
+
+
+test('overlapping violation windows group transitively and preserve every original', async () => {
+  const {groupViolations}=await import('./static/time.mjs');
+  const rows=[{rule:106,code:106,start:20,end:40},{rule:106,code:106,start:0,end:15},{rule:106,code:106,start:10,end:25}];
+  const before=JSON.stringify(rows);
+  const groups=groupViolations(rows);
+  assert.equal(groups.length,1);assert.equal(groups[0].start,0);assert.equal(groups[0].end,40);
+  assert.equal(groups[0].windows.length,3);assert.equal(JSON.stringify(rows),before);
+  assert.ok(groups[0].windows.includes(rows[0]));
+});
+test('different rules, incomplete results and touching windows remain distinct', async () => {
+  const {groupViolations}=await import('./static/time.mjs');
+  const groups=groupViolations([{rule:106,code:106,start:0,end:20},{rule:106,code:106,start:20,end:40},
+    {rule:102,code:102,start:0,end:20},{rule:106,code:21,start:0,end:20},{rule:106,code:21,start:1,end:21}]);
+  assert.equal(groups.length,5);assert.equal(groups.filter(g=>g.code===21).length,2);
+});
+test('hours and worst-window summaries retain the direction of each limit', async () => {
+  const {hours,findingExplanation,worstWindow}=await import('./static/time.mjs');
+  assert.equal(hours(1440),'24 hours');assert.equal(hours(60),'1 hour');assert.equal(hours(90),'1.5 hours');
+  assert.match(findingExplanation({code:106,measured:1440,limit:480}),/24 hours.*8 hours/);
+  assert.match(findingExplanation({code:102,measured:600,limit:660}),/10 hours.*11 hours/);
+  assert.equal(worstWindow([{code:102,measured:600},{code:102,measured:300}]).measured,300);
+  assert.equal(worstWindow([{code:103,measured:1,limit:2},{code:103,measured:0,limit:2}]).measured,0);
+  assert.equal(worstWindow([{code:106,measured:1000,limit:480},{code:106,measured:1440,limit:480}]).measured,1440);
+  const weekly=[{rule:101,code:101,start:0,end:100,measured:10,limit:1},{rule:101,code:101,start:1,end:101,measured:11,limit:1}];
+  const {groupViolations}=await import('./static/time.mjs');
+  assert.deepEqual(groupViolations(weekly)[0].windows.map(f=>[f.start,f.end]),[[0,100],[1,101]]);
 });

@@ -3,7 +3,11 @@
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import unquote
-import json,datetime,re,sys
+import json,datetime,re,sys,hashlib
+if __package__:
+    from .generate_report import explanation_coverage, refresh_explanation_status
+else:
+    from generate_report import explanation_coverage, refresh_explanation_status
 HERE=Path(__file__).resolve().parent
 class Content(HTMLParser):
     def __init__(self):
@@ -30,7 +34,6 @@ def main():
         description=entry.get('description')
         if entry.get('status')!='available' or not isinstance(description,str) or not description.strip():
             missing.append(identity)
-            if not allow_missing:errors.append(identity+': missing explanation')
             continue
         matching=[value for key,value in cache['entries'].items() if key.startswith(identity+':') and re.fullmatch('[0-9a-f]{64}',key[len(identity)+1:])]
         if not any(value.get('description')==description for value in matching):errors.append(identity+': not in cache')
@@ -45,8 +48,13 @@ def main():
         if pages[path].text.get(unquote(anchor))!=description:errors.append(identity+': rendered paragraph mismatch')
     expected=sum(file['declarations'] for file in report['files'])
     if len(entries)!=expected:errors.append('declaration count mismatch')
-    result={'status':'passed' if not errors else 'failed','checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'declarations':len(entries),'missing_explanations':missing,'allow_missing':allow_missing,'cache_entries':len(cache['entries']),'pages_checked':len(pages),'checks':['nonempty available explanations','matching cached text','dependency graph descriptions','rendered declaration paragraphs'],'errors':errors}
+    consistency={'status':'failed' if errors else 'passed','errors':list(errors)}
+    if not allow_missing:errors.extend(identity+': missing explanation' for identity in missing)
+    coverage=explanation_coverage(report)
+    status='failed' if errors else 'passed with incomplete coverage' if missing else 'passed'
+    result={'status':status,'consistency':consistency,'coverage':coverage,'report_sha256':hashlib.sha256((HERE/'report.json').read_bytes()).hexdigest(),'checked_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'declarations':len(entries),'missing_explanations':missing,'allow_missing':allow_missing,'cache_entries':len(cache['entries']),'pages_checked':len(pages),'checks':['nonempty available explanations','matching cached text','dependency graph descriptions','rendered declaration paragraphs'],'errors':errors}
     (HERE/'explanation-check.json').write_text(json.dumps(result,indent=2)+'\n')
+    refresh_explanation_status()
     print(json.dumps(result,indent=2))
     if errors:raise SystemExit(1)
 if __name__=='__main__':main()

@@ -72,3 +72,11 @@ The shared readable build excludes `theories/verify_assumptions.v`: it contains
 only audit commands and contributes no declaration pages. `make verify` still
 runs that audit; documentation rendering does not need to repeat it through
 coq-lsp.
+
+The offline link audit resolves directory URLs through `index.html` and checks
+fragments in that page. Root-relative URLs use the repository root by default.
+For an application served from a subdirectory, list its static directory in
+`repository.json` under `documentation_web_roots`; the most specific containing
+web root determines `/style.css` and similar asset URLs. Declared roots must be
+existing directories within the repository, and root-relative links cannot
+escape their web root. Missing files and anchors remain errors.

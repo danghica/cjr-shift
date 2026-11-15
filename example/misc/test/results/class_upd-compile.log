@@ -1,0 +1,9 @@
+[33mwarning[0m: unused expression
+  [36m==>[0m /Users/danghica/pandian/example/misc/extracted/class_upd.cj:17:5:
+   [36m| [0m
+[36m17[0m [36m| [0m    o.value[0m
+   [36m| [0m    [33m^^^^^^^ unused expression[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+1 warning generated, 1 warning printed.

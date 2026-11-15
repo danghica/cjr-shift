@@ -1,0 +1,58 @@
+{
+  "started_utc": "2026-11-15T12:08:09.347621+00:00",
+  "commands": [
+    {
+      "name": "python-tests",
+      "argv": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests"
+      ],
+      "cwd": "/Users/danghica/pandian",
+      "started_utc": "2026-11-15T12:08:09.347880+00:00",
+      "log": "build/commit-evidence/python-tests.log",
+      "exit_status": 0,
+      "finished_utc": "2026-11-15T12:09:31.891059+00:00",
+      "unittest_counts": [
+        138
+      ],
+      "skips": 0
+    },
+    {
+      "name": "repository-extraction",
+      "argv": [
+        "make",
+        "extract"
+      ],
+      "cwd": "/Users/danghica/pandian",
+      "started_utc": "2026-11-15T12:09:31.891556+00:00",
+      "log": "build/commit-evidence/repository-extraction.log",
+      "exit_status": 0,
+      "finished_utc": "2026-11-15T12:09:32.691896+00:00",
+      "unittest_counts": [],
+      "skips": 0
+    },
+    {
+      "name": "repository-native-tests",
+      "argv": [
+        "make",
+        "test"
+      ],
+      "cwd": "/Users/danghica/pandian",
+      "started_utc": "2026-11-15T12:09:32.692173+00:00",
+      "log": "build/commit-evidence/repository-native-tests.log",
+      "exit_status": 2,
+      "finished_utc": "2026-11-15T12:09:45.380954+00:00",
+      "unittest_counts": [],
+      "skips": 0
+    }
+  ],
+  "status": "failed",
+  "finished_utc": "2026-11-15T12:09:45.381133+00:00",
+  "error": "repository-native-tests: Cangjie cases passed; mandatory link audit failed on directory URLs and UI root-relative URLs.",
+  "attempt": "Initial validation before the approved link-audit repair",
+  "resolved_by": "build/commit-evidence/repository-native-tests-retry.log"
+}

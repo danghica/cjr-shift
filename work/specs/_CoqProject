@@ -8,9 +8,9 @@ Runtime.v
 Contracts.v
 Operations.v
 Public.v
+WorkingTimeModel.v
 Validation.v
 Storage.v
-WorkingTimeModel.v
 WorkingTimeSource.v
 WorkingTimeRuntime.v
 WorkingTimeIntervals.v

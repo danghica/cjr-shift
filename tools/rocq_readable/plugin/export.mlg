@@ -69,7 +69,8 @@ let serialize env sigma root =
         "universes", universe u; "parameters", `List (List.map sub (Array.to_list params));
         "return", sub (fst pred); "scrutinee", sub scrut; "indices", `List (List.map sub indices);
         "branches", `List (Array.to_list (Array.mapi (fun i b ->
-          `Assoc ["constructor", str (global_name (GlobRef.ConstructRef (ci.Constr.ci_ind,i+1))); "body", sub b]) branches))]
+          `Assoc ["constructor", str (global_name (GlobRef.ConstructRef (ci.Constr.ci_ind,i+1)));
+                  "binder_count", `Int ci.Constr.ci_cstr_ndecls.(i); "body", sub b]) branches))]
     | Constr.Fix ((indices,selected),(names,types,bodies)) -> recursive "fix" depth env names types bodies selected (Array.to_list indices)
     | Constr.CoFix (selected,(names,types,bodies)) -> recursive "cofix" depth env names types bodies selected []
     | Constr.Int i -> obj "literal" ["text", str (Uint63.to_string i)]

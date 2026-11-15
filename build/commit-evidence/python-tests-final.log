@@ -1,0 +1,71 @@
+........................Explaining Skin.Skin.Foreign.bi_wand
+Explaining Skin.Skin.adequacy_post
+Explaining Skin.Skin.adequacy_unused
+Explaining Skin.Skin.aggregate_program
+Explaining Skin.Skin.anonymous_program
+Explaining Skin.Skin.block_ownership
+Explaining Skin.Skin.box
+Explaining Skin.Skin.carrier
+Explaining Skin.Skin.carrier_function
+Explaining Skin.Skin.color
+Explaining Skin.Skin.dependent
+Explaining Skin.Skin.dependent_match
+Explaining Skin.Skin.empty_struct
+Explaining Skin.Skin.empty_struct_reference
+Explaining Skin.Skin.empty_struct_value
+Explaining Skin.Skin.entail
+Explaining Skin.Skin.field_ownership
+Explaining Skin.Skin.function_type
+Explaining Skin.Skin.implies
+Explaining Skin.Skin.in_section
+Explaining Skin.Skin.inferred
+Explaining Skin.Skin.literal
+Explaining Skin.Skin.logic
+Explaining Skin.Skin.option_match
+Explaining Skin.Skin.pointer_call
+Explaining Skin.Skin.quantified
+Explaining Skin.Skin.raw_ownership
+Explaining Skin.Skin.recursive_program
+Explaining Skin.Skin.reflexive
+Explaining Skin.Skin.same_name_program
+Explaining Skin.Skin.shadow
+Explaining Skin.Skin.shadow_program
+Explaining Skin.Skin.size
+Explaining Skin.Skin.slot_ownership
+Explaining Skin.Skin.state_type
+Explaining Skin.Skin.stream
+Explaining Skin.Skin.symbolic_aggregate
+Explaining Skin.Skin.symbolic_program
+Explaining Skin.Skin.twp_explicit
+Explaining Skin.Skin.unrelated
+Explaining Skin.Skin.unusual_program
+Explaining Skin.Skin.update
+Explaining Skin.Skin.use_constructor
+Explaining Skin.Skin.use_field
+Explaining Skin.Skin.value_type
+Explaining Skin.Skin.wp_default
+Explaining Skin.Skin.wp_explicit
+Explaining Skin.Skin.zeros
+.....................Parsing A.v
+Parsing A.v
+...................................................Explaining P.A.a
+Explaining P.A.a
+Explaining P.A.a
+.Explaining P.A.a
+..Explaining P.A.a
+Explaining P.A.b
+Explaining P.A.a
+Explaining P.A.b
+.....Explaining P.A.a
+...Explaining P.A.a
+Explaining P.A.a
+Explaining P.A.a
+.....Explaining P.A.a
+.Explaining P.A.a
+.........................Generated /private/var/folders/mq/rtbdtgcd44b6bxl9gmby_9xm0000gn/T/tmp8rk54lzu/fallback-html/index.html (1 files, 0 with errors, 61 unmapped/unsupported constructs, 0 failed explanations)
+Proof validation passed: 1 modules; 1/1 assumption audits closed.
+...
+----------------------------------------------------------------------
+Ran 141 tests in 82.373s
+
+OK

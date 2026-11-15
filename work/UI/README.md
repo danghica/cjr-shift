@@ -10,18 +10,28 @@ Open [http://127.0.0.1:8765](http://127.0.0.1:8765) in a browser. Keep the serve
 running while using the app; stop it with Ctrl+C. No JavaScript dependencies,
 build step, account or internet connection are required.
 
-By default the store is `work/UI/data/shifts.store`, relative to the application
-folder, even when launching from another directory. To use another store,
-including a file already used by the CLI:
+Each browser origin stores its own complete snapshot under
+`localStorage['cjr-shift.store.v1']`: shifts, running state, settings, classifications,
+regular overtime and opt-out declarations. New browsers start empty. The previous
+Railway shared store is never imported or exposed by the default server.
 
-```sh
-python3 work/UI/server.py --store /absolute/path/shifts.store --port 8765
-```
+The browser still needs the server for core operations and compliance checks.
+Each request sends its snapshot to the unchanged native core through a temporary
+file adapter. Temporary files are removed before returning the result. A single
+atomic localStorage write commits the complete returned snapshot. Failed browser
+writes retain the previous snapshot and never report a successful save. Web Locks
+serialize requests across tabs; storage events refresh other tabs.
 
-The store's parent directory must exist for a custom path. The server creates
-an empty store when absent and validates existing data before serving the UI.
-An invalid file is not overwritten. If the native CLI is absent, build it first
-with `python3 work/CLI/build.py`.
+Records persist through refreshes and server redeployments, but clearing browser
+site data removes them. They do not sync across browsers/devices. Use a current
+browser with localStorage and Web Locks enabled. There is no offline recording.
+The server does not retain browser snapshots or log request bodies. Native CLI
+availability is still required; build it with `python3 work/CLI/build.py` if absent.
+
+The optional `--file-store --store /absolute/path/shifts.store` serves the legacy
+file API for integrations and regression checks, not the default browser UI.
+The file adapter and its recovery journal remain in use internally for disposable
+core requests; later file/sidecar descriptions document that adapter.
 
 ## Use
 
@@ -222,62 +232,29 @@ proof validation is needed or run for these UI-only changes. See
 [compliance test log](compliance-tests.log) and [preview](compliance-preview.jpg).
 
 
-## Railway shared demo
+## Railway browser-storage deployment
 
-Live demo: [cjr-shift](https://cjr-shift-production.up.railway.app).
-The [deployment record](railway-deployment.json) records the live health,
-browser and persistence checks. Saved settings survived a redeployment.
+Live app: [cjr-shift](https://cjr-shift-production.up.railway.app).
+`Dockerfile` compiles unchanged extracted Cangjie with the pinned, checksum-verified
+Linux SDK 1.0.5 and runs native runtime tests. No proof tools are run. Python serves
+static assets and `/api/browser`, the stateless core adapter. GET `/api/state` and
+legacy mutation routes are disabled in browser-storage mode. `/health` contains
+no user data. Host, Origin and UI-header checks remain enforced.
 
-`Dockerfile` compiles the unchanged extracted Cangjie sources on Linux amd64 with
-SDK **1.0.5**, using the exact archive and published SHA-256 from the
-[official download page](https://cangjie-lang.cn/download/1.0.5). The image runs
-native tracker and working-time boundary tests, then serves the JavaScript UI
-with Python. The checked-in macOS executable is not used in the Linux image.
-No proof compiler, proof extraction or proof-validation command is run.
+The existing Railway volume is left untouched and unused by browser mode. A
+volume is no longer required. No user identity or server-side browser store is
+created. The old shared store remains inaccessible through the app. Payloads are
+bounded to 2 MiB. Deployment upload allowlists exclude local records and tokens.
+After linking the service, deploy with `railway up --ci`.
 
-The hosted mode is deliberately an **open shared demo**. Its banner asks visitors
-to use sample data: everyone can view, modify and reset the shared shifts and
-settings. The deployment starts with its own empty store; local private records
-are excluded by `.gitignore`, `.railwayignore` and `.dockerignore`.
-
-Railway configuration:
-
-- One service/replica and a persistent volume mounted at `/data`.
-- `PORT=8080`, `TRACKER_DEMO=true`, `TRACKER_STORE_FILE=/data/shifts.store`.
-- `TRACKER_PUBLIC_ORIGIN` is the generated HTTPS URL (or use Railway's
-  `RAILWAY_PUBLIC_DOMAIN`). The existing Host, Origin and UI-header checks remain
-  enforced for the app; `/health` returns only readiness status.
-- The platform-provided `PORT` makes the server bind to `0.0.0.0`; local startup
-  without that variable remains `127.0.0.1:8765`.
-- In a Railway environment, startup fails if no persistent volume is attached or
-  the configured store is outside it. Store, metadata, lock and recovery journal
-  files all live together on that volume.
-
-After linking the Railway project/service, deploy with `railway up --ci`.
-The CLI upload includes only the application/build files listed in
-`.railwayignore`; logs, prompts, proofs, documentation caches and local data are
-not uploaded. Docker build context uses the matching `.dockerignore` allowlist.
-Local Railway account tokens and project linkage are not committed.
-
-For a local Linux container check on an amd64 Docker host:
+Regression checks:
 
 ```sh
-docker build --platform linux/amd64 -t cjr-shift .
-docker run --rm -p 8080:8080 -v cjr-shift-data:/data cjr-shift
+node --test work/UI/test_ui.mjs work/UI/test_storage.mjs
+python3 work/UI/test_browser_store.py
+python3 work/UI/test_server.py
+python3 work/UI/test_hosting.py
 ```
-
-The hosting-specific regression command is `python3 work/UI/test_hosting.py`.
-It checks public-origin restrictions, data-free health checks, demo disclosure,
-Railway port/domain selection and refusal to use an ephemeral store. Physical
-mobile-device testing and multi-user isolation are outside this shared demo.
-
-Records are assumed complete across assessment periods, including all employment.
-Gaps, including dates before the earliest shift, count as no work. Unknown
-classifications, unfinished shifts and unresolved elapsed times can still make
-a check incomplete. No separate history-completeness declaration is required.
-
-Secondary pages place their back action in the header, right-aligned beside
-the Shift logo. The report uses “change dates” to return to its date form.
 
 ## Regular overtime
 
@@ -298,3 +275,18 @@ supported.
 Start, stop, missed-shift and running-classification requests accept optional
 boolean `overtime`. State responses include `pendingOvertime` and an `overtime`
 map keyed by each midnight piece's start, matching `classifications`.
+
+## Grouped compliance findings
+
+The browser groups overlapping violation windows only when they have the same
+rule and error code. Each card shows the most severe window and the combined
+window span. Non-overlapping findings and incomplete checks remain separate.
+**Individual windows** expands the original periods and their results; weekly
+opt-out questions remain attached to their exact original reference periods.
+Work and rest durations appear in hours (up to two decimal places). The native
+validator and its raw findings are unchanged.
+
+On phones the app fills the browser viewport without the decorative device
+frame, fake status bar or home indicator. Safe-area spacing respects notches
+and real system controls. Desktop browsers retain the phone preview. Narrow
+viewports and touch devices up to 1024 px use the frameless layout.

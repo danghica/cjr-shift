@@ -1,24 +1,24 @@
-test_healthcheck_has_no_data_and_accepts_railway_health_host (__main__.HostedHTTPTests.test_healthcheck_has_no_data_and_accepts_railway_health_host) ... 127.0.0.1 - - [12/Nov/2026 13:18:48] "GET /health HTTP/1.1" 200 -
-127.0.0.1 - - [12/Nov/2026 13:18:48] "GET /api/state HTTP/1.1" 403 -
+test_healthcheck_has_no_data_and_accepts_railway_health_host (__main__.HostedHTTPTests.test_healthcheck_has_no_data_and_accepts_railway_health_host) ... 127.0.0.1 - - [12/Nov/2026 14:53:32] "GET /health HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 14:53:32] "GET /api/state HTTP/1.1" 403 -
 ok
-test_public_origin_demo_and_same_origin_write (__main__.HostedHTTPTests.test_public_origin_demo_and_same_origin_write) ... 127.0.0.1 - - [12/Nov/2026 13:18:48] "GET /api/state HTTP/1.1" 200 -
-127.0.0.1 - - [12/Nov/2026 13:18:48] "POST /api/start HTTP/1.1" 200 -
-127.0.0.1 - - [12/Nov/2026 13:18:48] "POST /api/stop HTTP/1.1" 403 -
-127.0.0.1 - - [12/Nov/2026 13:18:48] "GET /api/state HTTP/1.1" 403 -
-127.0.0.1 - - [12/Nov/2026 13:18:48] "POST /api/start HTTP/1.1" 403 -
+test_public_origin_demo_and_same_origin_write (__main__.HostedHTTPTests.test_public_origin_demo_and_same_origin_write) ... 127.0.0.1 - - [12/Nov/2026 14:53:33] "GET /api/state HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 14:53:33] "POST /api/start HTTP/1.1" 200 -
+127.0.0.1 - - [12/Nov/2026 14:53:33] "POST /api/stop HTTP/1.1" 403 -
+127.0.0.1 - - [12/Nov/2026 14:53:33] "GET /api/state HTTP/1.1" 403 -
+127.0.0.1 - - [12/Nov/2026 14:53:33] "POST /api/start HTTP/1.1" 403 -
 ok
 test_public_origin_must_be_an_origin (__main__.HostedHTTPTests.test_public_origin_must_be_an_origin) ... ok
 test_local_defaults_stay_on_loopback_without_demo (__main__.HostingConfigurationTests.test_local_defaults_stay_on_loopback_without_demo) ... Work tracker: http://127.0.0.1:8765
-Store: <MagicMock name='mock.tracker.repository.path' id='4476930768'>
+Store: <MagicMock name='mock.tracker.repository.path' id='4433480400'>
 ok
 test_railway_refuses_ephemeral_or_wrong_mount_store (__main__.HostingConfigurationTests.test_railway_refuses_ephemeral_or_wrong_mount_store) ... Attach a persistent Railway volume and put the store inside its mount path.
 Attach a persistent Railway volume and put the store inside its mount path.
 ok
 test_railway_uses_platform_port_volume_and_domain (__main__.HostingConfigurationTests.test_railway_uses_platform_port_volume_and_domain) ... Work tracker: https://shift.up.railway.app
-Store: <MagicMock name='mock.tracker.repository.path' id='4476059136'>
+Store: <MagicMock name='mock.tracker.repository.path' id='4432592384'>
 ok
 
 ----------------------------------------------------------------------
-Ran 6 tests in 1.883s
+Ran 6 tests in 1.873s
 
 OK

@@ -1,0 +1,305 @@
+[33mwarning[0m: unused import 'std.core.Array as CjrBuffer'
+ [36m==>[0m /Users/danghica/pandian/example/generics/extracted/generics.cj:2:1:
+  [36m| [0m
+[36m2[0m [36m| [0mimport std.core.Array as CjrBuffer[0m
+  [36m| [0m[33m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unused import[0m
+  [36m| [0m
+  [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+
+[33mwarning[0m: unused variable:'u'
+  [36m==>[0m /Users/danghica/pandian/example/generics/test/generics_test.cj:81:34:
+   [36m| [0m
+[36m81[0m [36m| [0m        let result = strictAnd({ u: Unit =>[0m
+   [36m| [0m                                 [33m^ unused variable[0m
+   [36m| [0m
+   [36m#[0m [0mnote[0m: this warning can be suppressed by setting the compiler option `-Woff unused`
+[34mnote[0m: the warning occurs after the macro is expanded
+  [36m==>[0m /Users/danghica/pandian/example/generics/test/generics_test.cj:6:1:
+   [36m| [0m
+[36m6[0m  [36m| [0m  @Test[0m
+   [36m| [0m [34m_[0m[34m^[0m
+[36m7[0m  [36m| [0m[34m|[0m class GenericsTests {[0m
+   [36m| [0m[34m|[0m ...[0m
+[36m95[0m [36m| [0m[34m|[0m }[0m
+   [36m| [0m[34m|[0m[34m_[0m[34m^[0m
+   [36m| [0m
+[34mnote[0m: the code after the macro is expanded as follows
+    [36m| [0m
+    [36m| [0m  /* 6.1 */@Attribute[TEST_GENERATED] class GenericsTests <: TestClass {[0m
+    [36m| [0m [34m_[0m[34m^[0m
+    [36m| [0m[34m|[0m /* 6.2 */    @Attribute[TestCase_0][0m
+    [36m| [0m[34m|[0m /* 6.3 */    func identityTypes(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.4 */        expectEqual("genericId < Int64 >(42)", "42", genericId < Int64 >(42), 42, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.5 */        expectEqual("genericId < Bool >(true)", "true", genericId < Bool >(true), true, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.6 */        expectEqual("genericIdAgain < Int64 >(- 17)", "- 17", genericIdAgain < Int64 >(- 17), - 17, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.7 */        expectEqual("genericIdAgain < Bool >(false)", "false", genericIdAgain < Bool >(false), false, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.8 */    }[0m
+    [36m| [0m[34m|[0m /* 6.9 */    [0m
+    [36m| [0m[34m|[0m /* 6.10 */    @Attribute[TestCase_1][0m
+    [36m| [0m[34m|[0m /* 6.11 */    func heterogeneousPair(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.12 */        let p = makePair < Int64, Bool >(7, true)[0m
+    [36m| [0m[34m|[0m /* 6.13 */        expectEqual("firstOf < Int64, Bool >(p)", "7", firstOf < Int64, Bool >(p), 7, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.14 */        expectEqual("secondOf < Int64, Bool >(p)", "true", secondOf < Int64, Bool >(p), true, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.15 */        let q = Pair < Bool, Int64 >(false, - 3)[0m
+    [36m| [0m[34m|[0m /* 6.16 */        expectEqual("firstOf < Bool, Int64 >(q)", "false", firstOf < Bool, Int64 >(q), false, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.17 */        expectEqual("secondOf < Bool, Int64 >(q)", "- 3", secondOf < Bool, Int64 >(q), - 3, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.18 */    }[0m
+    [36m| [0m[34m|[0m /* 6.19 */    [0m
+    [36m| [0m[34m|[0m /* 6.20 */    @Attribute[TestCase_2][0m
+    [36m| [0m[34m|[0m /* 6.21 */    func boxRead(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.22 */        expectEqual("makeBox < Int64 >(23).get()", "23", makeBox < Int64 >(23).get(), 23, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.23 */        expectEqual("Box < Bool >(false).get()", "false", Box < Bool >(false).get(), false, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.24 */    }[0m
+    [36m| [0m[34m|[0m /* 6.25 */    [0m
+    [36m| [0m[34m|[0m /* 6.26 */    @Attribute[TestCase_3][0m
+    [36m| [0m[34m|[0m /* 6.27 */    func mapChangesType(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.28 */        let b = Box < Int64 >(5)[0m
+    [36m| [0m[34m|[0m /* 6.29 */        let c = b.map < Bool >({ x: Int64 =>[0m
+    [36m| [0m[34m|[0m /* 6.30 */            x > 0[0m
+    [36m| [0m[34m|[0m /* 6.31 */        })[0m
+    [36m| [0m[34m|[0m /* 6.32 */        expectEqual("c.get()", "true", c.get(), true, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.33 */        expectEqual("b.get()", "5", b.get(), 5, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.34 */        expectEqual("Box < Int64 >(- 1).map < Bool >({ x: Int64 =>\n    x > 0\n}).get()", "false", Box < Int64 >(- 1).map < Bool >({ x: Int64 =>[0m
+    [36m| [0m[34m|[0m /* 6.35 */            x > 0[0m
+    [36m| [0m[34m|[0m /* 6.36 */        }).get(), false, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.37 */    }[0m
+    [36m| [0m[34m|[0m /* 6.38 */    [0m
+    [36m| [0m[34m|[0m /* 6.39 */    @Attribute[TestCase_4][0m
+    [36m| [0m[34m|[0m /* 6.40 */    func extractedLambdaAndLet(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.41 */        expectEqual("positiveBox(3)", "true", positiveBox(3), true, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.42 */        expectEqual("positiveBox(0)", "true", positiveBox(0), true, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.43 */        expectEqual("positiveBox(- 1)", "false", positiveBox(- 1), false, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.44 */    }[0m
+    [36m| [0m[34m|[0m /* 6.45 */    [0m
+    [36m| [0m[34m|[0m /* 6.46 */    @Attribute[TestCase_5][0m
+    [36m| [0m[34m|[0m /* 6.47 */    func mapComposition(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.48 */        let b = Box < Int64 >(4)[0m
+    [36m| [0m[34m|[0m /* 6.49 */        let c = b.map < Int64 >({ x: Int64 =>[0m
+    [36m| [0m[34m|[0m /* 6.50 */            x + 3[0m
+    [36m| [0m[34m|[0m /* 6.51 */        }).map < Int64 >({ x: Int64 =>[0m
+    [36m| [0m[34m|[0m /* 6.52 */            x * 2[0m
+    [36m| [0m[34m|[0m /* 6.53 */        })[0m
+    [36m| [0m[34m|[0m /* 6.54 */        expectEqual("c.get()", "14", c.get(), 14, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.55 */        expectEqual("b.get()", "4", b.get(), 4, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.56 */    }[0m
+    [36m| [0m[34m|[0m /* 6.57 */    [0m
+    [36m| [0m[34m|[0m /* 6.58 */    @Attribute[TestCase_6][0m
+    [36m| [0m[34m|[0m /* 6.59 */    func nestedInstances(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.60 */        let p = Pair < Int64, Bool >(8, true)[0m
+    [36m| [0m[34m|[0m /* 6.61 */        let b = genericId < Box < Pair < Int64, Bool >>>(Box < Pair < Int64, Bool >>(p))[0m
+    [36m| [0m[34m|[0m /* 6.62 */        expectEqual("firstOf < Int64, Bool >(b.get())", "8", firstOf < Int64, Bool >(b.get()), 8, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.63 */        expectEqual("secondOf < Int64, Bool >(b.get())", "true", secondOf < Int64, Bool >(b.get()), true, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.64 */        let c = b.map < Box < Bool >>({ x: Pair < Int64, Bool > =>[0m
+    [36m| [0m[34m|[0m /* 6.65 */            Box < Bool >(x.second)[0m
+    [36m| [0m[34m|[0m /* 6.66 */        })[0m
+    [36m| [0m[34m|[0m /* 6.67 */        expectEqual("c.get().get()", "true", c.get().get(), true, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.68 */    }[0m
+    [36m| [0m[34m|[0m /* 6.69 */    [0m
+    [36m| [0m[34m|[0m /* 6.70 */    @Attribute[TestCase_7][0m
+    [36m| [0m[34m|[0m /* 6.71 */    func sameShapeDifferentNames(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.72 */        let p = OtherPair < Bool, Int64 >(true, 11)[0m
+    [36m| [0m[34m|[0m /* 6.73 */        let q = Pair < Bool, Int64 >(false, 19)[0m
+    [36m| [0m[34m|[0m /* 6.74 */        expectEqual("p.left", "true", p.left, true, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.75 */        expectEqual("p.right", "11", p.right, 11, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.76 */        expectEqual("q.first", "false", q.first, false, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.77 */        expectEqual("q.second", "19", q.second, 19, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.78 */        expectEqual("OtherBox < Int64 >(17).item", "17", OtherBox < Int64 >(17).item, 17, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.79 */        expectEqual("Box < Int64 >(18).get()", "18", Box < Int64 >(18).get(), 18, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.80 */    }[0m
+    [36m| [0m[34m|[0m /* 6.81 */    [0m
+    [36m| [0m[34m|[0m /* 6.82 */    @Attribute[TestCase_8][0m
+    [36m| [0m[34m|[0m /* 6.83 */    func eagerBooleanOperands(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.84 */        let counter = GenericCounter()[0m
+    [36m| [0m[34m|[0m /* 6.85 */        let result = strictAnd({ u: Unit =>[0m
+    [36m| [0m[34m|[0m /* 6.86 */            counter.count += 1[0m
+    [36m| [0m[34m|[0m /* 6.87 */            true[0m
+    [36m| [0m[34m|[0m /* 6.88 */        })[0m
+    [36m| [0m[34m|[0m /* 6.89 */        expectEqual("result", "false", result, false, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.90 */        expectEqual("counter.count", "1", counter.count, 1, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.91 */    }[0m
+    [36m| [0m[34m|[0m /* 6.92 */    [0m
+    [36m| [0m[34m|[0m /* 6.93 */    @Attribute[TestCase_9][0m
+    [36m| [0m[34m|[0m /* 6.94 */    func recursiveGenericFunction(): Unit {[0m
+    [36m| [0m[34m|[0m /* 6.95 */        expectEqual("repeatIdentity < Int64 >(71, 0)", "71", repeatIdentity < Int64 >(71, 0), 71, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.96 */        expectEqual("repeatIdentity < Bool >(false, 5)", "false", repeatIdentity < Bool >(false, 5), false, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.97 */        expectEqual("repeatIdentity < Pair < Int64, Bool >>(Pair < Int64, Bool >(3, true), 7).first", "3", repeatIdentity < Pair < Int64, Bool >>(Pair < Int64, Bool >(3, true), 7).first, 3, isDelta: false)[0m
+    [36m| [0m[34m|[0m /* 6.98 */    }[0m
+    [36m| [0m[34m|[0m /* 6.99 */    [0m
+    [36m| [0m[34m|[0m /* 6.100 */    init() {[0m
+    [36m| [0m[34m|[0m /* 6.101 */    }[0m
+    [36m| [0m[34m|[0m /* 6.102 */    private func classConfiguration(): Configuration {[0m
+    [36m| [0m[34m|[0m /* 6.103 */        let configuration = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.104 */        [0m
+    [36m| [0m[34m|[0m /* 6.105 */        return configuration[0m
+    [36m| [0m[34m|[0m /* 6.106 */    }[0m
+    [36m| [0m[34m|[0m /* 6.107 */    public override func asTestSuite(): TestSuite {[0m
+    [36m| [0m[34m|[0m /* 6.108 */        [0m
+    [36m| [0m[34m|[0m /* 6.109 */        let suiteConfiguration = classConfiguration()[0m
+    [36m| [0m[34m|[0m /* 6.110 */        let suiteBuilder = TestSuite.builder("GenericsTests").configure(suiteConfiguration)[0m
+    [36m| [0m[34m|[0m /* 6.111 */        [0m
+    [36m| [0m[34m|[0m /* 6.112 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.113 */            [0m
+    [36m| [0m[34m|[0m /* 6.114 */            let identityTypesTestFunc = { => identityTypes();() }[0m
+    [36m| [0m[34m|[0m /* 6.115 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.116 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.117 */            "identityTypes",[0m
+    [36m| [0m[34m|[0m /* 6.118 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.119 */            body: identityTypesTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.120 */            )[0m
+    [36m| [0m[34m|[0m /* 6.121 */            )[0m
+    [36m| [0m[34m|[0m /* 6.122 */            [0m
+    [36m| [0m[34m|[0m /* 6.123 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.124 */        [0m
+    [36m| [0m[34m|[0m /* 6.125 */        [0m
+    [36m| [0m[34m|[0m /* 6.126 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.127 */            [0m
+    [36m| [0m[34m|[0m /* 6.128 */            let heterogeneousPairTestFunc = { => heterogeneousPair();() }[0m
+    [36m| [0m[34m|[0m /* 6.129 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.130 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.131 */            "heterogeneousPair",[0m
+    [36m| [0m[34m|[0m /* 6.132 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.133 */            body: heterogeneousPairTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.134 */            )[0m
+    [36m| [0m[34m|[0m /* 6.135 */            )[0m
+    [36m| [0m[34m|[0m /* 6.136 */            [0m
+    [36m| [0m[34m|[0m /* 6.137 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.138 */        [0m
+    [36m| [0m[34m|[0m /* 6.139 */        [0m
+    [36m| [0m[34m|[0m /* 6.140 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.141 */            [0m
+    [36m| [0m[34m|[0m /* 6.142 */            let boxReadTestFunc = { => boxRead();() }[0m
+    [36m| [0m[34m|[0m /* 6.143 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.144 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.145 */            "boxRead",[0m
+    [36m| [0m[34m|[0m /* 6.146 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.147 */            body: boxReadTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.148 */            )[0m
+    [36m| [0m[34m|[0m /* 6.149 */            )[0m
+    [36m| [0m[34m|[0m /* 6.150 */            [0m
+    [36m| [0m[34m|[0m /* 6.151 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.152 */        [0m
+    [36m| [0m[34m|[0m /* 6.153 */        [0m
+    [36m| [0m[34m|[0m /* 6.154 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.155 */            [0m
+    [36m| [0m[34m|[0m /* 6.156 */            let mapChangesTypeTestFunc = { => mapChangesType();() }[0m
+    [36m| [0m[34m|[0m /* 6.157 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.158 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.159 */            "mapChangesType",[0m
+    [36m| [0m[34m|[0m /* 6.160 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.161 */            body: mapChangesTypeTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.162 */            )[0m
+    [36m| [0m[34m|[0m /* 6.163 */            )[0m
+    [36m| [0m[34m|[0m /* 6.164 */            [0m
+    [36m| [0m[34m|[0m /* 6.165 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.166 */        [0m
+    [36m| [0m[34m|[0m /* 6.167 */        [0m
+    [36m| [0m[34m|[0m /* 6.168 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.169 */            [0m
+    [36m| [0m[34m|[0m /* 6.170 */            let extractedLambdaAndLetTestFunc = { => extractedLambdaAndLet();() }[0m
+    [36m| [0m[34m|[0m /* 6.171 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.172 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.173 */            "extractedLambdaAndLet",[0m
+    [36m| [0m[34m|[0m /* 6.174 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.175 */            body: extractedLambdaAndLetTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.176 */            )[0m
+    [36m| [0m[34m|[0m /* 6.177 */            )[0m
+    [36m| [0m[34m|[0m /* 6.178 */            [0m
+    [36m| [0m[34m|[0m /* 6.179 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.180 */        [0m
+    [36m| [0m[34m|[0m /* 6.181 */        [0m
+    [36m| [0m[34m|[0m /* 6.182 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.183 */            [0m
+    [36m| [0m[34m|[0m /* 6.184 */            let mapCompositionTestFunc = { => mapComposition();() }[0m
+    [36m| [0m[34m|[0m /* 6.185 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.186 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.187 */            "mapComposition",[0m
+    [36m| [0m[34m|[0m /* 6.188 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.189 */            body: mapCompositionTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.190 */            )[0m
+    [36m| [0m[34m|[0m /* 6.191 */            )[0m
+    [36m| [0m[34m|[0m /* 6.192 */            [0m
+    [36m| [0m[34m|[0m /* 6.193 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.194 */        [0m
+    [36m| [0m[34m|[0m /* 6.195 */        [0m
+    [36m| [0m[34m|[0m /* 6.196 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.197 */            [0m
+    [36m| [0m[34m|[0m /* 6.198 */            let nestedInstancesTestFunc = { => nestedInstances();() }[0m
+    [36m| [0m[34m|[0m /* 6.199 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.200 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.201 */            "nestedInstances",[0m
+    [36m| [0m[34m|[0m /* 6.202 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.203 */            body: nestedInstancesTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.204 */            )[0m
+    [36m| [0m[34m|[0m /* 6.205 */            )[0m
+    [36m| [0m[34m|[0m /* 6.206 */            [0m
+    [36m| [0m[34m|[0m /* 6.207 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.208 */        [0m
+    [36m| [0m[34m|[0m /* 6.209 */        [0m
+    [36m| [0m[34m|[0m /* 6.210 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.211 */            [0m
+    [36m| [0m[34m|[0m /* 6.212 */            let sameShapeDifferentNamesTestFunc = { => sameShapeDifferentNames();() }[0m
+    [36m| [0m[34m|[0m /* 6.213 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.214 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.215 */            "sameShapeDifferentNames",[0m
+    [36m| [0m[34m|[0m /* 6.216 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.217 */            body: sameShapeDifferentNamesTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.218 */            )[0m
+    [36m| [0m[34m|[0m /* 6.219 */            )[0m
+    [36m| [0m[34m|[0m /* 6.220 */            [0m
+    [36m| [0m[34m|[0m /* 6.221 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.222 */        [0m
+    [36m| [0m[34m|[0m /* 6.223 */        [0m
+    [36m| [0m[34m|[0m /* 6.224 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.225 */            [0m
+    [36m| [0m[34m|[0m /* 6.226 */            let eagerBooleanOperandsTestFunc = { => eagerBooleanOperands();() }[0m
+    [36m| [0m[34m|[0m /* 6.227 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.228 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.229 */            "eagerBooleanOperands",[0m
+    [36m| [0m[34m|[0m /* 6.230 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.231 */            body: eagerBooleanOperandsTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.232 */            )[0m
+    [36m| [0m[34m|[0m /* 6.233 */            )[0m
+    [36m| [0m[34m|[0m /* 6.234 */            [0m
+    [36m| [0m[34m|[0m /* 6.235 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.236 */        [0m
+    [36m| [0m[34m|[0m /* 6.237 */        [0m
+    [36m| [0m[34m|[0m /* 6.238 */        { => let caseConfig = Configuration()[0m
+    [36m| [0m[34m|[0m /* 6.239 */            [0m
+    [36m| [0m[34m|[0m /* 6.240 */            let recursiveGenericFunctionTestFunc = { => recursiveGenericFunction();() }[0m
+    [36m| [0m[34m|[0m /* 6.241 */            suiteBuilder.add([0m
+    [36m| [0m[34m|[0m /* 6.242 */            UnitTestCase.create([0m
+    [36m| [0m[34m|[0m /* 6.243 */            "recursiveGenericFunction",[0m
+    [36m| [0m[34m|[0m /* 6.244 */            configuration: caseConfig,[0m
+    [36m| [0m[34m|[0m /* 6.245 */            body: recursiveGenericFunctionTestFunc[0m
+    [36m| [0m[34m|[0m /* 6.246 */            )[0m
+    [36m| [0m[34m|[0m /* 6.247 */            )[0m
+    [36m| [0m[34m|[0m /* 6.248 */            [0m
+    [36m| [0m[34m|[0m /* 6.249 */        }()[0m
+    [36m| [0m[34m|[0m /* 6.250 */        [0m
+    [36m| [0m[34m|[0m /* 6.251 */        return suiteBuilder.build()[0m
+    [36m| [0m[34m|[0m /* 6.252 */    }[0m
+    [36m| [0m[34m|[0m /* 6.253 */    private func inheritedFromClassAnnotatedByTestTemplate < T >(): TestSuite where T <: TestClass {[0m
+    [36m| [0m[34m|[0m /* 6.254 */        throw Exception("Unreachable code")[0m
+    [36m| [0m[34m|[0m /* 6.255 */    }[0m
+    [36m| [0m[34m|[0m /* 6.256 */}[0m
+    [36m| [0m[34m|[0m /* 6.257 */[0m
+    [36m| [0m[34m|[0m /* 6.258 */[0m
+    [36m| [0m[34m|[0m /* 6.259 */interface TestPackageExtension_GenericsTests {[0m
+    [36m| [0m[34m|[0m /* 6.260 */    func registerGenericsTests(): Unit[0m
+    [36m| [0m[34m|[0m /* 6.261 */}[0m
+    [36m| [0m[34m|[0m /* 6.262 */extend TestPackage <: TestPackageExtension_GenericsTests {[0m
+    [36m| [0m[34m|[0m /* 6.263 */    @Attribute[TEST_REGISTER][0m
+    [36m| [0m[34m|[0m /* 6.264 */    public func registerGenericsTests() {[0m
+    [36m| [0m[34m|[0m /* 6.265 */        registerSuite({ => GenericsTests().asTestSuite() })[0m
+    [36m| [0m[34m|[0m /* 6.266 */    }[0m
+    [36m| [0m[34m|[0m /* 6.267 */}[0m
+    [36m| [0m[34m|[0m /* 6.268 */[0m
+    [36m| [0m[34m|[0m[34m_[0m[34m__________^[0m
+    [36m| [0m
+[34mnote[0m: which is expanded as follows
+   [36m| [0m
+   [36m| [0m/* 6.85 */        let result = strictAnd({ u: Unit =>[0m
+   [36m| [0m                                           [34m^ [0m
+   [36m| [0m
+
+2 warnings generated, 2 warnings printed.

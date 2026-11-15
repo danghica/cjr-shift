@@ -4,13 +4,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
 
 from tools.rocq_readable.ast import Declaration
-from tools.rocq_readable.history import (added_records, backwards, collect, extract_commit, git,
-                                        panel, patch_hunks, records)
+from tools.rocq_readable.history import (added_records, backwards, blob, collect, extract_commit,
+                                        failure_detail, git, panel, patch_hunks, records)
 from tools.rocq_readable.html import page
 from tools.rocq_readable.layout import leaf
 from tools.rocq_readable.project import Glob, Source
@@ -136,6 +137,45 @@ class GitHistoryTests(unittest.TestCase):
         self.assertEqual(actual["Test.a"]["entries"], expected["Test.a"]["entries"])
         self.assertFalse(actual["Test.a"]["complete"])
 
+    def test_failed_source_lookup_is_retried_without_a_source_or_head_change(self):
+        def unavailable(repo, revision, path):
+            if path == "test.v":
+                raise subprocess.CalledProcessError(128, ["git", "show", revision + ":" + path],
+                                                    stderr=b"fatal: temporary object lookup failure\n")
+            return blob(repo, revision, path)
+        with patch("tools.rocq_readable.history.blob", side_effect=unavailable):
+            failed = collect([self.source()])["Test.a"]
+        self.assertFalse(failed["complete"])
+        self.assertIn("git show exited with status 128: fatal: temporary object lookup failure", failed["issues"][0])
+        self.assertIn("No prompts could be attributed from the available history.", panel(failed))
+        recovered = collect([self.source()])["Test.a"]
+        self.assertTrue(recovered["complete"])
+        self.assertEqual(recovered["entries"][0]["commit"], self.initial)
+
+    def test_old_cached_lookup_failure_is_discarded(self):
+        expected = collect([self.source()])
+        cache = self.root / "build/prompt-history.json"
+        data = json.loads(cache.read_text())
+        for value in data["associations"].values():
+            value.update(entries=[], issues=["Cannot map this source to its committed version."])
+        cache.write_text(json.dumps(data))
+        self.assertEqual(collect([self.source()]), expected)
+
+    def test_refresh_failure_identifies_operation_and_recovers(self):
+        expected = collect([self.source()])
+        error = subprocess.CalledProcessError(128, ["git", "rev-parse", "HEAD"],
+                                             stderr=b"fatal: unavailable repository\nextra diagnostics")
+        with patch("tools.rocq_readable.history.update_stream", side_effect=error):
+            failed = collect([self.source()])["Test.a"]
+        self.assertEqual(failed["entries"], expected["Test.a"]["entries"])
+        self.assertIn("Git history refresh failed (git rev-parse exited with status 128: fatal: unavailable repository)",
+                      failed["issues"][0])
+        self.assertNotIn("extra diagnostics", failed["issues"][0])
+        self.assertEqual(collect([self.source()]), expected)
+        self.assertIn("timed out after 60 seconds", failure_detail(subprocess.TimeoutExpired(["git"], 60)))
+        self.assertEqual(failure_detail(FileNotFoundError(2, "No such file", "/private/original/migration-manifest.json")),
+                         "No such file: migration-manifest.json")
+
     def test_shallow_checkout_can_be_deepened_without_head_change(self):
         (self.root / "test.v").write_text(A + B.replace("exact I", "now exact I"))
         self.commit("latest proof", ["Latest prompt"])
@@ -222,12 +262,33 @@ class GitHistoryTests(unittest.TestCase):
         result = collect([self.source(root=child)], history_repository=self.root)
         self.assertEqual([e["commit"] for e in result["Test.a"]["entries"]], [self.initial])
         self.assertTrue(result["Test.a"]["complete"])
+        cache_path = child / "build/prompt-history.json"
+        stale = json.loads(cache_path.read_text())
+        stale["bridge"]["root"] = "0" * 40
+        cache_path.write_text(json.dumps(stale))
+        with patch("tools.rocq_readable.history.extract_commit", side_effect=AssertionError("re-extracted")):
+            self.assertEqual(result, collect([self.source(root=child)], history_repository=self.root))
         shutil.rmtree(self.root / ".git")
         with patch("tools.rocq_readable.history.extract_commit", side_effect=AssertionError("re-extracted")):
             cached = collect([self.source(root=child)])
         self.assertEqual(result, cached)
         cache = json.loads((child / "build/prompt-history.json").read_text())
         self.assertEqual(cache["primary"]["commits"][0]["prompts"], [])
+
+    def test_migration_uses_repository_identity_in_a_renamed_checkout(self):
+        child = Path(self.tmp.name) / "renamed-checkout"
+        child.mkdir()
+        self.init(child)
+        (child / "logs").mkdir()
+        shutil.copyfile(self.root / "logs/prompts.txt", child / "logs/prompts.txt")
+        shutil.copyfile(self.root / "test.v", child / "test.v")
+        (child / "repository.json").write_text(json.dumps({"name": "original-child", "checkpoint": self.initial}))
+        self.commit("split baseline", root=child)
+        (self.root / "migration-manifest.json").write_text(json.dumps({"checkpoint": self.initial, "files": [
+            {"source": "test.v", "destinations": ["original-child/test.v"]}]}))
+        result = collect([self.source(root=child)], history_repository=self.root)["Test.a"]
+        self.assertTrue(result["complete"], result["issues"])
+        self.assertEqual([e["commit"] for e in result["entries"]], [self.initial])
 
     def test_refresh_preserves_all_existing_content_and_explanations(self):
         source = self.source()

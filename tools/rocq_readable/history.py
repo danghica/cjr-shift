@@ -18,6 +18,7 @@ import tempfile
 
 
 VERSION = 1
+MAPPING_FAILURE = "Cannot map this source to its committed version"
 STAMP = re.compile(r"^\[(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d+)?(?:Z|[+-]\d\d:\d\d))\]\n", re.M)
 HUNK = re.compile(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@", re.M)
 
@@ -26,6 +27,24 @@ def git(repo, *args, input=None):
     return subprocess.run(["git", "--no-pager", "-C", str(repo), *args], input=input,
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True,
                           timeout=60).stdout.decode("utf-8")
+
+
+def failure_detail(error):
+    """Describe the failed operation without including full command output."""
+    if isinstance(error, subprocess.TimeoutExpired):
+        return f"Git command timed out after {error.timeout:g} seconds"
+    if isinstance(error, subprocess.CalledProcessError):
+        args = error.cmd if isinstance(error.cmd, (tuple, list)) else []
+        operation = next((a for a in args if a in {"show", "diff", "rev-list", "rev-parse", "hash-object"}), "command")
+        reason = error.stderr or ""
+        if isinstance(reason, bytes):
+            reason = reason.decode("utf-8", errors="replace")
+        reason = reason.strip().splitlines()[0][:300] if reason.strip() else ""
+        return f"git {operation} exited with status {error.returncode}" + (f": {reason}" if reason else "")
+    if isinstance(error, OSError):
+        filename = Path(error.filename).name if error.filename else None
+        return (error.strerror or type(error).__name__) + (f": {filename}" if filename else "")
+    return str(error) or type(error).__name__
 
 
 def records(text):
@@ -192,10 +211,12 @@ def bridge(repo, origin, checkpoint, primary):
         raise ValueError("migration checkpoint mismatch")
     root_commit = primary["commits"][0]["commit"]
     paths = {c["new"] for c in primary["commits"][0]["changes"] if c["new"]}
+    settings = json.loads((repo / "repository.json").read_text())
+    identity = settings.get("name") or repo.name
     mapping = {}
     for entry in manifest["files"]:
         for destination in entry["destinations"]:
-            prefix = repo.name + "/"
+            prefix = identity + "/"
             if destination.startswith(prefix) and destination[len(prefix):] in paths:
                 path = destination[len(prefix):]
                 before = blob(origin, checkpoint, entry["source"])
@@ -322,8 +343,8 @@ def collect(sources, cache=None, history_repository=None):
     checkpoint = migration(repo)
     try:
         data["primary"] = update_stream(repo, data.get("primary"), baseline=bool(checkpoint))
-    except (OSError, subprocess.SubprocessError):
-        problems.append("Git history is unavailable; showing cached evidence where available.")
+    except (OSError, subprocess.SubprocessError) as error:
+        problems.append("Git history refresh failed (" + failure_detail(error) + "); showing cached evidence where available.")
     primary = data.get("primary")
     if primary and primary["shallow"]:
         problems.append("The checkout is shallow; earlier commits may be missing.")
@@ -333,14 +354,16 @@ def collect(sources, cache=None, history_repository=None):
         if (cached_bridge.get("checkpoint") != checkpoint or
                 cached_bridge.get("root") != primary["commits"][0]["commit"]):
             data.pop("bridge", None)
-            data.pop("origin", None)
+            if cached_bridge.get("checkpoint") != checkpoint:
+                data.pop("origin", None)
         if not data.get("bridge"):
             try:
-                origin_stream = update_stream(origin, None, checkpoint)
+                origin_stream = update_stream(origin, data.get("origin"), checkpoint)
                 migration_bridge = bridge(repo, origin, checkpoint, primary)
                 data.update(origin=origin_stream, bridge=migration_bridge)
-            except (OSError, ValueError, KeyError, subprocess.SubprocessError):
-                problems.append("Pre-split history is unavailable; supply --history-repository with the original checkout.")
+            except (OSError, ValueError, KeyError, subprocess.SubprocessError) as error:
+                problems.append("Pre-split history could not be loaded (" + failure_detail(error) +
+                                "); supply --history-repository with the original checkout.")
         elif data.get("origin", {}).get("shallow"):
             try:
                 data["origin"] = update_stream(origin, data["origin"], checkpoint)
@@ -359,10 +382,13 @@ def collect(sources, cache=None, history_repository=None):
             signature = [path, digest, ranges, revisions, data.get("bridge")]
             key = decl.identity + ":" + hashlib.sha256(json.dumps(signature, sort_keys=True).encode()).hexdigest()
             saved = data["associations"].get(key)
-            if saved and isinstance(saved, dict) and isinstance(saved.get("entries"), list) and isinstance(saved.get("issues"), list):
+            if (saved and isinstance(saved, dict) and isinstance(saved.get("entries"), list)
+                    and isinstance(saved.get("issues"), list)
+                    and not any(issue.startswith(MAPPING_FAILURE) for issue in saved["issues"])):
                 record = saved
             else:
                 entries, issues = [], []
+                cacheable = True
                 tracked_path = path
                 if primary:
                     try:
@@ -373,8 +399,9 @@ def collect(sources, cache=None, history_repository=None):
                             ranges = []
                         elif not ranges:
                             issues.append("This definition has no committed counterpart yet.")
-                    except (OSError, subprocess.SubprocessError):
-                        issues.append("Cannot map this source to its committed version.")
+                    except (OSError, subprocess.SubprocessError) as error:
+                        issues.append(MAPPING_FAILURE + " (" + failure_detail(error) + ").")
+                        cacheable = False
                         ranges = []
                     if ranges:
                         tracked_path, ranges, trace_issues = trace(path, ranges, primary["commits"], entries, skip_root=bool(checkpoint))
@@ -395,14 +422,15 @@ def collect(sources, cache=None, history_repository=None):
                 # versions of this declaration after source or ancestry changes.
                 for stale in [k for k in data["associations"] if k.startswith(decl.identity + ":")]:
                     del data["associations"][stale]
-                data["associations"][key] = record
+                if cacheable:
+                    data["associations"][key] = record
             issues = list(dict.fromkeys([*problems, *record["issues"]]))
             result[decl.identity] = {"entries": record["entries"], "issues": issues, "complete": not issues}
     try:
         atomic_cache(cache, data)
-    except OSError:
+    except OSError as error:
         for record in result.values():
-            record["issues"].append("History cache could not be saved.")
+            record["issues"].append("History cache could not be saved (" + failure_detail(error) + ").")
             record["complete"] = False
     return result
 
@@ -414,7 +442,8 @@ def panel(record=None):
     if not record["complete"]:
         body += '<p class="notice">History incomplete: ' + html.escape(" ".join(record["issues"])) + '</p>'
     if not record["entries"]:
-        body += '<p class="meta">No recorded prompts found.</p>'
+        body += '<p class="meta">' + ("No recorded prompts found." if record["complete"] else
+                                      "No prompts could be attributed from the available history.") + '</p>'
     for entry in record["entries"]:
         body += '<section class="history-entry"><h3>' + html.escape(entry["subject"]) + '</h3>'
         body += '<p class="meta">Commit <code>' + html.escape(entry["commit"][:12]) + '</code> · ' + html.escape(entry["date"]) + '</p>'

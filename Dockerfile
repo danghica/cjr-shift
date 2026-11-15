@@ -30,7 +30,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 ca-certificates tzdata libstdc++6 && rm -rf /var/lib/apt/lists/*
-ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PORT=8080 TRACKER_HOST=0.0.0.0 TRACKER_DEMO=true TRACKER_STORE_FILE=/data/shifts.store
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PORT=8080 TRACKER_HOST=0.0.0.0 TRACKER_DEMO=false TRACKER_STORE_FILE=/data/shifts.store
 ENV LD_LIBRARY_PATH=/opt/cangjie/runtime/lib/linux_x86_64_cjnative
 WORKDIR /app
 COPY --from=native-build /opt/cangjie/runtime/lib/linux_x86_64_cjnative /opt/cangjie/runtime/lib/linux_x86_64_cjnative

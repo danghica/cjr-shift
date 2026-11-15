@@ -26,7 +26,7 @@
           <div class="menu" id="menu" role="menu" hidden><button id="missed-menu" role="menuitem"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v18H7zM10 8h4M10 12h4M10 16h2"/></svg>missed shift</button><button id="compliance-menu" role="menuitem">✓ compliance</button><button id="settings-menu" role="menuitem">⚙ settings</button><button id="reset-menu" role="menuitem"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13M10 10v6M14 10v6"/></svg>reset</button></div>
         </div>
       </header>
-      <p class="demo-notice" id="demo-notice" role="status" hidden>Shared public demo · use sample data. Everyone can view and change these shifts.</p>
+      <p class="demo-notice" id="demo-notice" role="status" hidden>Saved in this browser only. Clearing site data removes your records. Compliance checks use the server.</p>
       <div id="error" class="error-banner" role="alert" hidden><span id="error-message"></span><button id="retry" type="button">retry</button></div>
       <section id="home" class="page home-page" aria-labelledby="home-title">
         <div class="home-heading"><p class="eyebrow" id="today-date">YOUR TIME, WELL SPENT</p><h1 id="home-title">Ready when<br>you are.</h1><p class="heading-note" id="status-note">A fresh moment to focus.</p></div>
@@ -74,7 +74,7 @@
           <div class="date-field" id="fortnight-field" hidden><label for="fortnight-start">Fortnight starts</label><input id="fortnight-start" class="request-control" type="date" min="0001-01-01" max="9999-12-31"><small>Choose the Monday starting a fortnight.</small></div>
           <div class="date-field"><label for="night-worker">Night worker</label><select id="night-worker" class="request-control"><option value="">Not set</option><option value="true">Yes</option><option value="false">No</option></select><small>Regular night-worker status; an occasional late shift alone does not establish this.</small></div>
           <div class="date-field"><label for="hazardous-night">Hazardous night work</label><select id="hazardous-night" class="request-control"><option value="">Not set</option><option value="true">Yes</option><option value="false">No</option></select><small>Work involving special hazards or heavy physical or mental strain during night work.</small></div>
-          <p class="form-note">Great Britain · ordinary adult rules · 17-week reference period. All employment is assumed recorded. Normal hours for average night work are not assumed.</p>
+          <p class="form-note">Great Britain · ordinary adult rules · 17-week reference period. All employment is assumed recorded. Regular overtime counts as normal hours.</p>
           <button class="add-button request-control" type="submit">save <span aria-hidden="true">↗</span></button><p id="settings-status" role="status" class="form-note"></p>
         </form>
       </section>

@@ -12,7 +12,7 @@ PUBLIC={
 'Contracts':[],
 'Operations':[],
 'Public':[],
-'Validation':[],
+'Validation':['first_violation_zero_or_error','first_violation_detects_error','summary_preserves_error','daily_rest_under_eleven_hours_finding','insufficient_daily_rest_returns_error','longest_rest_between_covering_shifts','short_inter_shift_gap_returns_error','short_gap_alone_can_pass'],
 'Storage':[],
 'WorkingTimeModel':[],
 'WorkingTimeSource':[],
@@ -30,11 +30,11 @@ def main():
         if p.returncode:raise RuntimeError('failed: '+' '.join(map(str,args)))
         return p.stdout+p.stderr
     try:
-        sources=[HERE/(n+'.v') for n in ['Tracker','Model','Pure','Runtime','Contracts','Operations','Public','Validation','Storage','WorkingTimeModel','WorkingTimeSource','WorkingTimeRuntime','WorkingTimeIntervals','WorkingTimeBase','WorkingTimeRules','WorkingTimeContracts','WorkingTimeExamples']]
+        sources=[HERE/(n+'.v') for n in ['Tracker','Model','Pure','Runtime','Contracts','Operations','Public','WorkingTimeModel','Validation','Storage','WorkingTimeSource','WorkingTimeRuntime','WorkingTimeIntervals','WorkingTimeBase','WorkingTimeRules','WorkingTimeContracts','WorkingTimeExamples']]
         for source in sources:
             if re.search(r'\b(Admitted|admit|Abort|Axiom|Axioms|Parameter)\b',source.read_text()):raise RuntimeError('unproved declaration in '+str(source))
-        for module in ('Contracts','Operations','Public','Validation','Storage','WorkingTimeModel','WorkingTimeSource','WorkingTimeContracts'):
-            PUBLIC[module]=re.findall(r'^Theorem (\w+)',(HERE/(module+'.v')).read_text(),re.M)
+        for module in ('Contracts','Operations','Public','WorkingTimeModel','Validation','Storage','WorkingTimeSource','WorkingTimeContracts'):
+            PUBLIC[module]=list(dict.fromkeys([*PUBLIC[module],*re.findall(r'^Theorem (\w+)',(HERE/(module+'.v')).read_text(),re.M)]))
         audit='From Tracker Require Import Tracker Model Pure Runtime Contracts Operations Public Validation Storage WorkingTimeModel WorkingTimeSource WorkingTimeContracts.\n'+''.join(f'Print Assumptions {module}.{name}.\n' for module,names in PUBLIC.items() for name in names)
         (HERE/'Audit.v').write_text(audit)
         for source in sources:run([BIN/'coqc',*FLAGS,source])

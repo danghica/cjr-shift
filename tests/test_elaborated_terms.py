@@ -13,7 +13,7 @@ from tools.rocq_readable.cli import DEFAULT_DICTIONARY, generate, main, prepare
 from tools.rocq_readable.dictionary import Dictionary
 from tools.rocq_readable.elaboration import export
 from tools.rocq_readable.explanations import Options
-from tools.rocq_readable.layout import Doc, Token, leaf, render_html
+from tools.rocq_readable.layout import Doc, Token, anchor, leaf, render_html
 from tools.rocq_readable.project import Glob, Source
 from tools.rocq_readable.terms import Renderer, application, block
 from test_rocq_readable import audit_links, backend_available
@@ -33,6 +33,83 @@ def nodes(term):
 
 
 class LayoutMigration(unittest.TestCase):
+    def test_match_patterns_distinguish_fields_from_returned_functions(self):
+        ref = lambda identity: {'tag': 'ref', 'identity': identity}
+        lam = lambda name, body: {'tag': 'lambda', 'name': name, 'type': ref('Test.T'), 'body': body}
+        node = {'tag': 'match', 'scrutinee': ref('Test.input'),
+                'return': lam('_', ref('Test.T')), 'indices': [],
+                'branches': [{'constructor': 'Test.Box', 'binder_count': 1,
+                              'body': lam('x', lam('x', {'tag': 'rel', 'index': 2}))}]}
+        decl = Declaration('branch', 'Test.branch', 'definition', {}, '')
+        renderer = Renderer(decl, Dictionary(DEFAULT_DICTIONARY))
+        doc = renderer.term(node, [])
+        self.assertIn('when Box(x):\n    function x2: T\n      x', doc.plain())
+        self.assertNotIn('return:', doc.plain())
+        details = '\n'.join(d.plain() for d in renderer.hidden)
+        self.assertIn('pattern binding:', details)
+        self.assertIn('match return type:', details)
+        target = Path('/tmp/match.html')
+        rendered = render_html(doc, target, {}) + ''.join(render_html(d, target, {}) for d in renderer.hidden)
+        import re
+        self.assertEqual(len(re.findall(r' id="', rendered)), len(set(re.findall(r' id="([^"]+)"', rendered))))
+        for destination in re.findall(r'href="#([^"]+)"', rendered):
+            self.assertIn('id="' + destination + '"', rendered)
+        # Old exports with unknown constructors retain all lambda structure.
+        del node['branches'][0]['binder_count']
+        fallback = Renderer(decl, Dictionary(DEFAULT_DICTIONARY)).term(node, []).plain()
+        self.assertIn('when Box:\n    function x: T', fallback)
+        node['branches'] = [{'constructor': 'Coq.Init.Datatypes.true', 'binder_count': 0,
+                             'body': lam('x', {'tag': 'rel', 'index': 1})}]
+        nullary = Renderer(decl, Dictionary(DEFAULT_DICTIONARY)).term(node, []).plain()
+        self.assertIn('when true:\n    function x: T\n      x', nullary)
+
+    def test_dependent_match_return_types_remain_visible(self):
+        ref = lambda identity: {'tag': 'ref', 'identity': identity}
+        node = {'tag': 'match', 'scrutinee': ref('Test.input'), 'indices': [],
+                'return': {'tag': 'lambda', 'name': 'value', 'type': ref('Test.T'),
+                           'body': {'tag': 'rel', 'index': 1}},
+                'branches': [{'constructor': 'Coq.Init.Datatypes.Some',
+                              'body': {'tag': 'lambda', 'name': 'p', 'type': ref('Test.T'),
+                                       'body': {'tag': 'rel', 'index': 1}}}]}
+        decl = Declaration('branch', 'Test.branch', 'definition', {}, '')
+        doc = Renderer(decl, Dictionary(DEFAULT_DICTIONARY)).term(node, [])
+        self.assertIn('return:\n    function value: T\n      value', doc.plain())
+        self.assertIn('when Some(p):\n    p', doc.plain())
+        narrow = '\n'.join(''.join(t.text for t in ts) for _, ts in doc.lines(width=14))
+        self.assertIn('when:\npattern:\nSome(p)\nbody:\np', narrow)
+
+    def test_nested_program_conditions_keep_scope_and_links(self):
+        def ref(identity):
+            return {'tag': 'ref', 'identity': identity}
+        def app(identity, *arguments):
+            return {'tag': 'app', 'head': ref(identity),
+                    'arguments': [{'implicit': False, 'term': a} for a in arguments]}
+        comparison = app('cjr.lang.BinOp', ref('cjr.lang.LeOp'), ref('Test.minute'), ref('Test.limit'))
+        inner = app('cjr.lang.If', comparison, ref('Coq.Init.Datatypes.false'), ref('Coq.Init.Datatypes.true'))
+        term = app('cjr.lang.If', inner, ref('Test.reject'), ref('Test.accept'))
+        declaration = Declaration('branch', 'Test.branch', 'definition', {}, '')
+        outer = Renderer(declaration, Dictionary(DEFAULT_DICTIONARY)).term(term, [])
+        self.assertEqual(outer.plain(),
+                         'if:\n  condition:\n    if (minute ≤ limit):\n      false\n'
+                         '    else:\n      true\n  then:\n    reject\n  else:\n    accept')
+        target = Path('/tmp/conditional.html')
+        rendered = render_html(outer, target, {'cjr.lang.If': (target, 'if-constructor')})
+        self.assertIn('href="#if-constructor" title="cjr.lang.If">condition:', rendered)
+        self.assertIn('│ │ <a href="#if-constructor" title="cjr.lang.If">if ', rendered)
+        self.assertNotIn('\n│ :', rendered)
+
+    def test_program_condition_uses_available_header_width(self):
+        from tools.rocq_readable.program_syntax import Conditional
+        doc = Conditional(Token(''), [leaf('ready'), leaf('yes'), leaf('no')],
+                          template='if {0}:\n  {1}\nelse:\n  {2}',
+                          template_indent=2, plain_indent=2)
+        self.assertEqual(''.join(t.text for t in doc.lines(width=9)[0][1]), 'if ready:')
+        for indent, width in [(0, 8), (1, 10)]:
+            lines = doc.lines(indent=indent, width=width)
+            self.assertEqual(''.join(t.text for t in lines[0][1]), 'if:')
+            self.assertEqual(''.join(t.text for t in lines[1][1]), 'condition:')
+            self.assertFalse(any(''.join(t.text for t in tokens) == ':' for _, tokens in lines))
+
     def test_html_has_scope_guides_while_legacy_cache_input_is_unchanged(self):
         doc = Doc(Token('a'), [Doc(Token('b'), [leaf('c')], block=True)], block=True)
         self.assertEqual(doc.plain(), 'a:\n    b:\n        c')
@@ -90,6 +167,14 @@ Definition aggregate_program : expr := VarBind "s" (Struct [LitV (LitInt 1)] [Va
     (Seq (StructStore "s" 1 (Val (LitV (LitInt 4))))
       (Seq (FieldStore (Var "o") 0 (Val (LitV (LitInt 5))))
         (App (StructLoad (Var "s") 1) (FieldLoad (Var "o") 0))))).
+Definition empty_struct : expr := Struct [] [].
+Definition empty_struct_value : val := StructV [].
+Definition empty_struct_reference (struct : expr) : expr := struct.
+Definition option_match (p : option nat) := match p with Some x => x | None => O end.
+Inductive carrier := Carry : nat -> carrier.
+Definition carrier_function (c : carrier) := match c with Carry n => fun x : nat => n + x end.
+Definition dependent_match (b : bool) : if b then nat else bool :=
+  match b as value return (if value then nat else bool) with true => O | false => false end.
 Definition symbolic_aggregate (vs : list val) (es : list expr) : expr := Struct vs es.
 Definition symbolic_program (name : string) : expr := Var name.
 Definition value_type := iris.program_logic.language.val cjr_lang.
@@ -183,6 +268,28 @@ End Local.
         self.assertIn('symbolic variable name', text)
         self.assertIn('name', text)
         self.assertTrue(renderer.unsupported)
+
+    def test_empty_structs_remain_constructor_calls_in_both_views(self):
+        from html import unescape
+        import re
+        self.assertIn('struct()', self.render('empty_struct')[0])
+        self.assertIn('struct()', self.render('empty_struct_value')[0])
+        reference = self.render('empty_struct_reference')[0]
+        self.assertIn('definition:\n    struct', reference)
+        self.assertNotIn('struct()', reference)
+        output = self.root / 'empty-struct-source-html'
+        generate(self.sources, self.resolutions, self.dictionary, output, term_view='source')
+        page = (output / 'Skin.html').read_text()
+        for name in ('empty_struct', 'empty_struct_value', 'empty_struct_reference'):
+            declaration = next(d for d in self.sources[0].declarations if d.name == name)
+            article = page.split('<article id="' + anchor(declaration.identity) + '">', 1)[1].split('</article>', 1)[0]
+            pre = re.search(r'<pre class="pseudocode">(.*?)</pre>', article, re.S)[1]
+            text = unescape(re.sub('<[^>]*>', '', pre))
+            if name == 'empty_struct_reference':
+                self.assertNotIn('struct()', text)
+            else:
+                self.assertIn('struct()', text)
+        audit_links(output)
 
     def test_lemma_headings_and_postconditions(self):
         source = self.sources[0]
@@ -294,6 +401,19 @@ End Local.
         self.assertIn('Complete resolved term data', page)
         self.assertIn('Parsed source structure', page)
         self.assertNotIn('Source-view fallback', page)
+
+    def test_constructor_patterns_and_dependent_motives(self):
+        text, record, renderer = self.render('option_match')
+        self.assertIn('when Some(x):', text)
+        self.assertNotIn('return:', text)
+        self.assertIn('match return type:', '\n'.join(d.plain() for d in renderer.hidden))
+        matches = [n for n in nodes(record) if n['tag'] == 'match']
+        self.assertEqual([b['binder_count'] for b in matches[0]['branches']], [1, 0])
+        text = self.render('carrier_function')[0]
+        self.assertIn('when Carry(n):\n', text)
+        self.assertIn('function x: nat', text)
+        self.assertNotIn('when Carry(n, x)', text)
+        self.assertIn('return:', self.render('dependent_match')[0])
 
     def test_explanation_cache_survives_migration_byte_for_byte(self):
         output = self.root / 'cache-html'

@@ -110,3 +110,186 @@ Proof.
  unfold state_invariant; cbn [shifts pending]; repeat split; auto.
  destruct Hbound as [Hbad|Hbound]; [lia|assumption].
 Qed.
+
+(** Specification-only validation of the daily-rest rule. A short gap alone is
+    insufficient: the supplied daily period must have no continuous rest of
+    eleven hours, and its applicability and coverage must be known. No CJR
+    execution lemma or implementation correctness theorem is used below. *)
+From Tracker Require Import WorkingTimeModel.
+
+Lemma first_violation_zero_or_error fs :
+ WorkingTimeModel.first_violation fs = 0 \/
+ 100 <= WorkingTimeModel.first_violation fs.
+Proof.
+ induction fs as [|f fs IH]; [left; reflexivity|].
+ cbn [WorkingTimeModel.first_violation].
+ destruct (100 <=? WorkingTimeModel.finding_code f) eqn:Hhead; [|exact IH].
+ apply Z.leb_le in Hhead.
+ destruct IH as [Hzero|Herror].
+ - rewrite Hzero. cbn. right. exact Hhead.
+ - assert (Hnonzero : WorkingTimeModel.first_violation fs =? 0 = false)
+     by (apply Z.eqb_neq; lia).
+   rewrite Hnonzero. right. apply Z.min_glb; assumption.
+Qed.
+
+Lemma first_violation_detects_error fs f :
+ In f fs -> 100 <= WorkingTimeModel.finding_code f ->
+ 100 <= WorkingTimeModel.first_violation fs.
+Proof.
+ induction fs as [|head fs IH]; [contradiction|].
+ intros Hin Hcode. cbn [WorkingTimeModel.first_violation].
+ destruct Hin as [Heq|Hin].
+ - subst head.
+   assert (Hhead : 100 <=? WorkingTimeModel.finding_code f = true)
+     by (apply Z.leb_le; exact Hcode).
+   rewrite Hhead.
+   destruct (first_violation_zero_or_error fs) as [Hzero|Herror].
+   + rewrite Hzero. cbn. exact Hcode.
+   + assert (Hnonzero : WorkingTimeModel.first_violation fs =? 0 = false)
+       by (apply Z.eqb_neq; lia).
+     rewrite Hnonzero. apply Z.min_glb; assumption.
+ - specialize (IH Hin Hcode).
+   destruct (100 <=? WorkingTimeModel.finding_code head) eqn:Hhead; [|exact IH].
+   apply Z.leb_le in Hhead.
+   assert (Hnonzero : WorkingTimeModel.first_violation fs =? 0 = false)
+     by (apply Z.eqb_neq; lia).
+   rewrite Hnonzero. apply Z.min_glb; assumption.
+Qed.
+
+Lemma summary_preserves_error fs complete f :
+ In f fs -> 100 <= WorkingTimeModel.finding_code f ->
+ 100 <= WorkingTimeModel.summary fs complete.
+Proof.
+ intros Hin Hcode.
+ pose proof (first_violation_detects_error fs f Hin Hcode) as Herror.
+ unfold WorkingTimeModel.summary.
+ assert (Hnonzero : WorkingTimeModel.first_violation fs =? 0 = false)
+   by (apply Z.eqb_neq; lia).
+ rewrite Hnonzero. exact Herror.
+Qed.
+
+Lemma daily_rest_under_eleven_hours_finding st m p :
+ WorkingTimeModel.rule p = 102 ->
+ WorkingTimeModel.evidence p = 1 ->
+ WorkingTimeModel.period_known st m p = true ->
+ WorkingTimeModel.longest_rest
+   (WorkingTimeModel.merge_work (shifts st) (WorkingTimeModel.other_work m))
+   (WorkingTimeModel.from_minute p) (WorkingTimeModel.to_minute p) < 11 * 60 ->
+ WorkingTimeModel.assess_period st m
+   (WorkingTimeModel.merge_work (shifts st) (WorkingTimeModel.other_work m)) p =
+ WorkingTimeModel.finding_for p 102
+   (WorkingTimeModel.longest_rest
+     (WorkingTimeModel.merge_work (shifts st) (WorkingTimeModel.other_work m))
+     (WorkingTimeModel.from_minute p) (WorkingTimeModel.to_minute p)) (11 * 60).
+Proof.
+ intros Hrule Hevidence Hknown Hrest.
+ unfold WorkingTimeModel.assess_period. rewrite Hevidence Hknown Hrule.
+ cbn. unfold WorkingTimeModel.assess_daily.
+ assert (Hshort : 660 <=? WorkingTimeModel.longest_rest
+   (WorkingTimeModel.merge_work (shifts st) (WorkingTimeModel.other_work m))
+   (WorkingTimeModel.from_minute p) (WorkingTimeModel.to_minute p) = false)
+   by (apply Z.leb_gt; lia).
+ rewrite Hshort. reflexivity.
+Qed.
+
+(** The report contains daily-rest finding 102 and has a violation code.
+    The overall code need not be 102: another rule, such as 101, may take
+    precedence. Valid metadata ensures p is a genuine 24-hour daily period. *)
+Lemma insufficient_daily_rest_returns_error st lower upper m p :
+ WorkingTimeModel.valid_metadata st m lower upper = true ->
+ WorkingTimeModel.supported_metadata m = true ->
+ In p (WorkingTimeModel.periods m) ->
+ WorkingTimeModel.rule p = 102 ->
+ WorkingTimeModel.evidence p = 1 ->
+ WorkingTimeModel.period_known st m p = true ->
+ WorkingTimeModel.longest_rest
+   (WorkingTimeModel.merge_work (shifts st) (WorkingTimeModel.other_work m))
+   (WorkingTimeModel.from_minute p) (WorkingTimeModel.to_minute p) < 11 * 60 ->
+ (exists f, In f (WorkingTimeModel.findings
+     (WorkingTimeModel.validate_working_time st lower upper m)) /\
+     WorkingTimeModel.finding_code f = 102) /\
+ 100 <= WorkingTimeModel.report_code
+   (WorkingTimeModel.validate_working_time st lower upper m).
+Proof.
+ intros Hvalid Hsupported Hin Hrule Hevidence Hknown Hrest.
+ pose proof (daily_rest_under_eleven_hours_finding st m p
+   Hrule Hevidence Hknown Hrest) as Hfinding.
+ unfold WorkingTimeModel.validate_working_time.
+ rewrite Hvalid Hsupported. cbn [negb].
+ set (f := WorkingTimeModel.assess_period st m
+   (WorkingTimeModel.merge_work (shifts st) (WorkingTimeModel.other_work m)) p).
+ assert (Hin_result : In f (map
+   (WorkingTimeModel.assess_period st m
+     (WorkingTimeModel.merge_work (shifts st) (WorkingTimeModel.other_work m)))
+   (WorkingTimeModel.periods m))).
+ { apply in_map. exact Hin. }
+ assert (Hcode : WorkingTimeModel.finding_code f = 102).
+ { unfold f. rewrite Hfinding. reflexivity. }
+ split.
+ - exists f. split; assumption.
+ - eapply summary_preserves_error; [exact Hin_result|]. rewrite Hcode. lia.
+Qed.
+
+(** Two shifts cover the beginning and end of the assessed day; therefore
+    their intervening gap is its only possible continuous rest. *)
+Lemma longest_rest_between_covering_shifts a b c d s e :
+ a <= s -> s <= b -> b <= c -> c < e -> e <= d ->
+ WorkingTimeModel.longest_rest [(a,b);(c,d)] s e = c-b.
+Proof.
+ intros Has Hsb Hbc Hce Hed.
+ assert (Hea : e <=? a = false) by (apply Z.leb_gt; lia).
+ assert (Hec : e <=? c = false) by (apply Z.leb_gt; lia).
+ assert (Hbd : b <= d) by lia.
+ assert (Has' : a-s <= 0) by lia.
+ assert (Hed' : e-d <= 0) by lia.
+ assert (Hgap : 0 <= c-b) by lia.
+ cbn [WorkingTimeModel.longest_rest].
+ rewrite Hea (Z.max_r s b Hsb) Hec (Z.max_r b d Hbd).
+ rewrite (Z.max_l 0 (a-s) Has') (Z.max_l 0 (e-d) Hed').
+ rewrite (Z.max_r 0 (c-b) Hgap) (Z.max_l (c-b) 0 Hgap).
+ exact (Z.max_r 0 (c-b) Hgap).
+Qed.
+
+Lemma short_inter_shift_gap_returns_error st lower upper m p a b c d :
+ WorkingTimeModel.valid_metadata st m lower upper = true ->
+ WorkingTimeModel.supported_metadata m = true ->
+ In p (WorkingTimeModel.periods m) ->
+ WorkingTimeModel.rule p = 102 ->
+ WorkingTimeModel.evidence p = 1 ->
+ WorkingTimeModel.period_known st m p = true ->
+ WorkingTimeModel.merge_work (shifts st) (WorkingTimeModel.other_work m) = [(a,b);(c,d)] ->
+ a <= WorkingTimeModel.from_minute p ->
+ WorkingTimeModel.from_minute p <= b -> b <= c ->
+ c < WorkingTimeModel.to_minute p -> WorkingTimeModel.to_minute p <= d ->
+ c-b < 11*60 ->
+ 100 <= WorkingTimeModel.report_code
+   (WorkingTimeModel.validate_working_time st lower upper m).
+Proof.
+ intros Hvalid Hsupported Hin Hrule Hevidence Hknown Hwork Has Hsb Hbc Hce Hed Hgap.
+ assert (Hrest : WorkingTimeModel.longest_rest
+   (WorkingTimeModel.merge_work (shifts st) (WorkingTimeModel.other_work m))
+   (WorkingTimeModel.from_minute p) (WorkingTimeModel.to_minute p) < 11*60).
+ { rewrite Hwork.
+   rewrite (longest_rest_between_covering_shifts a b c d _ _ Has Hsb Hbc Hce Hed).
+   exact Hgap. }
+ exact (proj2 (insufficient_daily_rest_returns_error st lower upper m p
+   Hvalid Hsupported Hin Hrule Hevidence Hknown Hrest)).
+Qed.
+
+(** A one-hour gap between two short shifts is not, by itself, a daily-rest
+    violation: this day still has twenty-one continuous hours of rest. The
+    other applicable ordinary-adult checks pass; night rules are not applicable. *)
+Lemma short_gap_alone_can_pass :
+ let st := State [(0,60);(120,180)] None in
+ let daily := WorkingTimeModel.Period 102 0 1440 1440 0 0 1 0 false in
+ let weekly := WorkingTimeModel.Period 101 0 171360 171360 0 0 1 0 false in
+ let rest := WorkingTimeModel.Period 103 0 10080 10080 0 0 1 1 false in
+ let night := WorkingTimeModel.Period 105 0 171360 171360 0 0 2 0 false in
+ let hazard := WorkingTimeModel.Period 106 0 1440 1440 0 0 2 0 false in
+ let m := WorkingTimeModel.Metadata 1 true true 0 171360 true true
+   [] [] [] [] [daily;weekly;rest;night;hazard] in
+ 120-60 < 11*60 /\
+ WorkingTimeModel.longest_rest (shifts st) 0 1440 = 21*60 /\
+ WorkingTimeModel.report_code
+   (WorkingTimeModel.validate_working_time st 0 1440 m) = 0.
+Proof. vm_compute. repeat split; reflexivity. Qed.

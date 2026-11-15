@@ -93,6 +93,13 @@ universes. Parsed source structure and original proof-free declarations remain
 available; original-source excerpts are unchanged. Evaluated Cangjie output
 continues to use the Gallina printer.
 
+Elaborated matches show constructor fields as patterns such as `when Some(p):`.
+Pattern-binding types and nondependent return motives appear in elaboration
+details; dependent return motives stay visible. Constructor binder counts keep
+functions returned by a branch distinct from its pattern fields. Older exports
+use known standard-constructor arities and retain explicit lambdas for unknown
+constructors.
+
 `--term-view source` selects the parsed-source display, which shares the CJR
 syntax rules wherever resolution is available. AI-generated
 explanations always use the unchanged legacy rendering as their input, including its
@@ -489,6 +496,10 @@ Git evidence and declaration associations; new commits extend the cache and
 rewritten history rebuilds affected entries. `--history-cache FILE.json` chooses
 another location. Explanation caches, rendering rules, and existing explanation
 text are independent of this cache.
+Failed Git operations identify the operation and cause. Temporary source-lookup
+failures are retried on the next refresh, including failures recorded by older
+caches. An incomplete empty history says that no prompts could be attributed
+from the available evidence, rather than claiming that no prompts were recorded.
 
 Split CJR repositories import their earlier history using `repository.json`'s
 checkpoint and the original checkout's `migration-manifest.json`. The parent
@@ -497,6 +508,8 @@ different original checkout. Copied prompt-log baselines are not attributed as
 new prompts. Once populated, the cache preserves this imported evidence for
 standalone child checkouts. Deleting the cache forces extraction again; the
 original checkout is then required to recover pre-split history.
+Migration destinations use the repository identity in `repository.json`, so
+renaming a checkout directory does not change its source mappings.
 
 To add or refresh history in **existing HTML without rerendering explanations,
 changing explanation caches, or invoking Rocq**, run from the original build's

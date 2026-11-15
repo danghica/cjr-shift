@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-11-12T14:57:15.094367+00:00",
+  "storage": "localStorage per browser origin",
+  "key": "cjr-shift.store.v1",
+  "serverPersistence": "none; temporary core-request files removed before response",
+  "legacySharedApiDisabled": true,
+  "previousSharedDataImported": false,
+  "coreChanged": false,
+  "proofValidationRun": false,
+  "tests": {
+    "javascript": 20,
+    "browserSnapshotHttp": 5,
+    "adapterAndHttp": 15,
+    "hosting": 6,
+    "compliance": 19
+  },
+  "browserChecks": [
+    "running status and overtime survive reload",
+    "same-origin tab reads saved running status",
+    "missed-shift midnight pieces persist with overtime labels",
+    "independent origin starts empty and stays empty after first store changes",
+    "browser-storage disclosure and phone layout",
+    "no console errors"
+  ],
+  "failureChecks": [
+    "quota errors preserve prior snapshot",
+    "blocked storage and malformed JSON are not overwritten",
+    "unsupported locks fail explicitly",
+    "concurrent tabs serialize their requests",
+    "server rejects damaged snapshots",
+    "legacy shared GET and mutation routes disabled",
+    "temporary files removed before reply"
+  ],
+  "preview": "browser-storage-preview.jpg",
+  "sourceHashes": {
+    "work/UI/server.py": "e01bf6f7251b255c3cf62394e68c22bdf407b0dd66111b580af5c0a4a62cf662",
+    "work/UI/static/storage.mjs": "0e8335085ce94c4201b7b876cf47eee40a3ca895c4ec6f65f28947ff05003c33",
+    "work/UI/static/app.js": "4081707fbe572e1f6ffe8edabb42c890b572f679279a24bb770515418db12be9",
+    "work/UI/static/index.html": "40735231c2f94e5b3ad26ed757eb8da90ac3999cb99ff72ff12ded39c54e84a7",
+    "Dockerfile": "50da35f81af0f2cdc4646fb548495e762b9fef88da7b9c3b83d03611b5be7fc5"
+  },
+  "deployedUrl": "https://cjr-shift-production.up.railway.app",
+  "deploymentVerifiedAt": "2026-11-12T14:58:33.392188+00:00",
+  "liveAssetsMatchSource": true,
+  "liveIndependentSnapshotsVerified": true,
+  "liveSharedApiDisabled": true
+}

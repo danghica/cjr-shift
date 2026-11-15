@@ -41,7 +41,7 @@ def main():
     modes=sys.argv[1:] or ['proof','extract','native','test','benchmark','docs']
     for mode in modes:
         if mode=='proof':
-            for src in ['Tracker.v','Model.v','Pure.v','Runtime.v','Contracts.v','Operations.v','Public.v','Validation.v','Storage.v','WorkingTimeModel.v','WorkingTimeSource.v','WorkingTimeRuntime.v','WorkingTimeIntervals.v','WorkingTimeBase.v','WorkingTimeRules.v','WorkingTimeContracts.v','WorkingTimeExamples.v','Audit.v']:
+            for src in ['Tracker.v','Model.v','Pure.v','Runtime.v','Contracts.v','Operations.v','Public.v','WorkingTimeModel.v','Validation.v','Storage.v','WorkingTimeSource.v','WorkingTimeRuntime.v','WorkingTimeIntervals.v','WorkingTimeBase.v','WorkingTimeRules.v','WorkingTimeContracts.v','WorkingTimeExamples.v','Audit.v']:
                 if (ROOT/'work/specs'/src).exists():run([BIN/'coqc',*FLAGS,ROOT/'work/specs'/src])
         elif mode=='extract':
             extract();extract_working_time()

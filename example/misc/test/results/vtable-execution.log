@@ -1,0 +1,8 @@
+--------------------------------------------------------------------------------------------------
+TP: default, time elapsed: 331000 ns, RESULT:
+    TCS: VTableTests, time elapsed: 330000 ns, RESULT:
+    [ PASSED ] CASE: runAppliesTheStoredClosure (149000 ns)
+Summary: TOTAL: 1
+    PASSED: 1, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+--------------------------------------------------------------------------------------------------

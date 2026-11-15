@@ -1,4 +1,5 @@
-import {responseFailure, pad, localTimestamp, localOrdinal, minuteDate, timeLabel, dateKey, duration, groupShifts} from './time.mjs';
+import {browserRequest, STORE_KEY} from './storage.mjs';
+import {responseFailure, pad, localTimestamp, localOrdinal, minuteDate, timeLabel, dateKey, duration, groupShifts, groupViolations, findingExplanation, worstWindow} from './time.mjs';
 
 const $ = id => document.getElementById(id);
 let state = null;
@@ -55,11 +56,9 @@ function navigate(target) {
 async function request(path, data) {
   let response;
   try {
-    response = await fetch(`/api/${path}`, data === undefined ? {cache: 'no-store'} : {
-      method: 'POST', headers: {'Content-Type': 'application/json', 'X-Tracker-UI': '1'}, body: JSON.stringify(data)
-    });
-  } catch {
-    throw new Error('Could not reach the tracker server. Make sure it is running. Check your saved shifts before submitting again.');
+    response = await browserRequest(path, data);
+  } catch (error) {
+    throw new Error(error.message || 'Could not reach the tracker server. Check your saved shifts before submitting again.');
   }
   let result;
   try { result = await response.json(); } catch { result = {}; }
@@ -67,7 +66,8 @@ async function request(path, data) {
   if (result.settings) metadata = {settings:result.settings, revision:result.metadataRevision,
     pendingKind:result.pendingKind, classifications:result.classifications, pendingOvertime:result.pendingOvertime, overtime:result.overtime};
   if (result.state) {
-    $('demo-notice').hidden = !result.demo;
+    $('demo-notice').hidden = !(result.browserStorage || result.demo);
+    if (result.browserStorage) $('demo-notice').textContent = 'Saved in this browser only. Clearing site data removes your records. Compliance checks use the server.';
     state = result.state;
     available = true;
     render();
@@ -279,19 +279,33 @@ function renderReport() {
   for (const text of report.notes) notes.append(element('li','',text));
 
   const seen = new Set();
-  for (const finding of [...report.findings].sort((a,b) => Number(b.code >= 100) - Number(a.code >= 100))) {
-    const box = element('details','report-finding');
-    box.open = finding.code >= 100;
-    box.append(element('summary','', `${finding.title} · ${finding.code >= 100 ? 'violation' : 'incomplete'}`),
-      element('p','finding-code',`Code ${finding.code} · ${reportTime(finding.start)} → ${reportTime(finding.end)}`),
-      element('p','',finding.explanation));
-    if (finding.calendarPeriod) box.append(element('p','report-note',`Calendar period: ${reportTime(finding.calendarPeriod.start)} → ${reportTime(finding.calendarPeriod.end)}. Adjacent daily-rest context is included above.`));
-    const link=element('a','',finding.legislation.title);
-    link.href=finding.legislation.url;link.target='_blank';link.rel='noopener noreferrer';box.append(link);
+  function windowContent(parent, finding) {
+    parent.append(element('p','finding-code',`Code ${finding.code} · ${reportTime(finding.start)} → ${reportTime(finding.end)}`),
+      element('p','',findingExplanation(finding)));
+    if (finding.calendarPeriod) parent.append(element('p','report-note',`Calendar period: ${reportTime(finding.calendarPeriod.start)} → ${reportTime(finding.calendarPeriod.end)}. Adjacent daily-rest context is included above.`));
     if (finding.code === 101) {
       const answer=report.optOuts.find(row=>row.start===finding.start && row.end===finding.end)?.answer;
-      optOutPanel(box,finding.start,finding.end,answer);seen.add(`${finding.start}:${finding.end}`);
+      optOutPanel(parent,finding.start,finding.end,answer);seen.add(`${finding.start}:${finding.end}`);
     }
+  }
+  for (const group of groupViolations(report.findings)) {
+    const finding = worstWindow(group.windows);
+    const box = element('details','report-finding');
+    box.open = finding.code >= 100;
+    box.append(element('summary','', `${finding.title} · ${finding.code >= 100 ? 'violation' : 'incomplete'}`));
+    if (group.windows.length > 1) {
+      box.append(element('p','finding-code',`${group.windows.length} overlapping windows · ${reportTime(group.start)} → ${reportTime(group.end)}`),
+        element('p','',`Most severe window: ${findingExplanation(finding)}`));
+      const windows = element('details','finding-windows');
+      windows.append(element('summary','',`Individual windows (${group.windows.length})`));
+      for (const original of group.windows) {
+        const item = element('section','finding-window');
+        windowContent(item, original);windows.append(item);
+      }
+      box.append(windows);
+    } else windowContent(box,finding);
+    const link=element('a','',finding.legislation.title);
+    link.href=finding.legislation.url;link.target='_blank';link.rel='noopener noreferrer';box.append(link);
     $('report-body').append(box);
   }
   for (const row of report.optOuts) {
@@ -368,3 +382,5 @@ setInterval(tick, 1000);
 setInterval(() => { if (!document.hidden && !$('reset-dialog').open) refresh(); }, 30000);
 tick();
 refresh();
+
+window.addEventListener('storage', event => { if (event.key === STORE_KEY) refresh(); });

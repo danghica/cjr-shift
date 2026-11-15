@@ -1,0 +1,17 @@
+--------------------------------------------------------------------------------------------------
+TP: default, time elapsed: 412000 ns, RESULT:
+    TCS: GenericsTests, time elapsed: 404000 ns, RESULT:
+    [ PASSED ] CASE: identityTypes (148000 ns)
+    [ PASSED ] CASE: heterogeneousPair (4000 ns)
+    [ PASSED ] CASE: boxRead (3000 ns)
+    [ PASSED ] CASE: mapChangesType (2000 ns)
+    [ PASSED ] CASE: extractedLambdaAndLet (2000 ns)
+    [ PASSED ] CASE: mapComposition (3000 ns)
+    [ PASSED ] CASE: nestedInstances (2000 ns)
+    [ PASSED ] CASE: sameShapeDifferentNames (3000 ns)
+    [ PASSED ] CASE: eagerBooleanOperands (2000 ns)
+    [ PASSED ] CASE: recursiveGenericFunction (2000 ns)
+Summary: TOTAL: 10
+    PASSED: 10, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+--------------------------------------------------------------------------------------------------

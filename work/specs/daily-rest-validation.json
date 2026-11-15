@@ -1,0 +1,85 @@
+{
+  "startedAt": "2026-11-14T11:07:41.785650+00:00",
+  "status": "passed",
+  "scope": "Validation module and added specification-only lemmas",
+  "fullApplicationVerificationRun": false,
+  "implementationChanged": false,
+  "lemmas": [
+    "first_violation_zero_or_error",
+    "first_violation_detects_error",
+    "summary_preserves_error",
+    "daily_rest_under_eleven_hours_finding",
+    "insufficient_daily_rest_returns_error",
+    "longest_rest_between_covering_shifts",
+    "short_inter_shift_gap_returns_error",
+    "short_gap_alone_can_pass"
+  ],
+  "commands": [
+    {
+      "argv": [
+        "/Users/danghica/.opam/default/bin/coqc",
+        "--version"
+      ],
+      "exitStatus": 0
+    },
+    {
+      "argv": [
+        "/Users/danghica/.opam/default/bin/coqc",
+        "-R",
+        "/Users/danghica/pandian/theories",
+        "cjr",
+        "-Q",
+        "/Users/danghica/pandian/tools/extraction/rocq",
+        "cjr.examples",
+        "-Q",
+        "/Users/danghica/pandian/work/specs",
+        "Tracker",
+        "/Users/danghica/pandian/work/specs/Validation.v"
+      ],
+      "exitStatus": 0
+    },
+    {
+      "argv": [
+        "/Users/danghica/.opam/default/bin/coqchk",
+        "-silent",
+        "-R",
+        "/Users/danghica/pandian/theories",
+        "cjr",
+        "-Q",
+        "/Users/danghica/pandian/tools/extraction/rocq",
+        "cjr.examples",
+        "-Q",
+        "/Users/danghica/pandian/work/specs",
+        "Tracker",
+        "-norec",
+        "Tracker.Validation"
+      ],
+      "exitStatus": 0
+    },
+    {
+      "argv": [
+        "/Users/danghica/.opam/default/bin/coqc",
+        "-R",
+        "/Users/danghica/pandian/theories",
+        "cjr",
+        "-Q",
+        "/Users/danghica/pandian/tools/extraction/rocq",
+        "cjr.examples",
+        "-Q",
+        "/Users/danghica/pandian/work/specs",
+        "Tracker",
+        "/var/folders/mq/rtbdtgcd44b6bxl9gmby_9xm0000gn/T/daily-rest-audit-fy_ydtiw/DailyRestAudit.v"
+      ],
+      "exitStatus": 0
+    }
+  ],
+  "toolchain": "The Coq Proof Assistant, version 8.20.1\ncompiled with OCaml 5.4.0",
+  "assumptions": "All 8 added lemmas closed under the global context.",
+  "kernelCheck": "Validation checked; dependency proof terms were not rechecked.",
+  "sources": {
+    "work/specs/Validation.v": "165fb4cb0c24bc587cc6418c3bce276d2f680f54868fc5cc664ec5fbf1dbdcfe",
+    "work/specs/WorkingTimeModel.v": "21ed358e6880fdbc8606258a97383c359e58d9ee4cb8a9cbe6b9b578f4d056bf",
+    "work/specs/Model.v": "e4273f54df6eb14446372a68a8f2b46cfebfa3bf78d6b39c016da12afc185979"
+  },
+  "finishedAt": "2026-11-14T11:07:58.241009+00:00"
+}

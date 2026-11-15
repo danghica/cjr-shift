@@ -20,9 +20,9 @@
     "machine": "arm64",
     "node": "Dans-Mac-mini.local",
     "processor": "arm",
-    "release": "25.6.0",
+    "release": "27.2.0",
     "system": "Darwin",
-    "version": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:11:03 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T8132"
+    "version": "Darwin Kernel Version 27.2.0: Wed Oct 14 23:47:07 PDT 2026; root:xnu-13432.41.4~25/RELEASE_ARM64_T8132"
   },
   "sdk": "macOS TAPI compatibility copy: arm64e.x1 removed, arm64e labels normalized to arm64",
   "sources": {
@@ -43,7 +43,7 @@
     "../../tools/project_tools/benchmark.py": "cea1a5e43874c512b3f520ee2c6aeed9bf7e7af6ef06c4bb55016bf45df5c005",
     "../../tools/project_tools/docs.py": "c9c97cdcce80dc93f76d130921cc84bd31d479d2312f65988df73a464918d177",
     "../../tools/project_tools/examples.py": "922bcdfd51f09bdd34c94acc1ef203e742a11bc09bc4d037fd619d1efde30dd7",
-    "../../tools/project_tools/link_audit.py": "3cb4b94c97d498401a12c0c187442453be677ca31e58f07055132410498f9b99",
+    "../../tools/project_tools/link_audit.py": "f835b7eec5964eb8e34d5573887548584ce8da40478058e3bca99b3530d88578",
     "../../tools/project_tools/support.py": "fc85ad211ff807cbc42e4d4606ccd5a9c3d6ea844d229f28ddb9c0b95f03c47b",
     "../../tools/project_tools/workspace.py": "94c0c97473e215f970fde5693d0ab7e749552296f88fa3007fad9ecd12ec2a0b",
     "../../tools/rocq_readable/__init__.py": "ec748d3e6ef80a77136b7893c74a7fe0a6b6e6b34ef29ed6e474183dee7909e5",
@@ -60,16 +60,16 @@
     "../../tools/rocq_readable/elaboration.py": "1dfd05265020f04a1b783f508e9431ea370c655cb984604d32fc328641a6c8b8",
     "../../tools/rocq_readable/explanations.py": "678cb47a33ceee75ade120601fc89b94bb0cee8c20fb213bda4cbc2bc0ec0b99",
     "../../tools/rocq_readable/gallina.py": "7be0554f40914c871a43266a666c0a5bde84afdbaf032e280bdb4d78172f734e",
-    "../../tools/rocq_readable/history.py": "c4d913120183d2fc06d4d546ae431c860cc5ceb78a1e8d3d12aea67a15574d77",
+    "../../tools/rocq_readable/history.py": "b742642256e4d90bda05d3b123ed55d5622990214981445d7204c6136a302f4f",
     "../../tools/rocq_readable/html.py": "519a4b5dde3030989b4a5a9dacbcfe944b26249e1a351164db0c47b38d22a371",
     "../../tools/rocq_readable/layout.py": "59b10449ff4d8bdb032f7fa3c80224418b81e4e88848611d17c4dd1d193c7c3d",
     "../../tools/rocq_readable/ownership.py": "b0bc3b60a02c7043cdc115dd60af5b59abaa14b1d6c68ad14166fc60fff5e8b5",
-    "../../tools/rocq_readable/program_syntax.py": "9d784bb4bb883f8ebc1f9e03af4923ead79db73c04aa6f8ab60b97c2054d4b89",
+    "../../tools/rocq_readable/program_syntax.py": "84777fbd536c1c08ad598ed01d27984144d9bb3aa32f6f45c82478ae92b98c88",
     "../../tools/rocq_readable/project.py": "e8817b49562a07024a362fd7dea84988d07ecc22f42bfb1a330c350a09769cbd",
     "../../tools/rocq_readable/refresh_history.py": "d94595930a25cb4d1f0f31c2f13a86d080cf2d234f87887126298d607bfa8bef",
     "../../tools/rocq_readable/renderings.json": "95745255fcfd5bd52692d423a8ce5627ecc28bd61f7a393254443e9490d59aa0",
     "../../tools/rocq_readable/semantics.py": "779561a050746bc750d56dab95e2f01781168d0a48ec7a4b5c4644989c2833dd",
-    "../../tools/rocq_readable/terms.py": "1c48c2480db7c683122d4ca0b780a9cc73cbb7f82b4e8c27c98fbf64a8cadc12",
+    "../../tools/rocq_readable/terms.py": "9f64efcb5855aef1ec65b3130343636945f245774b3756e2eccafe751290a8e1",
     "../misc/rocq/arith.v": "613d927e3780bf42709962c00c72422175d72e002a93e47e3777cd1354991dad",
     "../misc/rocq/cell.v": "c0471d220cde7e67e9a17df1f50da2bbf3dfc03ebf86c8706adaca0cc59626a8",
     "../misc/rocq/class_upd.v": "78217b10e216b98b5df4fc1283a8d3f2392463d91110a90bbe33e503e9ed8dae",
@@ -90,5 +90,5 @@
   },
   "status": "passed",
   "stderr": "",
-  "stdout": "--------------------------------------------------------------------------------------------------\nTP: default, time elapsed: 725000 ns, RESULT:\n    TCS: GenericsTests, time elapsed: 709000 ns, RESULT:\n    [ PASSED ] CASE: identityTypes (262000 ns)\n    [ PASSED ] CASE: heterogeneousPair (6000 ns)\n    [ PASSED ] CASE: boxRead (6000 ns)\n    [ PASSED ] CASE: mapChangesType (4000 ns)\n    [ PASSED ] CASE: extractedLambdaAndLet (5000 ns)\n    [ PASSED ] CASE: mapComposition (3000 ns)\n    [ PASSED ] CASE: nestedInstances (6000 ns)\n    [ PASSED ] CASE: sameShapeDifferentNames (4000 ns)\n    [ PASSED ] CASE: eagerBooleanOperands (4000 ns)\n    [ PASSED ] CASE: recursiveGenericFunction (5000 ns)\nSummary: TOTAL: 10\n    PASSED: 10, SKIPPED: 0, ERROR: 0\n    FAILED: 0\n--------------------------------------------------------------------------------------------------\n"
+  "stdout": "--------------------------------------------------------------------------------------------------\nTP: default, time elapsed: 412000 ns, RESULT:\n    TCS: GenericsTests, time elapsed: 404000 ns, RESULT:\n    [ PASSED ] CASE: identityTypes (148000 ns)\n    [ PASSED ] CASE: heterogeneousPair (4000 ns)\n    [ PASSED ] CASE: boxRead (3000 ns)\n    [ PASSED ] CASE: mapChangesType (2000 ns)\n    [ PASSED ] CASE: extractedLambdaAndLet (2000 ns)\n    [ PASSED ] CASE: mapComposition (3000 ns)\n    [ PASSED ] CASE: nestedInstances (2000 ns)\n    [ PASSED ] CASE: sameShapeDifferentNames (3000 ns)\n    [ PASSED ] CASE: eagerBooleanOperands (2000 ns)\n    [ PASSED ] CASE: recursiveGenericFunction (2000 ns)\nSummary: TOTAL: 10\n    PASSED: 10, SKIPPED: 0, ERROR: 0\n    FAILED: 0\n--------------------------------------------------------------------------------------------------\n"
 }

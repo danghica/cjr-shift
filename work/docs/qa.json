@@ -1,9 +1,9 @@
 {
-  "status": "passed with documented presentation limits",
-  "checked_utc": "2026-11-12T09:51:07.659786+00:00",
+  "status": "passed with documented presentation limits; explanation coverage incomplete",
+  "checked_utc": "2026-11-15T12:26:48.741475+00:00",
   "renderer_exit_status": 0,
   "rendered_sources": 18,
-  "declarations": 477,
+  "declarations": 485,
   "file_errors": [],
   "symbolic_forms": [
     {
@@ -350,14 +350,14 @@
     }
   },
   "english_explanations": {
-    "available": 116,
-    "unavailable": 361,
+    "available": 168,
+    "unavailable": 317,
     "failed": 0
   },
   "links": {
     "status": "passed",
     "html_files": 23,
-    "links_checked": 23141,
+    "links_checked": 24013,
     "errors": [],
     "remote_assets": [],
     "svg": "parsed successfully"
@@ -371,5 +371,15 @@
     ],
     "reason": "Browser URL policy rejected file:// local HTML preview. No workaround attempted. Static local-link, remote-asset and SVG XML checks are recorded separately in work/docs/link-check.json.",
     "visual_rendering_confirmed": false
+  },
+  "explanation_consistency": {
+    "status": "passed",
+    "checked_utc": "2026-11-15T12:26:47.136828+00:00"
+  },
+  "explanation_coverage": {
+    "status": "incomplete",
+    "available": 168,
+    "total": 485,
+    "missing": 317
   }
 }

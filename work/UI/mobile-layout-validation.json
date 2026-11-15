@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-12T15:10:10.195366+00:00",
+  "viewportsChecked": [
+    "390x844",
+    "320x568",
+    "desktop restored"
+  ],
+  "checks": [
+    "mobile frame radius zero",
+    "fake status bar and home indicator hidden",
+    "no horizontal overflow at 320px",
+    "Shifts navigation reachable at 320px",
+    "desktop frame radius 53px and status bar visible",
+    "safe-area spacing and dynamic viewport height configured"
+  ],
+  "javascriptTestsPassed": 20,
+  "proofValidationRun": false,
+  "preview": "mobile-frameless-preview.jpg",
+  "stylesheetHash": "039265795d633c37af5c4b864cd31591876d44b5b14deaaaab2ab9361543974e",
+  "deployedUrl": "https://cjr-shift-production.up.railway.app",
+  "liveStylesheetMatchesSource": true,
+  "deploymentVerifiedAt": "2026-11-12T15:12:21.980003+00:00"
+}

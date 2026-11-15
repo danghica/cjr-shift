@@ -1,0 +1,9 @@
+--------------------------------------------------------------------------------------------------
+TP: default, time elapsed: 323000 ns, RESULT:
+    TCS: StructUpdTests, time elapsed: 323000 ns, RESULT:
+    [ PASSED ] CASE: bumpWritesTheField (147000 ns)
+    [ PASSED ] CASE: bumpKeepLeavesTheRawWord (3000 ns)
+Summary: TOTAL: 2
+    PASSED: 2, SKIPPED: 0, ERROR: 0
+    FAILED: 0
+--------------------------------------------------------------------------------------------------

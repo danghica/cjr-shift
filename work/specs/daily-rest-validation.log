@@ -1,0 +1,23 @@
+Targeted daily-rest specification validation
+$ /Users/danghica/.opam/default/bin/coqc --version
+The Coq Proof Assistant, version 8.20.1
+compiled with OCaml 5.4.0
+
+EXIT 0
+$ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /Users/danghica/pandian/work/specs/Validation.v
+
+EXIT 0
+$ /Users/danghica/.opam/default/bin/coqchk -silent -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker -norec Tracker.Validation
+
+EXIT 0
+$ /Users/danghica/.opam/default/bin/coqc -R /Users/danghica/pandian/theories cjr -Q /Users/danghica/pandian/tools/extraction/rocq cjr.examples -Q /Users/danghica/pandian/work/specs Tracker /var/folders/mq/rtbdtgcd44b6bxl9gmby_9xm0000gn/T/daily-rest-audit-fy_ydtiw/DailyRestAudit.v
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+Closed under the global context
+
+EXIT 0
