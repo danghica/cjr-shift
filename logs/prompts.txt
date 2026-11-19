@@ -1677,3 +1677,22 @@ Push to cjr-shift and cjr-core
 [2026-11-15T12:21:33+00:00]
 Yes to both 
 
+[2026-11-15T12:53:42+00:00]
+Add the ai generated explanation for cjr-shift where missing only 
+
+[2026-11-19T09:52:39+00:00]
+# Selected text:
+
+## Selection 1: /Users/danghica/pandian/work/specs/Validation.v (line 198)
+Lemma insufficient_daily_rest_returns_error st lower upper m p :
+
+
+## My request:
+create a markdown document summarising the discussion above regarding this lemma and the conclusions. 
+
+[2026-11-19T10:01:16+00:00]
+create a pdf
+
+[2026-11-19T10:56:11+00:00]
+add a GUI reference to the cjr-shift HTML documentation , including an architectural diagram clearly indicating the core, the ports and adaptors, and the bridging code with links into the Github repo to the relevant functions and classes. do not run the proof validations again. push to clr-shift on git
+

@@ -25,7 +25,7 @@ def package(destination):
     destination.mkdir(parents=True,exist_ok=True)
     # Explicit public allowlist: no stores, prompt logs, executables or credentials.
     sources=[]
-    for folder in ('work/docs','work/CLI/doc'):
+    for folder in ('work/docs','work/CLI/doc','work/UI/doc'):
         sources.extend(p for p in (ROOT/folder).rglob('*') if p.is_file() and p.suffix in ('.html','.css','.svg'))
     sources.extend(ROOT/p for p in ('work/specs/verification.json','work/code/test/test-results.json',
                                    'work/code/test/benchmark-results.json','work/CLI/example-working-time.json'))
@@ -40,6 +40,7 @@ body{font:17px/1.6 system-ui,sans-serif;max-width:700px;margin:8vh auto;padding:
 h1{line-height:1.2}a{color:#355840}li{margin:20px 0}small{color:#687762}
 </style><main><h1>cjr-shift documentation</h1><p>Shift tracker specifications and interface reference.</p>
 <ul><li><a href="work/docs/">Application documentation</a><br><small>Core specifications, correctness declarations and validation reports.</small></li>
+<li><a href="work/UI/doc/">GUI reference</a><br><small>Browser usage, persistence, ports, adapters and linked architecture.</small></li>
 <li><a href="work/CLI/doc/">CLI reference</a><br><small>Commands, working-time validation and architecture.</small></li></ul>
 <p><a href="https://cjr-shift-production.up.railway.app">Open the shift tracker</a> · <a href="https://github.com/danghica/cjr-shift">Source on GitHub</a></p></main></html>\n''',encoding='utf-8')
     pages={p.resolve():Links(p.read_text(encoding='utf-8')) for p in destination.rglob('*.html')}

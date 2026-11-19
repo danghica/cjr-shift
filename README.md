@@ -2,7 +2,8 @@
 
 [Documentation home](https://danghica.github.io/cjr-shift/) ·
 [Application docs](https://danghica.github.io/cjr-shift/work/docs/) ·
-[CLI reference](https://danghica.github.io/cjr-shift/work/CLI/doc/)
+[CLI reference](https://danghica.github.io/cjr-shift/work/CLI/doc/) ·
+[GUI reference](https://danghica.github.io/cjr-shift/work/UI/doc/)
 
 Local shift tracking with a browser UI, file-backed persistence, working-time
 settings and compliance reports backed by a verified CJR core.
